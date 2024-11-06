@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	// Pkg is the message package.
+	// Pkg is the jet package.
 	Pkg = slip.Package{
 		Name:      "jet",
 		Nicknames: []string{"jet"},

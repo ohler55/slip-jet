@@ -3,6 +3,8 @@
 package jet
 
 import (
+	"fmt"
+
 	"github.com/ohler55/slip"
 	"github.com/ohler55/slip/pkg/flavors"
 
@@ -15,7 +17,7 @@ var (
 )
 
 func defConsumer() {
-	consumerFlavor = flavors.DefFlavor("consumer",
+	consumerFlavor = flavors.DefFlavor("jet-consumer",
 		map[string]slip.Object{},
 		[]string{},
 		slip.List{
@@ -37,6 +39,14 @@ TBD
 		&Pkg,
 	)
 	consumerFlavor.DefMethod(":init", "", consumerInitCaller{})
+	// fetch
+	// fetch-bytes
+	// fetch-no-wait
+	// consume
+	// next
+	// info
+	// cache-info
+
 }
 
 type consumer struct {
@@ -52,6 +62,9 @@ func (caller consumerInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip
 	}
 	c := consumer{self: obj}
 	obj.Any = &c
+
+	fmt.Printf("*** init args: %s\n", args)
+	// TBD
 
 	return nil
 }

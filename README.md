@@ -17,8 +17,34 @@ implement an object based API for SLIP.
 --------
 Notes
 
+- for msg headers use assoc since values are []string
+
+- support make-instance for msg (PubMsg)
+
+- don't implement both client and stream APIs for pub sub, just stream
+- add publisher with save PublishOpts
+ - also tied to stream (but not subject?)
+ - tied to sync vs async
+ - publish just data abd form msg from that
+
+
 - flavors
  - jetstream
  - stream
  - consumer
+  - create from jetstream object or consumer :init
+   - jetstream follows api
+   - :init keep jetstream more "trim"
  - msg
+  - need to be able to create a message
+   - publish from jetstream
+  - test after jetstream can be created
+   - consumer needed as well
+
+- general, factory or make
+ - factory matches jetstream api
+ - make is maybe more lispy
+ - pick and approach and use it throughout
+ - if adding a new client
+  - factory requires support from the top and touches all
+  - make can make use of an alternate top or alternatives for testing

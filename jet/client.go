@@ -3,6 +3,8 @@
 package jet
 
 import (
+	"fmt"
+
 	"github.com/ohler55/slip"
 	"github.com/ohler55/slip/pkg/flavors"
 
@@ -11,11 +13,11 @@ import (
 )
 
 var (
-	jetstreamFlavor *flavors.Flavor
+	clientFlavor *flavors.Flavor
 )
 
 func defJetstream() {
-	jetstreamFlavor = flavors.DefFlavor("jetstream",
+	clientFlavor = flavors.DefFlavor("jet-client",
 		map[string]slip.Object{},
 		[]string{},
 		slip.List{
@@ -36,7 +38,8 @@ TBD
 		},
 		&Pkg,
 	)
-	jetstreamFlavor.DefMethod(":init", "", jetInitCaller{})
+	clientFlavor.DefMethod(":init", "", jetInitCaller{})
+	//
 }
 
 type jet struct {
@@ -52,6 +55,14 @@ func (caller jetInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Obje
 	}
 	js := jet{self: obj}
 	obj.Any = &js
+
+	fmt.Printf("*** init args: %s\n", args)
+	// TBD
+	// jetstream.New()
+	//  with domain or api prefix
+	//  with client trace
+	//  with async error handler
+	//  with async max pending
 
 	return nil
 }

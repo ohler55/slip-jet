@@ -3,6 +3,8 @@
 package jet
 
 import (
+	"fmt"
+
 	"github.com/ohler55/slip"
 	"github.com/ohler55/slip/pkg/flavors"
 
@@ -15,7 +17,7 @@ var (
 )
 
 func defStream() {
-	streamFlavor = flavors.DefFlavor("stream",
+	streamFlavor = flavors.DefFlavor("jet-stream",
 		map[string]slip.Object{},
 		[]string{},
 		slip.List{
@@ -37,6 +39,11 @@ TBD
 		&Pkg,
 	)
 	streamFlavor.DefMethod(":init", "", streamInitCaller{})
+	// info &key cached timeout ... other options
+	// purge &key timeout ... other options
+	// get-msg seq &key subject timeout ... other options
+	// delete-msg seq &key secure ... other options
+
 }
 
 type stream struct {
@@ -52,6 +59,9 @@ func (caller streamInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.O
 	}
 	st := stream{self: obj}
 	obj.Any = &st
+
+	fmt.Printf("*** init args: %s\n", args)
+	// TBD
 
 	return nil
 }
