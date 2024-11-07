@@ -3,13 +3,12 @@
 package jet_test
 
 import (
-	"net"
 	"os"
 	"testing"
 )
 
 var (
-	natsURL string
+// natsURL string
 )
 
 func TestMain(m *testing.M) {
@@ -66,16 +65,16 @@ func wrapRun(m *testing.M) (status int) {
 // 	return
 // }
 
-func availablePort() int {
-	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
-	if err != nil {
-		panic(err)
-	}
-	var listener *net.TCPListener
-	if listener, err = net.ListenTCP("tcp", addr); err != nil {
-		panic(err)
-	}
-	defer listener.Close()
+// func availablePort() int {
+// 	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	var listener *net.TCPListener
+// 	if listener, err = net.ListenTCP("tcp", addr); err != nil {
+// 		panic(err)
+// 	}
+// 	defer listener.Close()
 
-	return listener.Addr().(*net.TCPAddr).Port
-}
+// 	return listener.Addr().(*net.TCPAddr).Port
+// }

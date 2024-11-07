@@ -4,12 +4,15 @@ package jet
 
 import (
 	"context"
-	"fmt"
+	"strings"
 	"time"
 
+	"github.com/ohler55/ojg/oj"
 	"github.com/ohler55/slip"
+	"github.com/ohler55/slip/pkg/bag"
 	"github.com/ohler55/slip/pkg/flavors"
 
+	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 )
 
@@ -23,6 +26,13 @@ func defMsg() {
 		[]string{},
 		slip.List{
 			slip.List{
+				slip.Symbol(":init-keywords"),
+				slip.Symbol(":subject"),
+				slip.Symbol(":reply"),
+				slip.Symbol(":data"),
+				slip.Symbol(":headers"),
+			},
+			slip.List{
 				slip.Symbol(":documentation"),
 				slip.String(`
 Includes methods for accessing information in a message. Methods for ack and nak are also included.
@@ -32,7 +42,7 @@ Includes methods for accessing information in a message. Methods for ack and nak
 		},
 		&Pkg,
 	)
-	msgFlavor.GoMakeOnly = true
+	msgFlavor.DefMethod(":init", "", msgInitCaller(true))
 
 	msgFlavor.DefMethod(":consumer-sequence", "", msgConsumerSequenceCaller{})
 	flavors.FlosFun("jet-msg-consumer-sequence", ":consumer-sequence", msgConsumerSequenceCaller{}.Docs(), &Pkg)
@@ -67,6 +77,9 @@ Includes methods for accessing information in a message. Methods for ack and nak
 	msgFlavor.DefMethod(":subject", "", msgSubjectCaller{})
 	flavors.FlosFun("jet-msg-subject", ":subject", msgSubjectCaller{}.Docs(), &Pkg)
 
+	msgFlavor.DefMethod(":reply", "", msgReplyCaller{})
+	flavors.FlosFun("jet-msg-reply", ":reply", msgReplyCaller{}.Docs(), &Pkg)
+
 	msgFlavor.DefMethod(":ack", "", msgAckCaller{})
 	flavors.FlosFun("jet-msg-ack", ":ack", msgAckCaller{}.Docs(), &Pkg)
 
@@ -88,6 +101,60 @@ func MakeMsg(m jetstream.Msg) (inst *flavors.Instance) {
 	inst = msgFlavor.MakeInstance().(*flavors.Instance)
 	inst.Any = m
 	return
+}
+
+type msgInitCaller bool
+
+func (caller msgInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+	self := s.Get("self").(*flavors.Instance)
+	if 0 < len(args) {
+		args = args[0].(slip.List)
+	}
+	var pm PubMsg
+	for i := 0; i < len(args); i += 2 {
+		key, _ := args[i].(slip.Symbol)
+		k := string(key)
+		switch {
+		case strings.EqualFold(":subject", k):
+			pm.Subj = getStrArg(args[i+1], k)
+		case strings.EqualFold(":reply", k):
+			pm.Repl = getStrArg(args[i+1], k)
+		case strings.EqualFold(":headers", k):
+			pm.Head = assocToHeader(args[i+1], ":headers")
+		case strings.EqualFold(":data", k):
+			switch td := args[i+1].(type) {
+			case slip.Octets:
+				pm.Body = []byte(td)
+			case slip.String:
+				pm.Body = []byte(td)
+			case *flavors.Instance:
+				if td.Class() == bag.Flavor() {
+					pm.Body = []byte(oj.JSON(td.Any))
+				} else {
+					slip.PanicType(":data", td, "octets", "string", "bag instance")
+				}
+			default:
+				slip.PanicType(":data", args[i+1], "octets", "string", "bag instance")
+			}
+		}
+	}
+	if self.Any == nil {
+		self.Any = &pm
+	}
+	return nil
+}
+
+func (caller msgInitCaller) Docs() string {
+	return `__:init__ &key _subject_ _reply_ _data_ _headers_
+   _:subject_ [string] subject to publish the message on
+   _:reply_ [string] reply subject to set in the message
+   _:headers_ [assoc] an association list with the values as a list such as (("Something" "str1" "str2"))
+   _:data_ [octets|string|bag instance] the body or payload of the message. If a _bag_ instance then the
+content will be serialized into JSON.
+
+
+Sets the initial values when _make-instance_ is called.
+`
 }
 
 type msgConsumerSequenceCaller struct{}
@@ -260,17 +327,26 @@ Returns the data for a message.
 
 type msgHeadersCaller struct{}
 
-func (caller msgHeadersCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller msgHeadersCaller) Call(s *slip.Scope, args slip.List, _ int) (result slip.Object) {
 	self := s.Get("self").(*flavors.Instance)
-
 	headers := self.Any.(jetstream.Msg).Headers()
-	fmt.Printf("*** %v\n", headers)
-
-	return nil // TBD
+	if 0 < len(headers) {
+		list := make(slip.List, 0, len(headers))
+		for k, sa := range headers {
+			el := make(slip.List, len(sa)+1)
+			el[0] = slip.String(k)
+			for i, v := range sa {
+				el[i+1] = slip.String(v)
+			}
+			list = append(list, el)
+		}
+		result = list
+	}
+	return
 }
 
 func (caller msgHeadersCaller) Docs() string {
-	return `__:headers__ => _TBD_
+	return `__:headers__ => _list_
 
 
 Returns the headers for a message.
@@ -293,16 +369,34 @@ Returns the subject the message was published and received on.
 `
 }
 
+type msgReplyCaller struct{}
+
+func (caller msgReplyCaller) Call(s *slip.Scope, args slip.List, _ int) (result slip.Object) {
+	self := s.Get("self").(*flavors.Instance)
+	if 0 < len(self.Any.(jetstream.Msg).Reply()) {
+		result = slip.String(self.Any.(jetstream.Msg).Reply())
+	}
+	return
+}
+
+func (caller msgReplyCaller) Docs() string {
+	return `__:reply__ => _string_
+
+
+Returns the subject the message should reply on or _nil_ if none has been specified.
+`
+}
+
 type msgAckCaller struct{}
 
 func (caller msgAckCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.PanicMethodArgCount(self, ":ack", len(args), 0, 1)
+	flavors.CheckMethodArgCount(self, ":ack", len(args), 0, 2)
 	var (
 		timeout time.Duration
 		err     error
 	)
-	if v, has := slip.GetArgsKeyValue(args[1:], slip.Symbol(":timeout")); has {
+	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":timeout")); has {
 		if num, ok := v.(slip.Real); ok {
 			timeout = time.Duration(num.RealValue() * float64(time.Second))
 		} else {
@@ -324,8 +418,7 @@ func (caller msgAckCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Objec
 
 func (caller msgAckCaller) Docs() string {
 	return `__:ack__ &key _timeout_
-   _:timeout_ [real] the
-timeout in seconds.
+   _:timeout_ [real] the timeout in seconds.
 
 
 Ack the message which tells the server the message was processed successfully and
@@ -338,12 +431,12 @@ type msgNakCaller struct{}
 
 func (caller msgNakCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.PanicMethodArgCount(self, ":nak", len(args), 0, 1)
+	flavors.CheckMethodArgCount(self, ":nak", len(args), 0, 2)
 	var (
 		delay time.Duration
 		err   error
 	)
-	if v, has := slip.GetArgsKeyValue(args[1:], slip.Symbol(":delay")); has {
+	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":delay")); has {
 		if num, ok := v.(slip.Real); ok {
 			delay = time.Duration(num.RealValue() * float64(time.Second))
 		} else {
@@ -375,7 +468,6 @@ type msgInProgressCaller struct{}
 
 func (caller msgInProgressCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-
 	if err := self.Any.(jetstream.Msg).InProgress(); err != nil {
 		panic(err)
 	}
@@ -395,12 +487,10 @@ type msgTermCaller struct{}
 
 func (caller msgTermCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.PanicMethodArgCount(self, ":term", len(args), 0, 1)
-	var (
-		err    error
-		reason string
-	)
-	if 0 < len(reason) {
+	flavors.CheckMethodArgCount(self, ":term", len(args), 0, 1)
+	var err error
+	if 0 < len(args) {
+		reason := getStrArg(args[0], "reason")
 		err = self.Any.(jetstream.Msg).TermWithReason(reason)
 	} else {
 		err = self.Any.(jetstream.Msg).Term()
@@ -418,4 +508,42 @@ func (caller msgTermCaller) Docs() string {
 Term tells the server to not redeliver this message. If _reason_ is provided
 it is added to the server logs.
 `
+}
+
+func getStrArg(arg slip.Object, use string) string {
+	ss, ok := arg.(slip.String)
+	if !ok {
+		slip.PanicType(use, arg, "string")
+	}
+	return string(ss)
+}
+
+func assocToHeader(value slip.Object, field string) nats.Header {
+	alist, ok := value.(slip.List)
+	if !ok {
+		slip.PanicType(field, value, "assoc")
+	}
+	header := nats.Header{}
+	for _, element := range alist {
+		elist, ok2 := element.(slip.List)
+		if !ok2 || len(elist) < 2 {
+			slip.PanicType("assoc element", element, "list")
+		}
+		var (
+			key    slip.String
+			values []string
+		)
+		if key, ok = elist[0].(slip.String); !ok {
+			slip.PanicType("header key", elist[0], "string")
+		}
+		for _, v := range elist[1:] {
+			var ss slip.String
+			if ss, ok = v.(slip.String); !ok {
+				slip.PanicType("header value", v, "string")
+			}
+			values = append(values, string(ss))
+		}
+		header[string(key)] = values
+	}
+	return header
 }

@@ -17,12 +17,11 @@ implement an object based API for SLIP.
 --------
 Notes
 
-- for msg headers use assoc since values are []string
-
-- support make-instance for msg (PubMsg)
+- test
+ - start server on main_test
 
 - don't implement both client and stream APIs for pub sub, just stream
-- add publisher with save PublishOpts
+- add publisher with saved PublishOpts
  - also tied to stream (but not subject?)
  - tied to sync vs async
  - publish just data abd form msg from that

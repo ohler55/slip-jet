@@ -28,6 +28,7 @@ func TestMsgDocs(t *testing.T) {
 		":domain",
 		":headers",
 		":in-progress",
+		":init",
 		":nak",
 		":number-delivered",
 		":number-pending",
@@ -54,6 +55,10 @@ func TestMsgConsumerSequence(t *testing.T) {
 		Source: `(send msg :consumer-sequence)`,
 		Expect: `3`,
 	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :consumer-sequence)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
 }
 
 func TestMsgStreamSequence(t *testing.T) {
@@ -65,9 +70,13 @@ func TestMsgStreamSequence(t *testing.T) {
 		Source: `(send msg :stream-sequence)`,
 		Expect: `3`,
 	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :stream-sequence)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
 }
 
-func TestMsgMsgNumberDelivered(t *testing.T) {
+func TestMsgNumberDelivered(t *testing.T) {
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("msg"), jet.MakeMsg(&jet.PubMsg{Meta: &jetstream.MsgMetadata{NumDelivered: 7}}))
 	(&sliptest.Function{
@@ -75,9 +84,13 @@ func TestMsgMsgNumberDelivered(t *testing.T) {
 		Source: `(send msg :number-delivered)`,
 		Expect: `7`,
 	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :number-delivered)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
 }
 
-func TestMsgMsgNumberPending(t *testing.T) {
+func TestMsgNumberPending(t *testing.T) {
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("msg"), jet.MakeMsg(&jet.PubMsg{Meta: &jetstream.MsgMetadata{NumPending: 7}}))
 	(&sliptest.Function{
@@ -85,9 +98,13 @@ func TestMsgMsgNumberPending(t *testing.T) {
 		Source: `(send msg :number-pending)`,
 		Expect: `7`,
 	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :number-pending)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
 }
 
-func TestMsgMsgTimestamp(t *testing.T) {
+func TestMsgTimestamp(t *testing.T) {
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("msg"),
 		jet.MakeMsg(&jet.PubMsg{Meta: &jetstream.MsgMetadata{
@@ -98,9 +115,13 @@ func TestMsgMsgTimestamp(t *testing.T) {
 		Source: `(send msg :timestamp)`,
 		Expect: `@2024-11-11T13:37:01Z`,
 	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :timestamp)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
 }
 
-func TestMsgMsgStream(t *testing.T) {
+func TestMsgStream(t *testing.T) {
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("msg"), jet.MakeMsg(&jet.PubMsg{Meta: &jetstream.MsgMetadata{Stream: "river"}}))
 	(&sliptest.Function{
@@ -108,9 +129,13 @@ func TestMsgMsgStream(t *testing.T) {
 		Source: `(send msg :stream)`,
 		Expect: `"river"`,
 	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :stream)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
 }
 
-func TestMsgMsgConsumer(t *testing.T) {
+func TestMsgConsumer(t *testing.T) {
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("msg"), jet.MakeMsg(&jet.PubMsg{Meta: &jetstream.MsgMetadata{Consumer: "drinker"}}))
 	(&sliptest.Function{
@@ -118,14 +143,141 @@ func TestMsgMsgConsumer(t *testing.T) {
 		Source: `(send msg :consumer)`,
 		Expect: `"drinker"`,
 	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :consumer)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
 }
 
-func TestMsgMsgDomain(t *testing.T) {
+func TestMsgDomain(t *testing.T) {
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("msg"), jet.MakeMsg(&jet.PubMsg{Meta: &jetstream.MsgMetadata{Domain: "domino"}}))
 	(&sliptest.Function{
 		Scope:  scope,
 		Source: `(send msg :domain)`,
 		Expect: `"domino"`,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :domain)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestMsgSubject(t *testing.T) {
+	(&sliptest.Function{
+		Source: `(send (make-instance 'jet-msg :subject "sub.ject") :subject)`,
+		Expect: `"sub.ject"`,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(make-instance 'jet-msg :subject t)`,
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestMsgReply(t *testing.T) {
+	(&sliptest.Function{
+		Source: `(send (make-instance 'jet-msg :reply "re.ply") :reply)`,
+		Expect: `"re.ply"`,
+	}).Test(t)
+}
+
+func TestMsgHeaders(t *testing.T) {
+	(&sliptest.Function{
+		Source: `(send (make-instance 'jet-msg :headers '(("head" "str1" "str2"))) :headers)`,
+		Expect: `(("head" "str1" "str2"))`,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(make-instance 'jet-msg :headers t)`,
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(make-instance 'jet-msg :headers '(t))`,
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(make-instance 'jet-msg :headers '((t "x")))`,
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(make-instance 'jet-msg :headers '(("a" t)))`,
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestMsgData(t *testing.T) {
+	(&sliptest.Function{
+		Source: `(send (make-instance 'jet-msg :data "abc") :data)`,
+		Array:  true,
+		Expect: "#(97 98 99)",
+	}).Test(t)
+	(&sliptest.Function{
+		Source: `(send (make-instance 'jet-msg :data (coerce "abc" 'octets)) :data)`,
+		Array:  true,
+		Expect: "#(97 98 99)",
+	}).Test(t)
+	(&sliptest.Function{
+		Source: `(send (make-instance 'jet-msg :data (make-instance 'bag-flavor :parse "{a:1}")) :data)`,
+		Array:  true,
+		Expect: "#(123 34 97 34 58 49 125)",
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(make-instance 'jet-msg :data (make-instance 'vanilla-flavor))`,
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(make-instance 'jet-msg :data t)`,
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestMsgAck(t *testing.T) {
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :ack)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :ack :timeout 0.1)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :ack :timeout t)`,
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestMsgNak(t *testing.T) {
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :nak)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :nak :delay 0.1)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :nak :delay t)`,
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestMsgInProgress(t *testing.T) {
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :in-progress)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestMsgTerm(t *testing.T) {
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :term)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :term "because")`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    `(send (make-instance 'jet-msg) :term t)`,
+		PanicType: slip.TypeErrorSymbol,
 	}).Test(t)
 }
