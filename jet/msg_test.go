@@ -231,9 +231,12 @@ func TestMsgData(t *testing.T) {
 }
 
 func TestMsgAck(t *testing.T) {
+	scope := slip.NewScope()
+	scope.Let(slip.Symbol("msg"), jet.MakeMsg(&jet.PubMsg{Meta: &jetstream.MsgMetadata{}}))
 	(&sliptest.Function{
-		Source:    `(send (make-instance 'jet-msg) :ack)`,
-		PanicType: slip.ErrorSymbol,
+		Scope:  scope,
+		Source: `(send msg :ack)`,
+		Expect: "nil",
 	}).Test(t)
 	(&sliptest.Function{
 		Source:    `(send (make-instance 'jet-msg) :ack :timeout 0.1)`,
@@ -246,6 +249,13 @@ func TestMsgAck(t *testing.T) {
 }
 
 func TestMsgNak(t *testing.T) {
+	scope := slip.NewScope()
+	scope.Let(slip.Symbol("msg"), jet.MakeMsg(&jet.PubMsg{Meta: &jetstream.MsgMetadata{}}))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send msg :nak)`,
+		Expect: "nil",
+	}).Test(t)
 	(&sliptest.Function{
 		Source:    `(send (make-instance 'jet-msg) :nak)`,
 		PanicType: slip.ErrorSymbol,
@@ -261,6 +271,13 @@ func TestMsgNak(t *testing.T) {
 }
 
 func TestMsgInProgress(t *testing.T) {
+	scope := slip.NewScope()
+	scope.Let(slip.Symbol("msg"), jet.MakeMsg(&jet.PubMsg{Meta: &jetstream.MsgMetadata{}}))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send msg :in-progress)`,
+		Expect: "nil",
+	}).Test(t)
 	(&sliptest.Function{
 		Source:    `(send (make-instance 'jet-msg) :in-progress)`,
 		PanicType: slip.ErrorSymbol,
@@ -268,6 +285,13 @@ func TestMsgInProgress(t *testing.T) {
 }
 
 func TestMsgTerm(t *testing.T) {
+	scope := slip.NewScope()
+	scope.Let(slip.Symbol("msg"), jet.MakeMsg(&jet.PubMsg{Meta: &jetstream.MsgMetadata{}}))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send msg :term)`,
+		Expect: "nil",
+	}).Test(t)
 	(&sliptest.Function{
 		Source:    `(send (make-instance 'jet-msg) :term)`,
 		PanicType: slip.ErrorSymbol,

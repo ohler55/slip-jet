@@ -54,42 +54,63 @@ func (pm *PubMsg) Reply() string {
 
 // Ack will always return an error since the message was not received and
 // hence has nowhere to send the ack to.
-func (pm *PubMsg) Ack() error {
-	return fmt.Errorf("can not ACK an unpublished message")
+func (pm *PubMsg) Ack() (err error) {
+	if pm.Meta == nil {
+		err = fmt.Errorf("can not ACK an unpublished message")
+	}
+	return
 }
 
 // DoubleAck will always return an error since the message was not received
 // and hence has nowhere to send the ack to.
-func (pm *PubMsg) DoubleAck(_ context.Context) error {
-	return fmt.Errorf("can not ACK an unpublished message")
+func (pm *PubMsg) DoubleAck(_ context.Context) (err error) {
+	if pm.Meta == nil {
+		err = fmt.Errorf("can not ACK an unpublished message")
+	}
+	return
 }
 
 // Nak will always return an error since the message was not received and
 // hence has nowhere to send the NAK to.
-func (pm *PubMsg) Nak() error {
-	return fmt.Errorf("can not NAK an unpublished message")
+func (pm *PubMsg) Nak() (err error) {
+	if pm.Meta == nil {
+		err = fmt.Errorf("can not NAK an unpublished message")
+	}
+	return
 }
 
 // NakWithDelay will always return an error since the message was not received
 // and hence has nowhere to send the NAK to.
-func (pm *PubMsg) NakWithDelay(delay time.Duration) error {
-	return fmt.Errorf("can not NAK an unpublished message")
+func (pm *PubMsg) NakWithDelay(delay time.Duration) (err error) {
+	if pm.Meta == nil {
+		err = fmt.Errorf("can not NAK an unpublished message")
+	}
+	return
 }
 
 // InProgress will always return an error since the message was not received
 // so can not be in progress.
-func (pm *PubMsg) InProgress() error {
-	return fmt.Errorf("can not indicate an unpublished message is in-progress")
+func (pm *PubMsg) InProgress() (err error) {
+	if pm.Meta == nil {
+		err = fmt.Errorf("can not indicate an unpublished message is in-progress")
+	}
+	return
 }
 
 // Term will always return an error since the message was not received
 // so can not be terminated.
-func (pm *PubMsg) Term() error {
-	return fmt.Errorf("can not terminate an unpublished message")
+func (pm *PubMsg) Term() (err error) {
+	if pm.Meta == nil {
+		err = fmt.Errorf("can not terminate an unpublished message")
+	}
+	return
 }
 
 // Term will always return an error since the message was not received
 // so can not be terminated.
-func (pm *PubMsg) TermWithReason(reason string) error {
-	return fmt.Errorf("can not terminate an unpublished message")
+func (pm *PubMsg) TermWithReason(reason string) (err error) {
+	if pm.Meta == nil {
+		err = fmt.Errorf("can not terminate an unpublished message")
+	}
+	return
 }
