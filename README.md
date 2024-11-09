@@ -17,8 +17,20 @@ implement an object based API for SLIP.
 --------
 Notes
 
-- test
- - start server on main_test
+- create client
+ - connect function called by jet-connect and make-instance
+ - create nats.Conn first or accept an instance with .Any as a nats.Conn
+  - nats.Connect
+   - all Option fields
+
+ - StreamConsumerManager
+ - StreamManager
+ - AccountInfo
+  - auth
+   - support and test auth
+    - users, accounts, nkeys, username, password
+
+
 
 - don't implement both client and stream APIs for pub sub, just stream
 - add publisher with saved PublishOpts

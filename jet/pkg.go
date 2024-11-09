@@ -18,13 +18,15 @@ var (
 
 func init() {
 	Pkg.Initialize(map[string]*slip.VarVal{})
-	defJetstream()
+	defClient()
 	defStream()
 	defConsumer()
 	defMsg()
 
+	initConnect()
+
 	slip.DefConstant(slip.Symbol("*jet*"), &Pkg, "")
-	Pkg.Initialize(nil, &jet{}) // lock
+	Pkg.Initialize(nil, &PubMsg{}) // lock
 	slip.AddPackage(&Pkg)
 	slip.UserPkg.Use(&Pkg)
 }
