@@ -18,10 +18,8 @@ implement an object based API for SLIP.
 Notes
 
 - create client
- - connect function called by jet-connect and make-instance
- - create nats.Conn first or accept an instance with .Any as a nats.Conn
-  - nats.Connect
-   - all Option fields
+ - test basic then add close
+- jet-client-close and :close - close nc and set to nil
 
  - StreamConsumerManager
  - StreamManager
