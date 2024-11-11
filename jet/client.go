@@ -25,10 +25,7 @@ func defClient() {
 		slip.List{
 			slip.List{
 				slip.Symbol(":documentation"),
-				slip.String(`
-TBD
-
-`),
+				slip.String(`Is a connection to a NATS JetStream server.`),
 			},
 			keywords,
 		},
@@ -36,8 +33,8 @@ TBD
 	)
 	clientFlavor.DefMethod(":init", "", clientInitCaller{})
 
-	// clientFlavor.DefMethod(":close", "", clientCloseCaller{})
-	// flavors.FlosFun("jet-client-close", ":close", clientCloseCaller{}.Docs(), &Pkg)
+	clientFlavor.DefMethod(":close", "", clientCloseCaller{})
+	flavors.FlosFun("jet-client-close", ":close", clientCloseCaller{}.Docs(), &Pkg)
 
 	// TBD
 }

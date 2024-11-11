@@ -10,53 +10,44 @@ import (
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 	"github.com/ohler55/slip"
+	"github.com/ohler55/slip/pkg/cl"
 	"github.com/ohler55/slip/pkg/flavors"
 )
 
 // TBD maybe one map for args, docs, and eval
 type conOpt struct {
-	doc  *slip.DocArg
-	opt  func(v slip.Object) nats.Option
-	jopt func(v slip.Object) jetstream.JetStreamOpt
+	doc    *slip.DocArg
+	update func(options *nats.Options, s *slip.Scope, v slip.Object)
+	jopt   func(s *slip.Scope, v slip.Object) jetstream.JetStreamOpt
 }
 
 var conOptMap = map[string]*conOpt{
-	":client-cert": {
+	":closed-callback": {
 		doc: &slip.DocArg{
-			Name: "client-cert",
-			Type: "list",
-			Text: `a helper option to provide the client certificate from a file.
-If Secure is not already set this will set it as well. The list must be a list of cert filename followed
-by the key filename.`,
+			Name: "closed-callback",
+			Type: "function",
+			Text: `Sets the closed-callback.`,
 		},
-		opt: func(v slip.Object) (opt nats.Option) {
-			if list, ok := v.(slip.List); ok && len(list) == 2 {
-				cert, _ := list[0].(slip.String)
-				key, _ := list[1].(slip.String)
-				if 0 < len(cert) && 0 < len(key) {
-					opt = nats.ClientCert(string(cert), string(key))
-				}
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			caller := cl.ResolveToCaller(s, v, 0)
+			options.ClosedCB = func(c *nats.Conn) {
+				self := s.Get("self").(*flavors.Instance)
+				caller.Call(s, slip.List{self}, 0)
 			}
-			if opt == nil {
-				slip.PanicType(":client-cert", v, "list of cert and key filenames")
-			}
-			return
 		},
 	},
-	// TBD others
 	":timeout": {
 		doc: &slip.DocArg{
 			Name: "timeout",
 			Type: "real",
 			Text: "the number of seconds to wait before timing out on the connection attempt.",
 		},
-		opt: func(v slip.Object) (opt nats.Option) {
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
 			if num, ok := v.(slip.Real); ok {
-				opt = nats.Timeout(time.Duration(float64(time.Second) * num.RealValue()))
+				options.Timeout = time.Duration(float64(time.Second) * num.RealValue())
 			} else {
 				slip.PanicType(":timeout", v, "real")
 			}
-			return
 		},
 	},
 	":url": {
@@ -65,7 +56,68 @@ by the key filename.`,
 			Type: "string",
 			Text: `URL of the jetstream server to connect to.`,
 		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			if ss, ok := v.(slip.String); ok {
+				options.Url = string(ss)
+			} else {
+				slip.PanicType(":url", v, "string")
+			}
+		},
 	},
+	// TBD
+	// AllowReconnect bool
+	// AsyncErrorCB ErrHandler
+	// ClosedCB ConnHandler
+	// Compression bool
+	// ConnectedCB ConnHandler
+	// CustomDialer CustomDialer
+	// CustomReconnectDelayCB ReconnectDelayHandler
+	// Dialer *net.Dialer
+	// DisconnectedCB ConnHandler
+	// DisconnectedErrCB ConnErrHandler
+	// DiscoveredServersCB ConnHandler
+	// DrainTimeout time.Duration
+	// FlusherTimeout time.Duration
+	// IgnoreAuthErrorAbort bool
+	// InProcessServer InProcessConnProvider
+	// InboxPrefix string
+	// LameDuckModeHandler ConnHandler
+	// MaxPingsOut int
+	// MaxReconnect int
+	// Name string
+	// Nkey string
+	// NoCallbacksAfterClientClose bool
+	// NoEcho bool
+	// NoRandomize bool
+	// Password string
+	// Pedantic bool
+	// PingInterval time.Duration
+	// ProxyPath string
+	// ReconnectBufSize int
+	// ReconnectJitter time.Duration
+	// ReconnectJitterTLS time.Duration
+	// ReconnectWait time.Duration
+	// ReconnectedCB ConnHandler
+	// RetryOnFailedConnect bool
+	// RootCAsCB RootCAsHandler
+	// Secure bool
+	// Servers []string
+	// SignatureCB SignatureHandler
+	// SkipHostLookup bool
+	// SubChanLen int
+	// TLSCertCB TLSCertHandler
+	// TLSConfig *tls.Config
+	// TLSHandshakeFirst bool
+	// Timeout time.Duration
+	// Token string
+	// TokenHandler AuthTokenHandler
+	// UseOldRequestStyle bool
+	// User string
+	// UserJWT UserJWTHandler
+	// Verbose bool
+
+	// TBD js options
+	//
 }
 
 func initConnect() {
@@ -116,30 +168,22 @@ func (caller clientInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.O
 	if 0 < len(args) {
 		args = args[0].(slip.List)
 	}
-	nurl := nats.DefaultURL
+	// nurl := nats.DefaultURL
 	var (
-		opts   []nats.Option
-		jopts  []jetstream.JetStreamOpt
-		prefix string
+		jopts   []jetstream.JetStreamOpt
+		prefix  string
+		options nats.Options
 	)
 	for i := 0; i < len(args)-1; i += 2 {
 		if sym, ok := args[i].(slip.Symbol); ok {
 			key := strings.ToLower(string(sym))
 			co := conOptMap[key]
 			switch {
-			case co.opt != nil:
-				if opt := co.opt(args[i+1]); opt != nil {
-					opts = append(opts, opt)
-				}
+			case co.update != nil:
+				co.update(&options, s, args[i+1])
 			case co.jopt != nil:
-				if opt := co.jopt(args[i+1]); opt != nil {
+				if opt := co.jopt(s, args[i+1]); opt != nil {
 					jopts = append(jopts, opt)
-				}
-			case key == ":url":
-				if ss, ok := args[i+1].(slip.String); ok {
-					nurl = string(ss)
-				} else {
-					slip.PanicType(":url", args[i+1], "string")
 				}
 			case key == ":prefix":
 				if ss, ok := args[i+1].(slip.String); ok {
@@ -157,7 +201,9 @@ func (caller clientInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.O
 		cl  client
 		err error
 	)
-	if cl.nc, err = nats.Connect(nurl, opts...); err == nil {
+	// TBD connect with options.Connect
+	if cl.nc, err = options.Connect(); err == nil {
+		// if cl.nc, err = nats.Connect(nurl, opts...); err == nil {
 		if 0 < len(prefix) {
 			cl.js, err = jetstream.NewWithAPIPrefix(cl.nc, prefix, jopts...)
 		} else {

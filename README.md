@@ -18,8 +18,9 @@ implement an object based API for SLIP.
 Notes
 
 - create client
- - test basic then add close
-- jet-client-close and :close - close nc and set to nil
+ - add all options
+ - get for nats option, use for testing as well
+  - return assoc with init keywords as keys
 
  - StreamConsumerManager
  - StreamManager
