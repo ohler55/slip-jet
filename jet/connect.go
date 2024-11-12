@@ -14,7 +14,6 @@ import (
 	"github.com/ohler55/slip/pkg/flavors"
 )
 
-// TBD maybe one map for args, docs, and eval
 type conOpt struct {
 	doc    *slip.DocArg
 	update func(options *nats.Options, s *slip.Scope, v slip.Object)
@@ -22,6 +21,31 @@ type conOpt struct {
 }
 
 var conOptMap = map[string]*conOpt{
+	":allow-reconnect": {
+		doc: &slip.DocArg{
+			Name: "allow-reconnect",
+			Type: "boolean",
+			Text: `Enables reconnection logic to be used when we encounter a disconnect from the current server.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			options.AllowReconnect = (v != nil)
+		},
+	},
+	":async-error-callback": {
+		doc: &slip.DocArg{
+			Name: "async-error-callback",
+			Type: "function",
+			Text: `Sets the async-error-callback.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			caller := cl.ResolveToCaller(s, v, 0)
+			options.AsyncErrorCB = func(c *nats.Conn, sub *nats.Subscription, err error) {
+				self := s.Get("self").(*flavors.Instance)
+				// TBD add subscription arg
+				caller.Call(s, slip.List{self, nil, slip.NewError("%s", err)}, 0)
+			}
+		},
+	},
 	":closed-callback": {
 		doc: &slip.DocArg{
 			Name: "closed-callback",
@@ -31,6 +55,31 @@ var conOptMap = map[string]*conOpt{
 		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
 			caller := cl.ResolveToCaller(s, v, 0)
 			options.ClosedCB = func(c *nats.Conn) {
+				self := s.Get("self").(*flavors.Instance)
+				caller.Call(s, slip.List{self}, 0)
+			}
+		},
+	},
+	":compression": {
+		doc: &slip.DocArg{
+			Name: "compression",
+			Type: "boolean",
+			Text: `For websocket connections, indicates to the server that the connection
+supports compression. If the server does too, then data will be compressed.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			options.Compression = (v != nil)
+		},
+	},
+	":connected-callback": {
+		doc: &slip.DocArg{
+			Name: "connected-callback",
+			Type: "function",
+			Text: `Sets the connected-callback.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			caller := cl.ResolveToCaller(s, v, 0)
+			options.ConnectedCB = func(c *nats.Conn) {
 				self := s.Get("self").(*flavors.Instance)
 				caller.Call(s, slip.List{self}, 0)
 			}
@@ -65,12 +114,7 @@ var conOptMap = map[string]*conOpt{
 		},
 	},
 	// TBD
-	// AllowReconnect bool
-	// AsyncErrorCB ErrHandler
-	// ClosedCB ConnHandler
-	// Compression bool
-	// ConnectedCB ConnHandler
-	// CustomDialer CustomDialer
+	// CustomDialer CustomDialer - maybe not supporter here
 	// CustomReconnectDelayCB ReconnectDelayHandler
 	// Dialer *net.Dialer
 	// DisconnectedCB ConnHandler
