@@ -18,6 +18,16 @@ func TestClientConnectBasic(t *testing.T) {
 	}).Test(t)
 }
 
+func TestClientConnectAllowReconnect(t *testing.T) {
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :allow-reconnect t))
+                                    (value (get (send js :options) :allow-reconnect)))
+                              (send js :close)
+                              value)`, natsURL),
+		Expect: "t",
+	}).Test(t)
+}
+
 func TestClientConnectClosedHandler(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((cc (make-channel 2))

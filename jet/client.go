@@ -36,10 +36,14 @@ func defClient() {
 	clientFlavor.DefMethod(":close", "", clientCloseCaller{})
 	flavors.FlosFun("jet-client-close", ":close", clientCloseCaller{}.Docs(), &Pkg)
 
+	clientFlavor.DefMethod(":options", "", clientOptionsCaller{})
+	flavors.FlosFun("jet-client-options", ":options", clientOptionsCaller{}.Docs(), &Pkg)
+
 	// TBD
 }
 
 type client struct {
-	nc *nats.Conn
-	js jetstream.JetStream
+	nc      *nats.Conn
+	js      jetstream.JetStream
+	options slip.List
 }

@@ -152,7 +152,6 @@ supports compression. If the server does too, then data will be compressed.`,
 	// TLSCertCB TLSCertHandler
 	// TLSConfig *tls.Config
 	// TLSHandshakeFirst bool
-	// Timeout time.Duration
 	// Token string
 	// TokenHandler AuthTokenHandler
 	// UseOldRequestStyle bool
@@ -212,7 +211,6 @@ func (caller clientInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.O
 	if 0 < len(args) {
 		args = args[0].(slip.List)
 	}
-	// nurl := nats.DefaultURL
 	var (
 		jopts   []jetstream.JetStreamOpt
 		prefix  string
@@ -245,9 +243,7 @@ func (caller clientInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.O
 		cl  client
 		err error
 	)
-	// TBD connect with options.Connect
 	if cl.nc, err = options.Connect(); err == nil {
-		// if cl.nc, err = nats.Connect(nurl, opts...); err == nil {
 		if 0 < len(prefix) {
 			cl.js, err = jetstream.NewWithAPIPrefix(cl.nc, prefix, jopts...)
 		} else {
@@ -257,6 +253,7 @@ func (caller clientInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.O
 	if err != nil {
 		panic(err)
 	}
+	cl.options = args
 	self.Any = &cl
 
 	return nil
