@@ -17,6 +17,11 @@ implement an object based API for SLIP.
 --------
 Notes
 
+- client :options
+ - compare nats options to proplist
+  - booleans are t and nil
+  - functions are either nil or the set original value
+
 - create client
  - add all options
  - get for nats option, use for testing as well
