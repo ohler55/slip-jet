@@ -21,17 +21,17 @@ func (caller clientOptionsCaller) Call(s *slip.Scope, args slip.List, _ int) sli
 		options = caller.appendFunc(options, ":closed-callback", cl.nc.Opts.ClosedCB, cl.options)
 		options = caller.appendBool(options, ":compression", cl.nc.Opts.Compression)
 		options = caller.appendFunc(options, ":connected-callback", cl.nc.Opts.ConnectedCB, cl.options)
-		// CustomDialer CustomDialer - TBD maybe not supporter here
+		// CustomDialer, a CustomDialer not supported yet
 		options = caller.appendFunc(options, ":custom-reconnect-delay-callback",
 			cl.nc.Opts.CustomReconnectDelayCB, cl.options)
-		// Dialer *net.Dialer - TBD an object
+		// Dialer, a *net.Dialer not supported yet
 		options = caller.appendFunc(options, ":disconnected-callback", cl.nc.Opts.DisconnectedCB, cl.options)
 		options = caller.appendFunc(options, ":disconnected-error-callback", cl.nc.Opts.DisconnectedErrCB, cl.options)
 		options = caller.appendFunc(options, ":discovered-servers-callback", cl.nc.Opts.DiscoveredServersCB, cl.options)
 		options = append(options, slip.Symbol(":drain-timeout"), slip.DoubleFloat(cl.nc.Opts.DrainTimeout))
 		options = append(options, slip.Symbol(":flusher-timeout"), slip.DoubleFloat(cl.nc.Opts.FlusherTimeout))
 		options = caller.appendBool(options, ":ignore-auth-error-abort", cl.nc.Opts.IgnoreAuthErrorAbort)
-		// InProcessServer InProcessConnProvider - TBD it's an object
+		// InProcessServer, a InProcessConnProvider not supported yet
 		options = caller.appendString(options, ":inbox-prefix", cl.nc.Opts.InboxPrefix)
 		options = caller.appendFunc(options, ":lame-duck-mode-handler", cl.nc.Opts.LameDuckModeHandler, cl.options)
 		options = append(options, slip.Symbol(":max-pings-out"), slip.Fixnum(cl.nc.Opts.MaxPingsOut))
@@ -59,7 +59,7 @@ func (caller clientOptionsCaller) Call(s *slip.Scope, args slip.List, _ int) sli
 		options = append(options, slip.Symbol(":sub-chan-len"), slip.Fixnum(cl.nc.Opts.SubChanLen))
 		options = append(options, slip.Symbol(":timeout"), slip.DoubleFloat(cl.nc.Opts.Timeout))
 		options = caller.appendFunc(options, ":tls-cert-callback", cl.nc.Opts.TLSCertCB, cl.options)
-		// TLSConfig *tls.Config - TBD
+		// TLSConfig, a *tls.Config not supported yet
 		options = caller.appendBool(options, ":tls-handshake-first", cl.nc.Opts.TLSHandshakeFirst)
 		options = caller.appendString(options, ":token", cl.nc.Opts.Token)
 		options = caller.appendFunc(options, ":token-handler", cl.nc.Opts.TokenHandler, cl.options)
@@ -68,6 +68,8 @@ func (caller clientOptionsCaller) Call(s *slip.Scope, args slip.List, _ int) sli
 		options = caller.appendString(options, ":user", cl.nc.Opts.User)
 		options = caller.appendFunc(options, ":user-jwt", cl.nc.Opts.UserJWT, cl.options)
 		options = caller.appendBool(options, ":verbose", cl.nc.Opts.Verbose)
+
+		// TBD add jetstream options
 
 		return options
 	}
