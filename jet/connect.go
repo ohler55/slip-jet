@@ -3,6 +3,7 @@
 package jet
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 	"time"
@@ -465,13 +466,104 @@ the connection is successfully reconnected.`,
 			}
 		},
 	},
-	// RetryOnFailedConnect bool
-	// RootCAsCB RootCAsHandler
-	// Secure bool
-	// Servers []string
-	// SignatureCB SignatureHandler
-	// SkipHostLookup bool
-	// SubChanLen int
+	":retry-on-failed-connect": {
+		doc: &slip.DocArg{
+			Name: "retry-on-failed-connect",
+			Type: "boolean",
+			Text: `Sets the connection in reconnecting state right
+away if it can't connect to a server in the initial set. The
+MaxReconnect and ReconnectWait options are used for this process,
+similarly to when an established connection is disconnected.
+If a ReconnectHandler is set, it will be invoked on the first
+successful reconnect attempt (if the initial connect fails),
+and if a ClosedHandler is set, it will be invoked if
+it fails to connect (after exhausting the MaxReconnect attempts).`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			options.RetryOnFailedConnect = (v != nil)
+		},
+	},
+	// RootCAsCB, a RootCAsHandler not supported yet
+	":secure": {
+		doc: &slip.DocArg{
+			Name: "secure",
+			Type: "boolean",
+			Text: `Enables TLS secure connections that skip server
+verification by default. NOT RECOMMENDED.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			options.Secure = (v != nil)
+		},
+	},
+	":servers": {
+		doc: &slip.DocArg{
+			Name: "servers",
+			Type: "list",
+			Text: `A configured set of servers which this client will use when attempting to connect.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			if list, ok := v.(slip.List); ok {
+				options.Servers = make([]string, len(list))
+				for i, val := range list {
+					if ss, ok := val.(slip.String); ok {
+						options.Servers[i] = string(ss)
+					} else {
+						slip.PanicType(":servers", v, "list of strings")
+					}
+				}
+			} else {
+				slip.PanicType(":servers", v, "list of strings")
+			}
+		},
+	},
+	":signature-callback": {
+		doc: &slip.DocArg{
+			Name: "signature-callback",
+			Type: "function",
+			Text: `Designates the function used to sign the nonce
+presented from the server.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			caller := cl.ResolveToCaller(s, v, 0)
+			options.SignatureCB = func(b []byte) (out []byte, err error) {
+				defer func() {
+					if rec := recover(); rec != nil {
+						err = fmt.Errorf("signature-callback failed: %s", rec)
+					}
+				}()
+				out = []byte(caller.Call(s, slip.List{slip.Octets(b)}, 0).(slip.Octets))
+				return
+			}
+		},
+	},
+	":skip-host-lookup": {
+		doc: &slip.DocArg{
+			Name: "skip-host-lookup",
+			Type: "boolean",
+			Text: `Skips the DNS lookup for the server hostname.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			options.SkipHostLookup = (v != nil)
+		},
+	},
+	":sub-chan-len": {
+		doc: &slip.DocArg{
+			Name: "sub-chan-len",
+			Type: "string",
+			Text: `The size of the buffered channel used between the socket
+Go routine and the message delivery for SyncSubscriptions.
+_NOTE: This does not affect AsyncSubscriptions which are
+dictated by pending limits._
+Defaults to 65536.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			if num, ok := v.(slip.Fixnum); ok {
+				options.SubChanLen = int(num)
+			} else {
+				slip.PanicType(":sub-chan-len", v, "fixnum")
+			}
+		},
+	},
 	":timeout": {
 		doc: &slip.DocArg{
 			Name: "timeout",
@@ -486,11 +578,49 @@ the connection is successfully reconnected.`,
 			}
 		},
 	},
-	// TLSCertCB TLSCertHandler
-	// TLSConfig *tls.Config
-	// TLSHandshakeFirst bool
-	// Token string
-	// TokenHandler AuthTokenHandler
+	// TLSCertCB, a TLSCertHandler not supported yet
+	// TLSConfig, a *tls.Config not supported yet
+	":tls-handshake-first": {
+		doc: &slip.DocArg{
+			Name: "tls-handshake-first",
+			Type: "boolean",
+			Text: `Used to instruct the library perform
+the TLS handshake right after the connect and before receiving
+the INFO protocol from the server. If this option is enabled
+but the server is not configured to perform the TLS handshake
+first, the connection will fail.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			options.TLSHandshakeFirst = (v != nil)
+		},
+	},
+	":token": {
+		doc: &slip.DocArg{
+			Name: "token",
+			Type: "string",
+			Text: `Sets the token to be used when connecting to a server.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			if ss, ok := v.(slip.String); ok {
+				options.Token = string(ss)
+			} else {
+				slip.PanicType(":token", v, "string")
+			}
+		},
+	},
+	":token-handler": {
+		doc: &slip.DocArg{
+			Name: "token-handler",
+			Type: "function",
+			Text: `Designates the function used to generate the token to be used when connecting to a server.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			caller := cl.ResolveToCaller(s, v, 0)
+			options.TokenHandler = func() string {
+				return string(caller.Call(s, slip.List{}, 0).(slip.String))
+			}
+		},
+	},
 	":url": {
 		doc: &slip.DocArg{
 			Name: "url",
@@ -505,13 +635,135 @@ the connection is successfully reconnected.`,
 			}
 		},
 	},
-	// UseOldRequestStyle bool
-	// User string
-	// UserJWT UserJWTHandler
-	// Verbose bool
+	":use-old-request-style": {
+		doc: &slip.DocArg{
+			Name: "use-old-request-style",
+			Type: "boolean",
+			Text: `Forces the old method of Requests that utilize
+a new Inbox and a new Subscription for each request.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			options.UseOldRequestStyle = (v != nil)
+		},
+	},
+	":user": {
+		doc: &slip.DocArg{
+			Name: "user",
+			Type: "string",
+			Text: `Sets the username to be used when connecting to the server.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			if ss, ok := v.(slip.String); ok {
+				options.User = string(ss)
+			} else {
+				slip.PanicType(":user", v, "string")
+			}
+		},
+	},
+	":user-jwt": {
+		doc: &slip.DocArg{
+			Name: "user-jwt",
+			Type: "function",
+			Text: `sets the callback handler that will fetch a user's JWT.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			caller := cl.ResolveToCaller(s, v, 0)
+			options.UserJWT = func() (jwt string, err error) {
+				defer func() {
+					if rec := recover(); rec != nil {
+						err = fmt.Errorf("user-jwt failed: %s", rec)
+					}
+				}()
+				jwt = string(caller.Call(s, slip.List{}, 0).(slip.String))
+				return
+			}
+		},
+	},
+	":verbose": {
+		doc: &slip.DocArg{
+			Name: "verbose",
+			Type: "boolean",
+			Text: `Signals the server to send an OK ack for commands
+successfully processed by the server.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			options.Verbose = (v != nil)
+		},
+	},
+	// jetstream options
+	":trace": {
+		doc: &slip.DocArg{
+			Name: "trace",
+			Type: "list",
+			Text: `Enables request/response API calls tracing. A list of two functions is expected.
+The first is called when a request is sent and will be called with a subject string and payload as
+octets. The second is called when a response is received and will be called with a subject string,
+payload as octets, and a header as an association list.`,
+		},
+		jopt: func(s *slip.Scope, v slip.Object) jetstream.JetStreamOpt {
+			list, ok := v.(slip.List)
+			if !ok {
+				slip.PanicType(":trace", v, "list of two functions")
+			}
+			sentCaller := cl.ResolveToCaller(s, list[0], 0)
+			recvCaller := cl.ResolveToCaller(s, list[1], 0)
+			ct := jetstream.ClientTrace{
+				RequestSent: func(subj string, payload []byte) {
+					sentCaller.Call(s, slip.List{slip.String(subj), slip.Octets(payload)}, 0)
+				},
+				ResponseReceived: func(subj string, payload []byte, hdr nats.Header) {
+					headers := make(slip.List, 0, len(hdr))
+					for k, sa := range hdr {
+						el := make(slip.List, len(sa)+1)
+						el[0] = slip.String(k)
+						for i, v := range sa {
+							el[i+1] = slip.String(v)
+						}
+						headers = append(headers, el)
+					}
+					recvCaller.Call(s, slip.List{slip.String(subj), slip.Octets(payload), headers}, 0)
+				},
+			}
+			return jetstream.WithClientTrace(&ct)
+		},
+	},
+	":publish-async-error-handler": {
+		doc: &slip.DocArg{
+			Name: "publish-async-error-handler",
+			Type: "function",
+			Text: ``,
+		},
+		jopt: func(s *slip.Scope, v slip.Object) jetstream.JetStreamOpt {
+			caller := cl.ResolveToCaller(s, v, 0)
+			return jetstream.WithPublishAsyncErrHandler(
+				func(js jetstream.JetStream, nm *nats.Msg, err error) {
+					self := s.Get("self").(*flavors.Instance)
+					// TBD verify js matches self.Any.js
+					pm := PubMsg{
+						Subj: nm.Subject,
+						Repl: nm.Reply,
+						Body: nm.Data,
+						Head: nm.Header,
+					}
+					caller.Call(s, slip.List{self, MakeMsg(&pm), slip.NewError("%s", err)}, 0)
 
-	// TBD js options
-	//
+				})
+		},
+	},
+	":publish-async-max-pending": {
+		doc: &slip.DocArg{
+			Name: "publish-async-max-pending",
+			Type: "fixnum",
+			Text: `Sets the maximum outstanding async publishes that can be inflight at one time.`,
+		},
+		jopt: func(s *slip.Scope, v slip.Object) jetstream.JetStreamOpt {
+			num, ok := v.(slip.Fixnum)
+			if !ok {
+				slip.PanicType(":publish-async-max-pending", v, "fixnum")
+			}
+			return jetstream.WithPublishAsyncMaxPending(int(num))
+		},
+	},
 }
 
 func initConnect() {

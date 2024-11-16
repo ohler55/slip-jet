@@ -51,14 +51,14 @@ func (caller clientOptionsCaller) Call(s *slip.Scope, args slip.List, _ int) sli
 		options = append(options, slip.Symbol(":reconnect-wait"), slip.DoubleFloat(cl.nc.Opts.ReconnectWait))
 		options = caller.appendFunc(options, ":reconnected-callback", cl.nc.Opts.ReconnectedCB, cl.options)
 		options = caller.appendBool(options, ":retry-on-failed-connect", cl.nc.Opts.RetryOnFailedConnect)
-		options = caller.appendFunc(options, ":root-cas-callback", cl.nc.Opts.RootCAsCB, cl.options)
+		// RootCAsCB, a RootCAsHandler not supported yet
 		options = caller.appendBool(options, ":secure", cl.nc.Opts.Secure)
 		options = caller.appendStringList(options, ":servers", cl.nc.Opts.Servers)
 		options = caller.appendFunc(options, ":signature-callback", cl.nc.Opts.SignatureCB, cl.options)
 		options = caller.appendBool(options, ":skip-host-lookup", cl.nc.Opts.SkipHostLookup)
 		options = append(options, slip.Symbol(":sub-chan-len"), slip.Fixnum(cl.nc.Opts.SubChanLen))
 		options = append(options, slip.Symbol(":timeout"), slip.DoubleFloat(cl.nc.Opts.Timeout))
-		options = caller.appendFunc(options, ":tls-cert-callback", cl.nc.Opts.TLSCertCB, cl.options)
+		// TLSCertCB, a TLSCertHandler not supported yet
 		// TLSConfig, a *tls.Config not supported yet
 		options = caller.appendBool(options, ":tls-handshake-first", cl.nc.Opts.TLSHandshakeFirst)
 		options = caller.appendString(options, ":token", cl.nc.Opts.Token)
