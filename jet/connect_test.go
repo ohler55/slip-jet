@@ -10,7 +10,6 @@ import (
 	"github.com/ohler55/slip"
 	"github.com/ohler55/slip-jet/jet"
 	"github.com/ohler55/slip/pkg/flavors"
-	"github.com/ohler55/slip/pkg/gi"
 	"github.com/ohler55/slip/sliptest"
 )
 
@@ -37,19 +36,17 @@ func TestClientConnectAllowReconnect(t *testing.T) {
 
 func TestClientConnectAsyncErrorCallback(t *testing.T) {
 	scope := slip.NewScope()
-	out := make(gi.Channel, 1)
 	scope.Let(slip.Symbol("js"), nil)
-	scope.Let(slip.Symbol("out"), out)
+	scope.Let(slip.Symbol("out"), nil)
 	defer func() {
 		_ = slip.ReadString("(send js :close)").Eval(scope, nil)
-		close(out)
 	}()
 	(&sliptest.Function{
 		Scope: scope,
 		Source: fmt.Sprintf(`(setq js
                                    (jet-connect :url %q
                                                 :user "u1" :password "password"
-                                                :async-error-callback (lambda (c sub err) (channel-push out 'error))))`,
+                                                :async-error-callback (lambda (c sub err) (setq out 'error))))`,
 			natsURL),
 		Expect: "/#<jet-client [0-9a-f]+>/",
 	}).Test(t)
@@ -58,8 +55,7 @@ func TestClientConnectAsyncErrorCallback(t *testing.T) {
 	nc := inst.Any.(*jet.Client).NatsConn()
 	tt.NotNil(t, nc.Opts.AsyncErrorCB)
 	nc.Opts.AsyncErrorCB(nc, nil, fmt.Errorf("dummy"))
-	popped := <-out
-	tt.Equal(t, slip.Symbol("error"), popped)
+	tt.Equal(t, slip.Symbol("error"), scope.Get("out"))
 }
 
 func TestClientConnectClosedHandler(t *testing.T) {
