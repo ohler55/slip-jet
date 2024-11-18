@@ -19,6 +19,7 @@ func TestClientDocs(t *testing.T) {
 	for _, method := range []string{
 		":init",
 		":close",
+		":options",
 	} {
 		_ = slip.ReadString(fmt.Sprintf(`(describe-method 'jet-client %s out)`, method)).Eval(scope, nil)
 		tt.Equal(t, true, strings.Contains(out.String(), method))

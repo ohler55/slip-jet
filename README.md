@@ -17,22 +17,26 @@ implement an object based API for SLIP.
 --------
 Notes
 
-- client :options
- - compare nats options to proplist
-  - booleans are t and nil
-  - functions are either nil or the set original value
+- test use cases (start with connection)
+ - with token ??
+ - nkeys
+ - start server with multiple accounts
+
+ - test callbacks by getting Any and asking for ns or js
+  - make client public
+
+- does client instance need to keep track of subscription?
+ - so that the error callback with subscription can return the correct instance?
+
 
 - create client
- - add all options
- - get for nats option, use for testing as well
-  - return assoc with init keywords as keys
-
- - StreamConsumerManager
- - StreamManager
- - AccountInfo
-  - auth
-   - support and test auth
-    - users, accounts, nkeys, username, password
+ - methods
+  - StreamConsumerManager
+  - StreamManager
+  - AccountInfo
+   - auth
+    - support and test auth
+     - users, accounts, nkeys, username, password
 
 
 

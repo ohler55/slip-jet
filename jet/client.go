@@ -42,8 +42,20 @@ func defClient() {
 	// TBD
 }
 
-type client struct {
+// Client is a container for the elements needed by an instance of the
+// jet-client flavor.
+type Client struct {
 	nc      *nats.Conn
 	js      jetstream.JetStream
 	options slip.List
+}
+
+// NatsConn returns the nats.Conn member of the client.
+func (cl *Client) NatsConn() *nats.Conn {
+	return cl.nc
+}
+
+// JetStream returns the jetstream.JetStream member of the client.
+func (cl *Client) JetStream() jetstream.JetStream {
+	return cl.js
 }

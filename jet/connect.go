@@ -746,7 +746,6 @@ payload as octets, and a header as an association list.`,
 						Head: nm.Header,
 					}
 					caller.Call(s, slip.List{self, MakeMsg(&pm), slip.NewError("%s", err)}, 0)
-
 				})
 		},
 	},
@@ -843,7 +842,7 @@ func (caller clientInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.O
 		}
 	}
 	var (
-		cl  client
+		cl  Client
 		err error
 	)
 	if cl.nc, err = options.Connect(); err == nil {

@@ -12,7 +12,7 @@ type clientCloseCaller struct{}
 func (caller clientCloseCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	flavors.CheckMethodArgCount(self, ":close", len(args), 0, 0)
-	if cl, ok := self.Any.(*client); ok {
+	if cl, ok := self.Any.(*Client); ok {
 		if cl.nc != nil {
 			cl.nc.Close()
 		}

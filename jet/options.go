@@ -12,7 +12,7 @@ type clientOptionsCaller struct{}
 func (caller clientOptionsCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	flavors.CheckMethodArgCount(self, ":options", len(args), 0, 0)
-	if cl, ok := self.Any.(*client); ok && cl.nc != nil {
+	if cl, ok := self.Any.(*Client); ok && cl.nc != nil {
 		// Use both the nats.Conn options as well as the saved options to
 		// lookup functions.
 		options := make(slip.List, 0, 100) // up to 50 pairs expected

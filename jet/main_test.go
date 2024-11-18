@@ -40,6 +40,10 @@ func wrapRun(m *testing.M) (status int) {
 	return
 }
 
+// TBD add accounts
+//  create account with function so the various options can be added
+//  create users
+
 func startJetStreamServer() (jss *server.Server, ju string) {
 	var (
 		err     error
@@ -48,11 +52,9 @@ func startJetStreamServer() (jss *server.Server, ju string) {
 			Port:   availablePort(),
 			NoLog:  true,
 			NoSigs: true,
-			// Users:    []*server.User{{Username: "foo", Password: "bar"}},
-			// Username: "foo",
-			// Password: "bar",
-			// NoAuthUser:  "foo",
-			// AllowNonTLS:           true,
+			Users: []*server.User{
+				{Username: "u1", Password: "password"},
+			},
 			JetStream: true,
 			StoreDir:  "nats-store",
 		}
