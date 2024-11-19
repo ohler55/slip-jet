@@ -15,7 +15,7 @@ var (
 
 func defClient() {
 	keywords := make(slip.List, 0, len(conOptMap)+1)
-	keywords = append(keywords, slip.Symbol(":init-keywords"))
+	keywords = append(keywords, slip.Symbol(":init-keywords"), slip.Symbol(":prefix"))
 	for k := range conOptMap {
 		keywords = append(keywords, slip.Symbol(k))
 	}

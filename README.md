@@ -22,9 +22,6 @@ Notes
  - nkeys
  - start server with multiple accounts
 
- - test callbacks by getting Any and asking for ns or js
-  - make client public
-
 - does client instance need to keep track of subscription?
  - so that the error callback with subscription can return the correct instance?
 

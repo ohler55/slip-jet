@@ -664,7 +664,7 @@ a new Inbox and a new Subscription for each request.`,
 		doc: &slip.DocArg{
 			Name: "user-jwt",
 			Type: "function",
-			Text: `sets the callback handler that will fetch a user's JWT.`,
+			Text: `Sets the callback handler that will fetch a user's JWT.`,
 		},
 		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
 			caller := cl.ResolveToCaller(s, v, 0)
@@ -819,26 +819,22 @@ func (caller clientInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.O
 		options nats.Options
 	)
 	for i := 0; i < len(args)-1; i += 2 {
-		if sym, ok := args[i].(slip.Symbol); ok {
-			key := strings.ToLower(string(sym))
-			co := conOptMap[key]
-			switch {
-			case co.update != nil:
-				co.update(&options, s, args[i+1])
-			case co.jopt != nil:
-				if opt := co.jopt(s, args[i+1]); opt != nil {
-					jopts = append(jopts, opt)
-				}
-			case key == ":prefix":
-				if ss, ok := args[i+1].(slip.String); ok {
-					prefix = string(ss)
-				} else {
-					slip.PanicType(":prefix", args[i+1], "string")
-				}
+		sym := args[i].(slip.Symbol)
+		key := strings.ToLower(string(sym))
+		co := conOptMap[key]
+		switch {
+		case key == ":prefix":
+			if ss, ok := args[i+1].(slip.String); ok {
+				prefix = string(ss)
+			} else {
+				slip.PanicType(":prefix", args[i+1], "string")
 			}
-		} else {
-			// TBD might not need this if check is done by make-instance
-			slip.PanicType("key", args[i], "keyword")
+		case co.update != nil:
+			co.update(&options, s, args[i+1])
+		case co.jopt != nil:
+			if opt := co.jopt(s, args[i+1]); opt != nil {
+				jopts = append(jopts, opt)
+			}
 		}
 	}
 	var (

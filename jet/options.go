@@ -69,7 +69,9 @@ func (caller clientOptionsCaller) Call(s *slip.Scope, args slip.List, _ int) sli
 		options = caller.appendFunc(options, ":user-jwt", cl.nc.Opts.UserJWT, cl.options)
 		options = caller.appendBool(options, ":verbose", cl.nc.Opts.Verbose)
 
-		// TBD add jetstream options
+		options = caller.appendFromArgs(options, ":prefix", cl.options)
+		options = caller.appendFromArgs(options, ":publish-async-error-handler", cl.options)
+		options = caller.appendFromArgs(options, ":publish-async-max-pending", cl.options)
 
 		return options
 	}
@@ -119,4 +121,12 @@ func (caller clientOptionsCaller) appendStringList(options slip.List, name strin
 		pv = slist
 	}
 	return append(options, slip.Symbol(name), pv)
+}
+
+func (caller clientOptionsCaller) appendFromArgs(options slip.List, name string, args slip.List) slip.List {
+	var pv slip.Object
+	key := slip.Symbol(name)
+	pv, _ = slip.GetArgsKeyValue(args, key)
+
+	return append(options, key, pv)
 }
