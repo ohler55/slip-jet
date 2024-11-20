@@ -25,15 +25,28 @@ Notes
 - does client instance need to keep track of subscription?
  - so that the error callback with subscription can return the correct instance?
 
+- jet-ack - simple instance with variables since it is only data
+ - stream [string]
+ - sequence [fixnum]
+ - duplicate [boolean]
+ - domain [string]
 
-- create client
- - methods
-  - StreamConsumerManager
-  - StreamManager
-  - AccountInfo
-   - auth
-    - support and test auth
-     - users, accounts, nkeys, username, password
+- client
+ - as Publisher
+  - publish (payload &optional subject &key timeout expect-last-msg-id expect-last-sequence expect-last-subject-sequence expect-stream msg-id retry-attempts retry-wait stall-wait) => jet-ack
+   - payload can be octets, string, or msg
+  - publish-async (payload &optional subject &key timeout ...) => jet-ack-future
+   - payload can be octets, string, or msg
+  - publish-pending () => fixnum
+  - publish-complete () => channel
+  - cleanup-publisher ()
+
+ - as StreamConsumerManager
+ - as StreamManager
+ - as AccountInfo
+  - auth
+   - support and test auth
+    - users, accounts, nkeys, username, password
 
 
 

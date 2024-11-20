@@ -39,6 +39,9 @@ func defClient() {
 	clientFlavor.DefMethod(":options", "", clientOptionsCaller{})
 	flavors.FlosFun("jet-client-options", ":options", clientOptionsCaller{}.Docs(), &Pkg)
 
+	clientFlavor.DefMethod(":publish", "", clientPublishCaller{})
+	flavors.FlosFun("jet-publish", ":publish", clientPublishCaller{}.Docs(), &Pkg)
+
 	// TBD
 }
 
