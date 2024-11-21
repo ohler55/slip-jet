@@ -22,6 +22,7 @@ func init() {
 	defStream()
 	defConsumer()
 	defMsg()
+	defAck()
 
 	initConnect()
 

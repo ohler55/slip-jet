@@ -33,8 +33,10 @@ Notes
 
 - client
  - as Publisher
-  - publish (payload &optional subject &key timeout expect-last-msg-id expect-last-sequence expect-last-subject-sequence expect-stream msg-id retry-attempts retry-wait stall-wait) => jet-ack
-   - payload can be octets, string, or msg
+  - publish
+   - test with go subscriber
+   - need stream defined
+
   - publish-async (payload &optional subject &key timeout ...) => jet-ack-future
    - payload can be octets, string, or msg
   - publish-pending () => fixnum
