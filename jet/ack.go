@@ -14,13 +14,16 @@ var (
 func defAck() {
 	ackFlavor = flavors.DefFlavor("jet-ack",
 		map[string]slip.Object{
-			"stream":    nil,
-			"sequence":  nil,
-			"duplicate": nil,
-			"domain":    nil,
+			"stream-name":     nil,
+			"sequence-number": nil,
+			"duplicate":       nil,
+			"domain":          nil,
 		},
 		[]string{},
 		slip.List{
+			slip.Symbol(":gettable-instance-variables"),
+			slip.Symbol(":settable-instance-variables"),
+			slip.Symbol(":inittable-instance-variables"),
 			slip.List{
 				slip.Symbol(":documentation"),
 				slip.String(`An instance of the _jet-ack_ flavor is received after a successful publish.`),
@@ -32,8 +35,8 @@ func defAck() {
 
 func makeAck(stream string, seq uint64, dup bool, domain string) (inst *flavors.Instance) {
 	inst = ackFlavor.MakeInstance().(*flavors.Instance)
-	inst.UnsafeLet(slip.Symbol("stream"), slip.String(stream))
-	inst.UnsafeLet(slip.Symbol("sequence"), slip.Fixnum(seq))
+	inst.UnsafeLet(slip.Symbol("stream-name"), slip.String(stream))
+	inst.UnsafeLet(slip.Symbol("sequence-number"), slip.Fixnum(seq))
 	if dup {
 		inst.UnsafeLet(slip.Symbol("duplicate"), slip.True)
 	}

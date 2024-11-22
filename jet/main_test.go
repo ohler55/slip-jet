@@ -45,6 +45,8 @@ func wrapRun(m *testing.M) (status int) {
 //  create users
 
 func startJetStreamServer() (jss *server.Server, ju string) {
+	// acct := server.NewAccount("test")
+	// acct.AddStreamExport("test.>", nil)
 	var (
 		err     error
 		options = server.Options{
@@ -53,8 +55,10 @@ func startJetStreamServer() (jss *server.Server, ju string) {
 			NoLog:  true,
 			NoSigs: true,
 			Users: []*server.User{
+				// {Username: "u1", Password: "password", Account: acct},
 				{Username: "u1", Password: "password"},
 			},
+			// Accounts:  []*server.Account{acct},
 			JetStream: true,
 			StoreDir:  "nats-store",
 		}

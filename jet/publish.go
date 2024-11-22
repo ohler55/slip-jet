@@ -75,9 +75,13 @@ func (caller clientPublishCaller) Call(s *slip.Scope, args slip.List, _ int) sli
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":retry-wait")); has {
 		opts = append(opts, jetstream.WithRetryWait(mustBeDuration(v, ":retry-wait")))
 	}
-	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":stall-wait")); has {
-		opts = append(opts, jetstream.WithStallWait(mustBeDuration(v, ":stall-wait")))
-	}
+	// TBD just used in async
+	// if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":stall-wait")); has {
+	// 	opts = append(opts, jetstream.WithStallWait(mustBeDuration(v, ":stall-wait")))
+	// }
+	//   _:stall-wait_ [real] sets the max wait time in seconds when the producer becomes stall
+	// producing messages. If a publish call is blocked for this long, ErrTooManyStalledMsgs is returned.
+
 	pa, err := js.PublishMsg(ctx, &msg, opts...)
 	if err != nil {
 		panic(err)
@@ -95,7 +99,6 @@ _expect-stream_
 _msg-id_
 _retry-attempts_
 _retry-wait_
-_stall-wait_
 => _jet-ack__
    _payload_ [octets|string|jet-msg] to publish as the content of a message.
    _subject_ [string] to publish the message on. It must be bound to a stream.
@@ -117,8 +120,6 @@ fail.
 encountered. Defaults to 2.
    _:retry-wait_ [real] sets the retry wait time in seconds when ErrNoResponders is encountered.
 Defaults to 0.250 seconds.
-   _:stall-wait_ [real] sets the max wait time in seconds when the producer becomes stall
-producing messages. If a publish call is blocked for this long, ErrTooManyStalledMsgs is returned.
 
 
 Performs a synchronous publish to a stream and waits for an ack from
