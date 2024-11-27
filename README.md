@@ -12,8 +12,6 @@ JetStream API is object based and this package uses Flavors to
 implement an object based API for SLIP.
 
 
-
-
 --------
 Notes
 
@@ -25,20 +23,20 @@ Notes
 - does client instance need to keep track of subscription?
  - so that the error callback with subscription can return the correct instance?
 
-- jet-ack - simple instance with variables since it is only data
- - stream [string]
- - sequence [fixnum]
- - duplicate [boolean]
- - domain [string]
+- jet-ack-future
+ - Any = jetstream.PubAckFuture
+ - methods
+  - ok => channel, wrap to implement pop
+  - err => channel, wrap to implement pop
+  - msg => jet-msg, get info from nats.Msg
+ - test
+  - create test ack-future
 
 - client
  - as Publisher
-  - publish
-   - test with go subscriber
-   - need stream defined
-
+  + publish
   - publish-async (payload &optional subject &key timeout ...) => jet-ack-future
-   - payload can be octets, string, or msg
+   - need jet-ack-future
   - publish-pending () => fixnum
   - publish-complete () => channel
   - cleanup-publisher ()
