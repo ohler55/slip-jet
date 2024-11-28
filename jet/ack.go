@@ -33,7 +33,8 @@ func defAck() {
 	)
 }
 
-func makeAck(stream string, seq uint64, dup bool, domain string) (inst *flavors.Instance) {
+// MakeAck makes a jet-ack.
+func MakeAck(stream string, seq uint64, dup bool, domain string) (inst *flavors.Instance) {
 	inst = ackFlavor.MakeInstance().(*flavors.Instance)
 	inst.UnsafeLet(slip.Symbol("stream-name"), slip.String(stream))
 	inst.UnsafeLet(slip.Symbol("sequence-number"), slip.Fixnum(seq))

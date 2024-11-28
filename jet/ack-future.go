@@ -84,7 +84,7 @@ func (obj *JetAckFuture) Pop() (result slip.Object) {
 	if obj.Ack != nil {
 		select {
 		case pa := <-obj.Ack.Ok():
-			result = makeAck(pa.Stream, pa.Sequence, pa.Duplicate, pa.Domain)
+			result = MakeAck(pa.Stream, pa.Sequence, pa.Duplicate, pa.Domain)
 		case err := <-obj.Ack.Err():
 			result = slip.NewError("%s", err)
 		}

@@ -3,9 +3,11 @@
 package jet_test
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
+	"github.com/nats-io/nats.go/jetstream"
 	"github.com/ohler55/ojg/tt"
 	"github.com/ohler55/slip"
 	"github.com/ohler55/slip-jet/jet"
@@ -62,13 +64,26 @@ func TestAckFutureObject(t *testing.T) {
 	tt.Equal(t, false, af.HasMethod(":nothing"))
 }
 
-func TestAckFutureresult(t *testing.T) {
+func TestAckFutureResult(t *testing.T) {
 	scope := slip.NewScope()
-	scope.Let("af", jet.MakeAckFuture(nil, nil))
+	jaf := mockAckFuture{
+		okChan:  make(chan *jetstream.PubAck, 1),
+		errChan: make(chan error, 1),
+		msg:     nil,
+	}
+	scope.Let("af", jet.MakeAckFuture(&jaf, nil))
+	jaf.okChan <- &jetstream.PubAck{}
 	(&sliptest.Function{
 		Scope:  scope,
 		Source: `(send af :result)`,
-		Expect: "nil",
+		Expect: "/#<jet-ack [0-9a-f]+>/",
+	}).Test(t)
+
+	jaf.errChan <- fmt.Errorf("broke")
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send af :result)`,
+		Expect: "/#<ERROR [0-9a-f]+>/",
 	}).Test(t)
 }
 
@@ -84,4 +99,5 @@ func TestAckFutureMessage(t *testing.T) {
 
 func TestDocCaller(t *testing.T) {
 	tt.Equal(t, "test", (&jet.DocCaller{Text: "test"}).Docs())
+	tt.Nil(t, (&jet.DocCaller{Text: "test"}).Call(nil, nil, 0))
 }

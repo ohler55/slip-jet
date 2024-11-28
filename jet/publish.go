@@ -86,7 +86,7 @@ func (caller clientPublishCaller) Call(s *slip.Scope, args slip.List, _ int) sli
 	if err != nil {
 		panic(err)
 	}
-	return makeAck(pa.Stream, pa.Sequence, pa.Duplicate, pa.Domain)
+	return MakeAck(pa.Stream, pa.Sequence, pa.Duplicate, pa.Domain)
 }
 
 func (caller clientPublishCaller) Docs() string {
