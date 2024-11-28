@@ -23,12 +23,15 @@ Notes
 - does client instance need to keep track of subscription?
  - so that the error callback with subscription can return the correct instance?
 
-- jet-ack-future
- - Any = jetstream.PubAckFuture
+- jet-ack-future, implements slip.Instance
  - methods
-  - ok => channel, wrap to implement pop
-  - err => channel, wrap to implement pop
-  - msg => jet-msg, get info from nats.Msg
+  - :pop [select on ok and err then return converted to object]
+  - :msg
+ - vars
+  - jetstream.PubAckFuture
+  - msg jet-msg [that was sent]
+ - works with channel-pop
+
  - test
   - create test ack-future
 
