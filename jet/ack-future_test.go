@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 	"github.com/ohler55/ojg/tt"
 	"github.com/ohler55/slip"
@@ -19,7 +20,7 @@ func TestAckFutureDescribe(t *testing.T) {
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("out"), &slip.OutputStream{Writer: &out})
 
-	scope.Let("af", jet.MakeAckFuture(nil, nil))
+	scope.Let("af", jet.MakeAckFuture(nil))
 	(&sliptest.Function{
 		Scope:  scope,
 		Source: `(send af :describe out)`,
@@ -45,7 +46,7 @@ func TestAckFutureDescribe(t *testing.T) {
 }
 
 func TestAckFutureObject(t *testing.T) {
-	af := jet.MakeAckFuture(nil, nil)
+	af := jet.MakeAckFuture(nil)
 	(&sliptest.Object{
 		Target:    af,
 		String:    "/#<jet-ack-future [0-9a-f]+>/",
@@ -71,7 +72,7 @@ func TestAckFutureResult(t *testing.T) {
 		errChan: make(chan error, 1),
 		msg:     nil,
 	}
-	scope.Let("af", jet.MakeAckFuture(&jaf, nil))
+	scope.Let("af", jet.MakeAckFuture(&jaf))
 	jaf.okChan <- &jetstream.PubAck{}
 	(&sliptest.Function{
 		Scope:  scope,
@@ -89,11 +90,17 @@ func TestAckFutureResult(t *testing.T) {
 
 func TestAckFutureMessage(t *testing.T) {
 	scope := slip.NewScope()
-	scope.Let("af", jet.MakeAckFuture(nil, nil))
+	af := mockAckFuture{
+		msg: &nats.Msg{
+			Data:    []byte("hello"),
+			Subject: "test.sub",
+		},
+	}
+	scope.Let("af", jet.MakeAckFuture(&af))
 	(&sliptest.Function{
 		Scope:  scope,
 		Source: `(send af :message)`,
-		Expect: "nil",
+		Expect: "/#<jet-msg [0-9a-f]+>/",
 	}).Test(t)
 }
 

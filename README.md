@@ -23,23 +23,10 @@ Notes
 - does client instance need to keep track of subscription?
  - so that the error callback with subscription can return the correct instance?
 
-- jet-ack-future, implements slip.Instance
- - methods
-  - :pop [select on ok and err then return converted to object]
-  - :msg
- - vars
-  - jetstream.PubAckFuture
-  - msg jet-msg [that was sent]
- - works with channel-pop
-
- - test
-  - create test ack-future
-
 - client
  - as Publisher
   + publish
-  - publish-async (payload &optional subject &key timeout ...) => jet-ack-future
-   - need jet-ack-future
+  + publish-async
   - publish-pending () => fixnum
   - publish-complete () => channel
   - cleanup-publisher ()

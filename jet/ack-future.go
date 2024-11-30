@@ -43,8 +43,7 @@ Returns the message sent to teh server.
 
 // JetAckFuture is a chan of time.Time that pops slip.Time Objects.
 type JetAckFuture struct {
-	Ack     jetstream.PubAckFuture
-	Message slip.Object
+	Ack jetstream.PubAckFuture
 }
 
 // String representation of the Object.
@@ -110,7 +109,16 @@ func (obj *JetAckFuture) Receive(s *slip.Scope, message string, args slip.List, 
 	case ":result":
 		result = obj.Pop()
 	case ":message":
-		result = obj.Message
+		if obj.Ack != nil {
+			if m := obj.Ack.Msg(); m != nil {
+				result = MakeMsg(&PubMsg{
+					Body: m.Data,
+					Head: m.Header,
+					Subj: m.Subject,
+					Repl: m.Reply,
+				})
+			}
+		}
 	default:
 		result = ackFutureClass.(*clos.Class).InvokeMethod(obj, s, message, args, depth)
 	}
@@ -127,9 +135,8 @@ func (obj *JetAckFuture) HasMethod(method string) bool {
 }
 
 // MakeAckFuture makes a new jet-ack-future.
-func MakeAckFuture(af jetstream.PubAckFuture, message slip.Object) *JetAckFuture {
+func MakeAckFuture(af jetstream.PubAckFuture) *JetAckFuture {
 	return &JetAckFuture{
-		Ack:     af,
-		Message: message,
+		Ack: af,
 	}
 }

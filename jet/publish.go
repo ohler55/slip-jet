@@ -12,9 +12,9 @@ import (
 	"github.com/ohler55/slip/pkg/flavors"
 )
 
-type clientPublishCaller struct{}
+type publishCaller struct{}
 
-func (caller clientPublishCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller publishCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	flavors.CheckMethodArgCount(self, ":publish", len(args), 1, 20)
 	js := self.Any.(*Client).js
@@ -53,35 +53,7 @@ func (caller clientPublishCaller) Call(s *slip.Scope, args slip.List, _ int) sli
 		ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
 		defer cf()
 	}
-	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":expect-last-msg-id")); has {
-		opts = append(opts, jetstream.WithExpectLastMsgID(slip.MustBeString(v, ":expect-last-msg-id")))
-	}
-	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":expect-stream")); has {
-		opts = append(opts, jetstream.WithExpectStream(slip.MustBeString(v, ":expect-stream")))
-	}
-	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":msg-id")); has {
-		opts = append(opts, jetstream.WithMsgID(slip.MustBeString(v, ":msg-id")))
-	}
-	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":expect-last-sequence")); has {
-		opts = append(opts, jetstream.WithExpectLastSequence(uint64(mustBeInt(v, ":expect-last-sequence"))))
-	}
-	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":expect-last-subject-sequence")); has {
-		opts = append(opts,
-			jetstream.WithExpectLastSequencePerSubject(uint64(mustBeInt(v, ":expect-last-subject-sequence"))))
-	}
-	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":retry-attempts")); has {
-		opts = append(opts, jetstream.WithRetryAttempts(mustBeInt(v, ":retry-attempts")))
-	}
-	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":retry-wait")); has {
-		opts = append(opts, jetstream.WithRetryWait(mustBeDuration(v, ":retry-wait")))
-	}
-	// TBD just used in async
-	// if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":stall-wait")); has {
-	// 	opts = append(opts, jetstream.WithStallWait(mustBeDuration(v, ":stall-wait")))
-	// }
-	//   _:stall-wait_ [real] sets the max wait time in seconds when the producer becomes stall
-	// producing messages. If a publish call is blocked for this long, ErrTooManyStalledMsgs is returned.
-
+	opts = pubOptsFromArgs(opts, args)
 	pa, err := js.PublishMsg(ctx, &msg, opts...)
 	if err != nil {
 		panic(err)
@@ -89,7 +61,7 @@ func (caller clientPublishCaller) Call(s *slip.Scope, args slip.List, _ int) sli
 	return MakeAck(pa.Stream, pa.Sequence, pa.Duplicate, pa.Domain)
 }
 
-func (caller clientPublishCaller) Docs() string {
+func (caller publishCaller) Docs() string {
 	return `__:publish__ _payload_ &optional _subject_ &key
 _timeout_
 _expect-last-msg-id_
@@ -127,7 +99,7 @@ server. It accepts a message payload and optional subject name (which must be
 bound to a stream) which can be _octets_, _string_, or a _jet-msg_
 instance. If the _payload_ is not a _jet-msg_ instance then the subject must
 be provided. Multiple options in the form of keywords and values are
-supported. An instace of the _jet-ack_ flavor is returned with information
+supported. An instance of the _jet-ack_ flavor is returned with information
 about the published message.
 `
 }
@@ -148,4 +120,33 @@ func mustBeDuration(arg slip.Object, name string) (dur time.Duration) {
 		slip.PanicType(name, arg, "real")
 	}
 	return
+}
+
+func pubOptsFromArgs(opts []jetstream.PublishOpt, args slip.List) []jetstream.PublishOpt {
+	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":expect-last-msg-id")); has {
+		opts = append(opts, jetstream.WithExpectLastMsgID(slip.MustBeString(v, ":expect-last-msg-id")))
+	}
+	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":expect-stream")); has {
+		opts = append(opts, jetstream.WithExpectStream(slip.MustBeString(v, ":expect-stream")))
+	}
+	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":msg-id")); has {
+		opts = append(opts, jetstream.WithMsgID(slip.MustBeString(v, ":msg-id")))
+	}
+	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":expect-last-sequence")); has {
+		opts = append(opts, jetstream.WithExpectLastSequence(uint64(mustBeInt(v, ":expect-last-sequence"))))
+	}
+	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":expect-last-subject-sequence")); has {
+		opts = append(opts,
+			jetstream.WithExpectLastSequencePerSubject(uint64(mustBeInt(v, ":expect-last-subject-sequence"))))
+	}
+	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":retry-attempts")); has {
+		opts = append(opts, jetstream.WithRetryAttempts(mustBeInt(v, ":retry-attempts")))
+	}
+	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":retry-wait")); has {
+		opts = append(opts, jetstream.WithRetryWait(mustBeDuration(v, ":retry-wait")))
+	}
+	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":stall-wait")); has {
+		opts = append(opts, jetstream.WithStallWait(mustBeDuration(v, ":stall-wait")))
+	}
+	return opts
 }
