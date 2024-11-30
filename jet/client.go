@@ -36,14 +36,23 @@ func defClient() {
 	clientFlavor.DefMethod(":close", "", clientCloseCaller{})
 	flavors.FlosFun("jet-client-close", ":close", clientCloseCaller{}.Docs(), &Pkg)
 
-	clientFlavor.DefMethod(":options", "", clientOptionsCaller{})
-	flavors.FlosFun("jet-client-options", ":options", clientOptionsCaller{}.Docs(), &Pkg)
+	clientFlavor.DefMethod(":options", "", optionsCaller{})
+	flavors.FlosFun("jet-client-options", ":options", optionsCaller{}.Docs(), &Pkg)
 
 	clientFlavor.DefMethod(":publish", "", publishCaller{})
 	flavors.FlosFun("jet-publish", ":publish", publishCaller{}.Docs(), &Pkg)
 
 	clientFlavor.DefMethod(":publish-async", "", publishAsyncCaller{})
 	flavors.FlosFun("jet-publish-async", ":publish-async", publishAsyncCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":publish-pending", "", publishPendingCaller{})
+	flavors.FlosFun("jet-publish-pending", ":publish-pending", publishPendingCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":publish-complete", "", publishCompleteCaller{})
+	flavors.FlosFun("jet-publish-complete", ":publish-complete", publishCompleteCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":cleanup-publisher", "", cleanupPublisherCaller{})
+	flavors.FlosFun("jet-cleanup-publisher", ":cleanup-publisher", cleanupPublisherCaller{}.Docs(), &Pkg)
 
 	// TBD
 }

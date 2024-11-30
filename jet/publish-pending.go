@@ -1,0 +1,30 @@
+// Copyright (c) 2024, Peter Ohler, All rights reserved.
+
+package jet
+
+import (
+	"github.com/ohler55/slip"
+	"github.com/ohler55/slip/pkg/flavors"
+)
+
+type publishPendingCaller struct{}
+
+func (caller publishPendingCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+	self := s.Get("self").(*flavors.Instance)
+	flavors.CheckMethodArgCount(self, ":publish-pending", len(args), 0, 0)
+	cl, ok := self.Any.(*Client)
+	if !ok || cl.nc == nil {
+		slip.NewPanic("%s is not a connected jet-client", self)
+	}
+	return slip.Fixnum(cl.js.PublishAsyncPending())
+}
+
+func (caller publishPendingCaller) Docs() string {
+	return `__:publish-pending__ => _fixnum_
+
+
+Returns the number of async publishes outstanding for this context. An
+outstanding publish is one that has been sent by the publisher but has not yet
+received an ack.
+`
+}

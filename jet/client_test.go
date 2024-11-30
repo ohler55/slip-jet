@@ -21,8 +21,13 @@ func TestClientDocs(t *testing.T) {
 
 	for _, method := range []string{
 		":init",
+		":cleanup-publisher",
 		":close",
 		":options",
+		":publish",
+		":publish-async",
+		":publish-complete",
+		":publish-pending",
 	} {
 		_ = slip.ReadString(fmt.Sprintf(`(describe-method 'jet-client %s out)`, method)).Eval(scope, nil)
 		tt.Equal(t, true, strings.Contains(out.String(), method))

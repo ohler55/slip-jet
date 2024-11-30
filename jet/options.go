@@ -7,9 +7,9 @@ import (
 	"github.com/ohler55/slip/pkg/flavors"
 )
 
-type clientOptionsCaller struct{}
+type optionsCaller struct{}
 
-func (caller clientOptionsCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller optionsCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	flavors.CheckMethodArgCount(self, ":options", len(args), 0, 0)
 	if cl, ok := self.Any.(*Client); ok && cl.nc != nil {
@@ -78,7 +78,7 @@ func (caller clientOptionsCaller) Call(s *slip.Scope, args slip.List, _ int) sli
 	return nil
 }
 
-func (caller clientOptionsCaller) Docs() string {
+func (caller optionsCaller) Docs() string {
 	return `__:options__ => _property-list_
 
 
@@ -86,7 +86,7 @@ Returns the options used for the client connection as a property list.
 `
 }
 
-func (caller clientOptionsCaller) appendBool(options slip.List, name string, value bool) slip.List {
+func (caller optionsCaller) appendBool(options slip.List, name string, value bool) slip.List {
 	var pv slip.Object
 	if value {
 		pv = slip.True
@@ -94,7 +94,7 @@ func (caller clientOptionsCaller) appendBool(options slip.List, name string, val
 	return append(options, slip.Symbol(name), pv)
 }
 
-func (caller clientOptionsCaller) appendFunc(options slip.List, name string, value any, args slip.List) slip.List {
+func (caller optionsCaller) appendFunc(options slip.List, name string, value any, args slip.List) slip.List {
 	var pv slip.Object
 	key := slip.Symbol(name)
 	if value != nil {
@@ -103,7 +103,7 @@ func (caller clientOptionsCaller) appendFunc(options slip.List, name string, val
 	return append(options, key, pv)
 }
 
-func (caller clientOptionsCaller) appendString(options slip.List, name string, value string) slip.List {
+func (caller optionsCaller) appendString(options slip.List, name string, value string) slip.List {
 	var pv slip.Object
 	if 0 < len(value) {
 		pv = slip.String(value)
@@ -111,7 +111,7 @@ func (caller clientOptionsCaller) appendString(options slip.List, name string, v
 	return append(options, slip.Symbol(name), pv)
 }
 
-func (caller clientOptionsCaller) appendStringList(options slip.List, name string, value []string) slip.List {
+func (caller optionsCaller) appendStringList(options slip.List, name string, value []string) slip.List {
 	var pv slip.Object
 	if 0 < len(value) {
 		slist := make(slip.List, len(value))
@@ -123,7 +123,7 @@ func (caller clientOptionsCaller) appendStringList(options slip.List, name strin
 	return append(options, slip.Symbol(name), pv)
 }
 
-func (caller clientOptionsCaller) appendFromArgs(options slip.List, name string, args slip.List) slip.List {
+func (caller optionsCaller) appendFromArgs(options slip.List, name string, args slip.List) slip.List {
 	var pv slip.Object
 	key := slip.Symbol(name)
 	pv, _ = slip.GetArgsKeyValue(args, key)

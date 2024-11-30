@@ -3,6 +3,7 @@
 package jet_test
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"os"
@@ -10,6 +11,9 @@ import (
 	"time"
 
 	"github.com/nats-io/nats-server/v2/server"
+	"github.com/nats-io/nats.go"
+	"github.com/nats-io/nats.go/jetstream"
+	"github.com/ohler55/ojg/tt"
 )
 
 var (
@@ -88,4 +92,28 @@ func availablePort() int {
 	defer listener.Close()
 
 	return listener.Addr().(*net.TCPAddr).Port
+}
+
+func createStream(t *testing.T, name, subject string) (jetstream.JetStream, jetstream.Stream) {
+	options := nats.Options{
+		Url:      natsURL,
+		User:     "u1",
+		Password: "password",
+	}
+	nc, err := options.Connect()
+	tt.Nil(t, err)
+	js, _ := jetstream.New(nc)
+	cfg := jetstream.StreamConfig{
+		Name:     name,
+		Subjects: []string{subject},
+	}
+	cfg.Storage = jetstream.FileStorage
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	var stream jetstream.Stream
+	stream, err = js.CreateStream(ctx, cfg)
+	tt.Nil(t, err)
+	tt.NotNil(t, stream)
+
+	return js, stream
 }

@@ -24,15 +24,8 @@ Notes
  - so that the error callback with subscription can return the correct instance?
 
 - client
- - as Publisher
-  + publish
-  + publish-async
-  - publish-pending () => fixnum
-  - publish-complete () => channel
-  - cleanup-publisher ()
-
- - as StreamConsumerManager
  - as StreamManager
+ - as StreamConsumerManager
  - as AccountInfo
   - auth
    - support and test auth

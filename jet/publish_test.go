@@ -8,7 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 	"github.com/ohler55/ojg/tt"
 	"github.com/ohler55/slip"
@@ -16,140 +15,68 @@ import (
 )
 
 func TestPublishString(t *testing.T) {
-	// Setup for the publish in go to reduce dependencies on the lisp
-	// functions in the testing phase.
-	options := nats.Options{
-		Url:      natsURL,
-		User:     "u1",
-		Password: "password",
-	}
-	nc, err := options.Connect()
-	tt.Nil(t, err)
-	js, _ := jetstream.New(nc)
-	cfg := jetstream.StreamConfig{
-		Name:     "string-test",
-		Subjects: []string{"test.string.>"},
-	}
-	cfg.Storage = jetstream.FileStorage
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	var stream jetstream.Stream
-	stream, err = js.CreateStream(ctx, cfg)
-	tt.Nil(t, err)
-	tt.NotNil(t, stream)
+	streamName := "publish-test"
+	js, stream := createStream(t, streamName, "test.publish.>")
+	defer func() { _ = js.DeleteStream(context.Background(), streamName) }()
 
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))
-                                    (ack (send js :publish "hello" "test.string.pub"
+                                    (ack (send js :publish "hello" "test.publish.string"
                                                            :retry-attempts 3
                                                            :retry-wait 0.1
                                                            :timeout 1.0)))
                               (send js :close)
                               (list (send ack :stream-name) (send ack :sequence-number)))`, natsURL),
-		Expect: `("string-test" 1)`,
+		Expect: `("publish-test" 1)`,
 	}).Test(t)
 
 	// Not really needed but verify the message can be consumed and has the
 	// expected content.
-	var (
-		cons jetstream.Consumer
-		msg  jetstream.Msg
-	)
-	cons, err = stream.CreateOrUpdateConsumer(ctx, jetstream.ConsumerConfig{})
+	var msg jetstream.Msg
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	cons, err := stream.CreateOrUpdateConsumer(ctx, jetstream.ConsumerConfig{})
 	tt.Nil(t, err)
 	msg, err = cons.Next(jetstream.FetchMaxWait(time.Second))
 	tt.Nil(t, err)
-	tt.Equal(t, "test.string.pub", msg.Subject())
+	tt.Equal(t, "test.publish.string", msg.Subject())
 	tt.Equal(t, "hello", string(msg.Data()))
 }
 
 func TestPublishOctets(t *testing.T) {
-	// Setup for the publish in go to reduce dependencies on the lisp
-	// functions in the testing phase.
-	options := nats.Options{
-		Url:      natsURL,
-		User:     "u1",
-		Password: "password",
-	}
-	nc, err := options.Connect()
-	tt.Nil(t, err)
-	js, _ := jetstream.New(nc)
-	cfg := jetstream.StreamConfig{
-		Name:     "octets-test",
-		Subjects: []string{"test.octets.>"},
-	}
-	cfg.Storage = jetstream.FileStorage
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	var stream jetstream.Stream
-	stream, err = js.CreateStream(ctx, cfg)
-	tt.Nil(t, err)
-	tt.NotNil(t, stream)
+	streamName := "publish-test"
+	js, _ := createStream(t, streamName, "test.publish.>")
+	defer func() { _ = js.DeleteStream(context.Background(), streamName) }()
 
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))
-                                    (ack (send js :publish (coerce "hello" 'octets) "test.octets.pub")))
+                                    (ack (send js :publish (coerce "hello" 'octets) "test.publish.octets")))
                               (send js :close)
                               (list (send ack :stream-name) (send ack :sequence-number)))`, natsURL),
-		Expect: `("octets-test" 1)`,
+		Expect: `("publish-test" 1)`,
 	}).Test(t)
 }
 
 func TestPublishMsg(t *testing.T) {
-	// Setup for the publish in go to reduce dependencies on the lisp
-	// functions in the testing phase.
-	options := nats.Options{
-		Url:      natsURL,
-		User:     "u1",
-		Password: "password",
-	}
-	nc, err := options.Connect()
-	tt.Nil(t, err)
-	js, _ := jetstream.New(nc)
-	cfg := jetstream.StreamConfig{
-		Name:     "msg-test",
-		Subjects: []string{"test.msg.>"},
-	}
-	cfg.Storage = jetstream.FileStorage
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	var stream jetstream.Stream
-	stream, err = js.CreateStream(ctx, cfg)
-	tt.Nil(t, err)
-	tt.NotNil(t, stream)
+	streamName := "publish-test"
+	js, _ := createStream(t, streamName, "test.publish.>")
+	defer func() { _ = js.DeleteStream(context.Background(), streamName) }()
 
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))
-                                    (m (make-instance 'jet-msg :data "hello" :subject "test.msg.pub"))
+                                    (m (make-instance 'jet-msg :data "hello" :subject "test.publish.msg"))
                                     (ack (send js :publish m)))
                               (send js :close)
                               (list (send ack :stream-name) (send ack :sequence-number)))`, natsURL),
-		Expect: `("msg-test" 1)`,
+		Expect: `("publish-test" 1)`,
 	}).Test(t)
 }
 
 func TestPublishExpectSeq(t *testing.T) {
-	// Setup for the publish in go to reduce dependencies on the lisp
-	// functions in the testing phase.
-	options := nats.Options{
-		Url:      natsURL,
-		User:     "u1",
-		Password: "password",
-	}
-	nc, err := options.Connect()
-	tt.Nil(t, err)
-	js, _ := jetstream.New(nc)
-	cfg := jetstream.StreamConfig{
-		Name:     "lastseq-test",
-		Subjects: []string{"test.lastseq.>"},
-	}
-	cfg.Storage = jetstream.FileStorage
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	var stream jetstream.Stream
-	stream, err = js.CreateStream(ctx, cfg)
-	tt.Nil(t, err)
-	tt.NotNil(t, stream)
+	streamName := "lastseq-test"
+	js, _ := createStream(t, streamName, "test.lastseq.>")
+	defer func() { _ = js.DeleteStream(context.Background(), streamName) }()
 
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))
