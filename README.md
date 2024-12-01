@@ -25,6 +25,26 @@ Notes
 
 - client
  - as StreamManager
+  - :create-stream (name &key ...) [also make-instance with a client and lots of &key options]
+  - :update-stream [just :update on stream]
+  - :create-or-update-stream
+  - :get-stream or maybe just :stream on a client
+  - :stream-name-by-subject
+  - :delete-stream [or use stream to :delete]
+  - :list-streams
+  - :stream-names [use for loop on channel then check for error]
+ - stream flavor [Any = jetstream.Stream]
+  - :update
+  - :delete
+  - :name
+  - :subjects
+  - :info (&key cached deleted filter) [property or assoc for all StreamConfig options]
+  - :purge (&key keep sequence-number subject)
+  - :get-msg (seq &key subject deleted)
+  - :delete-msg (seq &key secure)
+  - :get-last-msg-for-subject
+  - consumer manager functions (create, update, get, delete, list, names, ordered, create-or-update)
+
  - as StreamConsumerManager
  - as AccountInfo
   - auth
