@@ -26,6 +26,42 @@ Notes
 - client
  - as StreamManager
   - :create-stream (name &key ...) [also make-instance with a client and lots of &key options]
+   - :description string
+   - :subjects []string
+   - :retention [:limit :interest :queue]
+   - :max-consumers int
+   - :max-msgs int
+   - :max-bytes int
+   - :discard [:old :new]
+   - :discard-new-per-subject bool
+   - :max-age real [duration]
+   - :max-msgs-per-subject int
+   - :max-msg-size int
+   - :storage [:file :memory]
+   - :replicas int
+   - :no-ack bool
+   - :duplicates real [time.Duration]
+   - :placement list of strings (cluster tags...)
+   - :mirror list [property list]
+   - :sources list of list [property list] or maybe jet-stream-source flavor instance
+   - :sealed bool
+   - :deny-delete bool
+   - :deny-purge bool
+   - :allow-rollup bool
+   - :compression bool [maps to none or s2]
+   - :first-seq int
+   - :subject-transform list of (source destination)
+   - :re-publish list of (source destination headers-only)
+   - :allow-direct bool
+   - :mirror-direct bool
+   - :consumer-limits list of (inactive-threshold[real] max-ack-pending[int])
+   - :metadata list [property list]
+  - make a map with all options along with docs
+   - also a parseStreamConfigArgs that populates a StreamConfig
+    - use for create, update and make-instance
+    - :info should return a compatible prop list
+    - make public to test without combination restriction
+
   - :update-stream [just :update on stream]
   - :create-or-update-stream
   - :get-stream or maybe just :stream on a client
@@ -38,7 +74,8 @@ Notes
   - :delete
   - :name
   - :subjects
-  - :info (&key cached deleted filter) [property or assoc for all StreamConfig options]
+  - :info (&key cached deleted filter) [property list for all StreamConfig options]
+   - property list can be use as args in make-instance of create-stream
   - :purge (&key keep sequence-number subject)
   - :get-msg (seq &key subject deleted)
   - :delete-msg (seq &key secure)
