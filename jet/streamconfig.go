@@ -31,7 +31,7 @@ path separators (forward or backwards slash), and non-printable characters.`,
 	":allow-direct": {
 		doc: &slip.DocArg{
 			Name: "allow-direct",
-			Type: "bool",
+			Type: "boolean",
 			Text: `Enables direct access to individual messages using direct get API. Defaults to _nil_.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
@@ -41,7 +41,7 @@ path separators (forward or backwards slash), and non-printable characters.`,
 	":allow-rollup": {
 		doc: &slip.DocArg{
 			Name: "allow-rollup",
-			Type: "bool",
+			Type: "boolean",
 			Text: `Allows the use of the Nats-Rollup header to replace all
 contents of a stream, or subject in a stream, with a single new message.`,
 		},
@@ -97,7 +97,7 @@ unacknowledged messages for a consumer.
 	":deny-delete": {
 		doc: &slip.DocArg{
 			Name: "deny-delete",
-			Type: "bool",
+			Type: "boolean",
 			Text: `Restricts the ability to delete messages from a stream via  the API. Defaults to false.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
@@ -107,7 +107,7 @@ unacknowledged messages for a consumer.
 	":deny-purge": {
 		doc: &slip.DocArg{
 			Name: "deny-purge",
-			Type: "bool",
+			Type: "boolean",
 			Text: `Restricts the ability to purge messages from a stream via the API. Defaults to false.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
@@ -118,127 +118,188 @@ unacknowledged messages for a consumer.
 		doc: &slip.DocArg{
 			Name: "description",
 			Type: "string",
-			Text: `x`,
+			Text: `An optional description of the stream.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			config.Description = slip.MustBeString(v, ":description")
 		},
 	},
 	":discard": {
 		doc: &slip.DocArg{
 			Name: "discard",
-			Type: "[:old :new]",
-			Text: `x`,
+			Type: ":old|:new",
+			Text: `Defines the policy for handling messages when the stream reaches
+its limits in terms of number of messages or total bytes. :old, the default, will
+remove older messages to return to the limits. :new will fail to store new messages
+once the limits are reached.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			switch v {
+			case slip.Symbol(":old"), nil:
+				config.Discard = jetstream.DiscardOld
+			case slip.Symbol(":new"):
+				config.Discard = jetstream.DiscardNew
+			default:
+				slip.PanicType(":discard", v, "nil", ":old", ":new")
+			}
 		},
 	},
 	":discard-new-per-subject": {
 		doc: &slip.DocArg{
 			Name: "discard-new-per-subject",
-			Type: "bool",
-			Text: `x`,
+			Type: "boolean",
+			Text: `A flag to enable discarding new messages per subject when limits
+are reached. Requires DiscardPolicy to be DiscardNew and the MaxMsgsPerSubject to be set.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			config.DiscardNewPerSubject = (v != nil)
 		},
 	},
 	":duplicates": {
 		doc: &slip.DocArg{
 			Name: "duplicates",
 			Type: "real [time.Duration]",
-			Text: `x`,
+			Text: `Is the window within which to track duplicate messages.
+If not set, server default is 2 minutes. The value must be a real and is
+assumed to be seconds.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			if num, ok := v.(slip.Real); ok {
+				config.Duplicates = time.Duration(float64(time.Second) * num.RealValue())
+			} else {
+				slip.PanicType(":duplicates", v, "real")
+			}
 		},
 	},
 	":first-seq": {
 		doc: &slip.DocArg{
 			Name: "first-seq",
-			Type: "int",
-			Text: `x`,
+			Type: "fixnum",
+			Text: `The initial sequence number of the first message in the stream.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			if num, ok := v.(slip.Fixnum); ok {
+				config.FirstSeq = uint64(num)
+			} else {
+				slip.PanicType(":first-seq", v, "fixnum")
+			}
 		},
 	},
 	":max-age": {
 		doc: &slip.DocArg{
 			Name: "max-age",
-			Type: "real [duration]",
-			Text: `x`,
+			Type: "real",
+			Text: `The maximum age in seconds of messages that the stream will retain.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			if num, ok := v.(slip.Real); ok {
+				config.MaxAge = time.Duration(float64(time.Second) * num.RealValue())
+			} else {
+				slip.PanicType(":max-age", v, "real")
+			}
 		},
 	},
 	":max-bytes": {
 		doc: &slip.DocArg{
 			Name: "max-bytes",
-			Type: "int",
-			Text: `x`,
+			Type: "fixnum",
+			Text: `The maximum total size of messages the stream will store.
+After reaching the limit, stream adheres to the discard policy.
+If not set, server default is -1 (unlimited).`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			if num, ok := v.(slip.Fixnum); ok {
+				config.MaxBytes = int64(num)
+			} else {
+				slip.PanicType(":max-bytes", v, "fixnum")
+			}
 		},
 	},
 	":max-consumers": {
 		doc: &slip.DocArg{
 			Name: "max-consumers",
-			Type: "int",
-			Text: `x`,
+			Type: "fixnum",
+			Text: `Specifies the maximum number of consumers allowed for the stream.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			if num, ok := v.(slip.Fixnum); ok {
+				config.MaxConsumers = int(num)
+			} else {
+				slip.PanicType(":max-consumers", v, "fixnum")
+			}
 		},
 	},
 	":max-msg-size": {
 		doc: &slip.DocArg{
 			Name: "max-msg-size",
-			Type: "int",
-			Text: `x`,
+			Type: "fixnum",
+			Text: `The maximum size of any single message in the stream.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			if num, ok := v.(slip.Fixnum); ok {
+				config.MaxMsgSize = int32(num)
+			} else {
+				slip.PanicType(":max-msg-size", v, "fixnum")
+			}
 		},
 	},
 	":max-msgs": {
 		doc: &slip.DocArg{
 			Name: "max-msgs",
-			Type: "int",
-			Text: `x`,
+			Type: "fixnum",
+			Text: `The maximum number of messages the stream will store.
+After reaching the limit, stream adheres to the discard policy.
+If not set, server default is -1 (unlimited).`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			if num, ok := v.(slip.Fixnum); ok {
+				config.MaxMsgs = int64(num)
+			} else {
+				slip.PanicType(":max-msgs", v, "fixnum")
+			}
 		},
 	},
 	":max-msgs-per-subject": {
 		doc: &slip.DocArg{
 			Name: "max-msgs-per-subject",
-			Type: "int",
-			Text: `x`,
+			Type: "fixnum",
+			Text: `The maximum number of messages per subject that the stream will retain.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			if num, ok := v.(slip.Fixnum); ok {
+				config.MaxMsgsPerSubject = int64(num)
+			} else {
+				slip.PanicType(":max-msgs-per-subject", v, "fixnum")
+			}
 		},
 	},
 	":metadata": {
 		doc: &slip.DocArg{
 			Name: "metadata",
-			Type: "list [property list]",
-			Text: `x`,
+			Type: "property list",
+			Text: `A set of application-defined key-value pairs for
+associating metadata on the stream
+. This feature requires nats-server
+v2.10.0 or later.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			plist, ok := v.(slip.List)
+			if !ok {
+				slip.PanicType(":metadata", v, "property list")
+			}
+			m := map[string]string{}
+			for i := 0; i < len(plist)-1; i += 2 {
+				key := slip.MustBeString(v, ":metadata key")
+				m[key] = slip.MustBeString(v, ":metadata value")
+			}
+			config.Metadata = m
 		},
 	},
 	":mirror": {
 		doc: &slip.DocArg{
 			Name: "mirror",
-			Type: "list [property list]",
-			Text: `x`,
+			Type: "jet-stream-source instance",
+			Text: `Defines the configuration for mirroring another stream.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
 			// TBD
@@ -247,31 +308,51 @@ unacknowledged messages for a consumer.
 	":mirror-direct": {
 		doc: &slip.DocArg{
 			Name: "mirror-direct",
-			Type: "bool",
-			Text: `x`,
+			Type: "boolean",
+			Text: `Enables direct access to individual messages from the
+origin stream using direct get API. Defaults to _nil_.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			config.MirrorDirect = (v != nil)
 		},
 	},
 	":no-ack": {
 		doc: &slip.DocArg{
 			Name: "no-ack",
-			Type: "bool",
-			Text: `x`,
+			Type: "boolean",
+			Text: `A flag to disable acknowledging messages received by this stream.
+
+
+If set to true, publish methods from the JetStream client will not
+work as expected, since they rely on acknowledgements. Core NATS
+publish methods should be used instead. Note that this will make
+message delivery less reliable.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			config.NoAck = (v != nil)
 		},
 	},
 	":placement": {
 		doc: &slip.DocArg{
 			Name: "placement",
 			Type: "list of strings (cluster tags...)",
-			Text: `x`,
+			Text: `Used to declare where the stream should be placed via
+tags and/or an explicit cluster name. The list of string starts with a cluster
+name which is the name of the cluster to which the stream should be assigned.
+The cluster name can be followed by zero or more tags which are used to match
+streams to servers in the cluster. A stream will be assigned to a server with
+a matching tag.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			list, ok := v.(slip.List)
+			if !ok || len(list) < 1 {
+				slip.PanicType(":placement", v, "list")
+			}
+			p := jetstream.Placement{Cluster: slip.MustBeString(list[0], ":cluster")}
+			for _, x := range list[1:] {
+				p.Tags = append(p.Tags, slip.MustBeString(x, ":tag"))
+			}
+			config.Placement = &p
 		},
 	},
 	":re-publish": {
@@ -287,31 +368,51 @@ unacknowledged messages for a consumer.
 	":replicas": {
 		doc: &slip.DocArg{
 			Name: "replicas",
-			Type: "int",
-			Text: `x`,
+			Type: "fixnum",
+			Text: `The number of stream replicas in clustered JetStream. Defaults to 1, maximum is 5.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			if num, ok := v.(slip.Fixnum); ok {
+				config.Replicas = int(num)
+			} else {
+				slip.PanicType(":replicas", v, "fixnum")
+			}
 		},
 	},
 	":retention": {
 		doc: &slip.DocArg{
 			Name: "retention",
-			Type: "[:limit :interest :queue]",
-			Text: `x`,
+			Type: ":limit|:interest|:queue]",
+			Text: `Defines the message retention policy for the stream.
+Defaults to LimitsPolicy. :limits (default) means that messages are retained until any given limit is
+reached. This could be one of max-msgs, max-bytes, or max-age. :interest
+specifies that when all known observables have acknowledged a message it can
+be removed. :queue specifies that when the first worker or subscriber
+acknowledges the message it can be removed.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			switch v {
+			case slip.Symbol(":limit"):
+				config.Retention = jetstream.LimitsPolicy
+			case slip.Symbol(":interest"):
+				config.Retention = jetstream.InterestPolicy
+			case slip.Symbol(":queue"):
+				config.Retention = jetstream.WorkQueuePolicy
+			default:
+				slip.PanicType(":retention", v, ":limit", ":interest", ":queue")
+			}
 		},
 	},
 	":sealed": {
 		doc: &slip.DocArg{
 			Name: "sealed",
-			Type: "bool",
-			Text: `x`,
+			Type: "boolean",
+			Text: `Sealed streams do not allow messages to be published or deleted via limits or API,
+sealed streams can not be unsealed via configuration update. Can only
+be set on already created streams via the Update API.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			config.Sealed = (v != nil)
 		},
 	},
 	":sources": {
@@ -327,34 +428,59 @@ unacknowledged messages for a consumer.
 	":storage": {
 		doc: &slip.DocArg{
 			Name: "storage",
-			Type: "[:file :memory]",
-			Text: `x`,
+			Type: ":file|:memory",
+			Text: `Specifies the type of storage backend used for the stream as either
+file or memory. :file specifies on disk storage. It's the default. :memory specifies in
+memory only.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			switch v {
+			case slip.Symbol(":file"):
+				config.Storage = jetstream.FileStorage
+			case slip.Symbol(":memory"):
+				config.Storage = jetstream.MemoryStorage
+			default:
+				slip.PanicType(":storage", v, ":file", ":memory")
+			}
 		},
 	},
 	":subject-transform": {
 		doc: &slip.DocArg{
 			Name: "subject-transform",
-			Type: "list of (source destination)",
-			Text: `x`,
+			Type: "list",
+			Text: `Allows applying a transformation to matching messages' subjects. The
+list must be a list of source and destination as strings. Source is the subject pattern
+to match incoming messages against. Destination is the subject pattern to remap the subject to.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			list, ok := v.(slip.List)
+			if !ok || len(list) != 2 {
+				slip.PanicType(":subject-transform", v, "list")
+			}
+			config.SubjectTransform = &jetstream.SubjectTransformConfig{
+				Source:      slip.MustBeString(list[0], ":source"),
+				Destination: slip.MustBeString(list[1], ":destination"),
+			}
 		},
 	},
 	":subjects": {
 		doc: &slip.DocArg{
 			Name: "subjects",
-			Type: "[]string",
-			Text: `x`,
+			Type: "list",
+			Text: `A list of subjects that the stream is listening on.
+Wildcards are supported. Subjects cannot be set if the stream is
+created as a mirror.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			list, ok := v.(slip.List)
+			if !ok {
+				slip.PanicType(":subjects", v, "list")
+			}
+			for _, x := range list {
+				config.Subjects = append(config.Subjects, slip.MustBeString(x, ":subject"))
+			}
 		},
 	},
-	// TBD
 }
 
 // InitStreamConfig sets or updates the fields in a jetstream.StreamConfig
