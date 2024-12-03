@@ -5,6 +5,7 @@ package jet
 import (
 	"fmt"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/nats-io/nats.go/jetstream"
@@ -54,7 +55,7 @@ contents of a stream, or subject in a stream, with a single new message.`,
 	":compression": {
 		doc: &slip.DocArg{
 			Name: "compression",
-			Type: "bool [maps to none or s2]",
+			Type: "bool",
 			Text: `Specifies the message storage compression algorithm. Defaults to NoCompression.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
@@ -160,7 +161,7 @@ are reached. Requires DiscardPolicy to be DiscardNew and the MaxMsgsPerSubject t
 	":duplicates": {
 		doc: &slip.DocArg{
 			Name: "duplicates",
-			Type: "real [time.Duration]",
+			Type: "real",
 			Text: `Is the window within which to track duplicate messages.
 If not set, server default is 2 minutes. The value must be a real and is
 assumed to be seconds.`,
@@ -437,7 +438,7 @@ be set on already created streams via the Update API.`,
 	":sources": {
 		doc: &slip.DocArg{
 			Name: "sources",
-			Type: "list of list [property list] or maybe jet-stream-source flavor instance",
+			Type: "list of jet-stream-source instances",
 			Text: `A list of other streams this stream sources messages from.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
@@ -517,17 +518,121 @@ created as a mirror.`,
 // InitStreamConfig sets or updates the fields in a jetstream.StreamConfig
 // based on the slip arguments provided.
 func InitStreamConfig(config *jetstream.StreamConfig, args slip.List) {
-	// TBD
+	for i := 0; i < len(args)-1; i += 2 {
+		sym := args[i].(slip.Symbol)
+		key := strings.ToLower(string(sym))
+		if so := streamOptMap[key]; so != nil {
+			so.update(config, args[i+1])
+		} else {
+			slip.NewPanic("%s is not a valid keyword", key)
+		}
+	}
 }
 
 // StreamConfigPropList returns a property list built from a
 // jetstream.StreamConfig. The returned list is suitable as arguments to a
 // stream creation.
 func StreamConfigPropList(config *jetstream.StreamConfig, skipDefaults bool) slip.List {
-
 	// TBD
-
-	return nil
+	var (
+		discard   slip.Object
+		meta      slip.List
+		mirror    slip.Object
+		placement slip.List
+		repub     slip.List
+		retention slip.Object
+		sources   slip.List
+		storage   slip.Object
+		transform slip.List
+		subjects  slip.List
+	)
+	switch config.Discard {
+	case jetstream.DiscardOld:
+		discard = slip.Symbol(":old")
+	case jetstream.DiscardNew:
+		discard = slip.Symbol(":new")
+	}
+	for k, v := range config.Metadata {
+		meta = append(meta, slip.String(k), slip.String(v))
+	}
+	if config.Mirror != nil {
+		mirror = MakeStreamSource(config.Mirror)
+	}
+	if config.Placement != nil {
+		placement = append(placement, slip.String(config.Placement.Cluster))
+		for _, tag := range config.Placement.Tags {
+			placement = append(placement, slip.String(tag))
+		}
+	}
+	if config.RePublish != nil {
+		repub = slip.List{
+			slip.String(config.RePublish.Source),
+			slip.String(config.RePublish.Destination),
+			slipBool(config.RePublish.HeadersOnly),
+		}
+	}
+	switch config.Retention {
+	case jetstream.LimitsPolicy:
+		retention = slip.Symbol(":limit")
+	case jetstream.InterestPolicy:
+		retention = slip.Symbol(":interest")
+	case jetstream.WorkQueuePolicy:
+		retention = slip.Symbol(":queue")
+	}
+	for _, src := range config.Sources {
+		sources = append(sources, MakeStreamSource(src))
+	}
+	switch config.Storage {
+	case jetstream.FileStorage:
+		storage = slip.Symbol(":file")
+	case jetstream.MemoryStorage:
+		storage = slip.Symbol(":memory")
+	}
+	if config.SubjectTransform != nil {
+		transform = slip.List{
+			slip.String(config.SubjectTransform.Source),
+			slip.String(config.SubjectTransform.Destination),
+		}
+	}
+	for _, subj := range config.Subjects {
+		subjects = append(subjects, slip.String(subj))
+	}
+	return slip.List{
+		slip.Symbol(":name"), slip.String(config.Name),
+		slip.Symbol(":allow-direct"), slipBool(config.AllowDirect),
+		slip.Symbol(":allow-rollup"), slipBool(config.AllowRollup),
+		slip.Symbol(":compression"), slipBool(config.Compression == jetstream.S2Compression),
+		slip.Symbol(":consumer-limits"), slip.List{
+			slip.DoubleFloat(float64(config.ConsumerLimits.InactiveThreshold) / float64(time.Second)),
+			slip.Fixnum(config.ConsumerLimits.MaxAckPending),
+		},
+		slip.Symbol(":deny-delete"), slipBool(config.DenyDelete),
+		slip.Symbol(":deny-purge"), slipBool(config.DenyPurge),
+		slip.Symbol(":description"), slip.String(config.Description),
+		slip.Symbol(":discard"), discard,
+		slip.Symbol(":discard-new-per-subject"), slipBool(config.DiscardNewPerSubject),
+		slip.Symbol(":duplicates"), slip.DoubleFloat(float64(config.Duplicates) / float64(time.Second)),
+		slip.Symbol(":first-seq"), slip.Fixnum(config.FirstSeq),
+		slip.Symbol(":max-age"), slip.Fixnum(config.MaxAge),
+		slip.Symbol(":max-bytes"), slip.Fixnum(config.MaxBytes),
+		slip.Symbol(":max-consumers"), slip.Fixnum(config.MaxConsumers),
+		slip.Symbol(":max-msg-size"), slip.Fixnum(config.MaxMsgSize),
+		slip.Symbol(":max-msgs"), slip.Fixnum(config.MaxMsgs),
+		slip.Symbol(":max-msgs-per-subject"), slip.Fixnum(config.MaxMsgsPerSubject),
+		slip.Symbol(":metadata"), meta,
+		slip.Symbol(":mirror"), mirror,
+		slip.Symbol(":mirror-direct"), slipBool(config.MirrorDirect),
+		slip.Symbol(":no-ack"), slipBool(config.NoAck),
+		slip.Symbol(":placement"), placement,
+		slip.Symbol(":re-publish"), repub,
+		slip.Symbol(":replicas"), slip.Fixnum(config.Replicas),
+		slip.Symbol(":retention"), retention,
+		slip.Symbol(":sealed"), slipBool(config.Sealed),
+		slip.Symbol(":sources"), sources,
+		slip.Symbol(":storage"), storage,
+		slip.Symbol(":subject-transform"), transform,
+		slip.Symbol(":subjects"), subjects,
+	}
 }
 
 func makeFuncArgs() (args []*slip.DocArg) {
@@ -546,4 +651,11 @@ func makeFuncArgs() (args []*slip.DocArg) {
 
 func Foo() {
 	fmt.Printf("*** args: %v\n", makeFuncArgs())
+}
+
+func slipBool(v bool) slip.Object {
+	if v {
+		return slip.True
+	}
+	return nil
 }
