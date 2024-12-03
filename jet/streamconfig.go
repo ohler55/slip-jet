@@ -3,7 +3,6 @@
 package jet
 
 import (
-	"fmt"
 	"sort"
 	"strings"
 	"time"
@@ -77,8 +76,7 @@ as a _real_. The second element is the max-ack-pending which must be a
 _fixnum_. The inactive-threshold is a duration which instructs the server to
 clean up the consumer if it has been inactive for the specified
 duration. While the max-ack-pending a maximum number of outstanding
-unacknowledged messages for a consumer.
-`,
+unacknowledged messages for a consumer.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
 			list, ok := v.(slip.List)
@@ -281,8 +279,7 @@ If not set, server default is -1 (unlimited).`,
 			Name: "metadata",
 			Type: "property list",
 			Text: `A set of application-defined key-value pairs for
-associating metadata on the stream
-. This feature requires nats-server
+associating metadata on the stream. This feature requires nats-server
 v2.10.0 or later.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
@@ -292,8 +289,8 @@ v2.10.0 or later.`,
 			}
 			m := map[string]string{}
 			for i := 0; i < len(plist)-1; i += 2 {
-				key := slip.MustBeString(v, ":metadata key")
-				m[key] = slip.MustBeString(v, ":metadata value")
+				key := slip.MustBeString(plist[i], ":metadata key")
+				m[key] = slip.MustBeString(plist[i+1], ":metadata value")
 			}
 			config.Metadata = m
 		},
@@ -309,7 +306,7 @@ v2.10.0 or later.`,
 				var jss jetstream.StreamSource
 				SetJetstreamStreamSource(&jss, inst)
 				config.Mirror = &jss
-			} else {
+			} else if v != nil {
 				slip.PanicType(":mirror", v, "jet-stream-source instance")
 			}
 		},
@@ -330,8 +327,6 @@ origin stream using direct get API. Defaults to _nil_.`,
 			Name: "no-ack",
 			Type: "boolean",
 			Text: `A flag to disable acknowledging messages received by this stream.
-
-
 If set to true, publish methods from the JetStream client will not
 work as expected, since they rely on acknowledgements. Core NATS
 publish methods should be used instead. Note that this will make
@@ -442,17 +437,19 @@ be set on already created streams via the Update API.`,
 			Text: `A list of other streams this stream sources messages from.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			list, ok := v.(slip.List)
-			if !ok || len(list) != 2 {
-				slip.PanicType(":subject-transform", v, "list")
-			}
-			for _, x := range list {
-				if inst, ok := x.(*flavors.Instance); ok && inst.IsA(streamSourceFlavor) {
-					var jss jetstream.StreamSource
-					SetJetstreamStreamSource(&jss, inst)
-					config.Sources = append(config.Sources, &jss)
-				} else {
-					slip.PanicType(":sources", x, "jet-stream-source instance")
+			if v != nil {
+				list, ok := v.(slip.List)
+				if !ok {
+					slip.PanicType(":sources", v, "list")
+				}
+				for _, x := range list {
+					if inst, ok := x.(*flavors.Instance); ok && inst.IsA(streamSourceFlavor) {
+						var jss jetstream.StreamSource
+						SetJetstreamStreamSource(&jss, inst)
+						config.Sources = append(config.Sources, &jss)
+					} else {
+						slip.PanicType(":sources", x, "jet-stream-source instance")
+					}
 				}
 			}
 		},
@@ -485,13 +482,15 @@ list must be a list of source and destination as strings. Source is the subject 
 to match incoming messages against. Destination is the subject pattern to remap the subject to.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			list, ok := v.(slip.List)
-			if !ok || len(list) != 2 {
-				slip.PanicType(":subject-transform", v, "list")
-			}
-			config.SubjectTransform = &jetstream.SubjectTransformConfig{
-				Source:      slip.MustBeString(list[0], ":source"),
-				Destination: slip.MustBeString(list[1], ":destination"),
+			if v != nil {
+				list, ok := v.(slip.List)
+				if !ok || len(list) != 2 {
+					slip.PanicType(":subject-transform", v, "list")
+				}
+				config.SubjectTransform = &jetstream.SubjectTransformConfig{
+					Source:      slip.MustBeString(list[0], ":source"),
+					Destination: slip.MustBeString(list[1], ":destination"),
+				}
 			}
 		},
 	},
@@ -523,7 +522,7 @@ func InitStreamConfig(config *jetstream.StreamConfig, args slip.List) {
 		key := strings.ToLower(string(sym))
 		if so := streamOptMap[key]; so != nil {
 			so.update(config, args[i+1])
-		} else {
+		} else if key != ":timeout" {
 			slip.NewPanic("%s is not a valid keyword", key)
 		}
 	}
@@ -532,8 +531,7 @@ func InitStreamConfig(config *jetstream.StreamConfig, args slip.List) {
 // StreamConfigPropList returns a property list built from a
 // jetstream.StreamConfig. The returned list is suitable as arguments to a
 // stream creation.
-func StreamConfigPropList(config *jetstream.StreamConfig, skipDefaults bool) slip.List {
-	// TBD
+func StreamConfigPropList(config *jetstream.StreamConfig) slip.List {
 	var (
 		discard   slip.Object
 		meta      slip.List
@@ -613,7 +611,7 @@ func StreamConfigPropList(config *jetstream.StreamConfig, skipDefaults bool) sli
 		slip.Symbol(":discard-new-per-subject"), slipBool(config.DiscardNewPerSubject),
 		slip.Symbol(":duplicates"), slip.DoubleFloat(float64(config.Duplicates) / float64(time.Second)),
 		slip.Symbol(":first-seq"), slip.Fixnum(config.FirstSeq),
-		slip.Symbol(":max-age"), slip.Fixnum(config.MaxAge),
+		slip.Symbol(":max-age"), slip.DoubleFloat(float64(config.MaxAge) / float64(time.Second)),
 		slip.Symbol(":max-bytes"), slip.Fixnum(config.MaxBytes),
 		slip.Symbol(":max-consumers"), slip.Fixnum(config.MaxConsumers),
 		slip.Symbol(":max-msg-size"), slip.Fixnum(config.MaxMsgSize),
@@ -635,22 +633,55 @@ func StreamConfigPropList(config *jetstream.StreamConfig, skipDefaults bool) sli
 	}
 }
 
-func makeFuncArgs() (args []*slip.DocArg) {
-	args = make([]*slip.DocArg, len(streamOptMap)+1)
+// func makeFuncArgs() (args []*slip.DocArg) {
+// 	args = make([]*slip.DocArg, len(streamOptMap)+1)
+// 	keys := make([]string, 0, len(streamOptMap))
+// 	for k := range streamOptMap {
+// 		keys = append(keys, k)
+// 	}
+// 	sort.Strings(keys)
+// 	args[0] = &slip.DocArg{Name: "&key"}
+// 	for i, k := range keys {
+// 		args[i+1] = streamOptMap[k].doc
+// 	}
+// 	return
+// }
+
+func makeStreamMethodDoc(method, args, retType, argDocs, description string) string {
+	var b []byte
+	b = append(b, "__"...)
+	b = append(b, method...)
+	b = append(b, "__ "...)
+	b = append(b, args...)
+	b = append(b, "&key"...)
 	keys := make([]string, 0, len(streamOptMap))
 	for k := range streamOptMap {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
-	args[0] = &slip.DocArg{Name: "&key"}
-	for i, k := range keys {
-		args[i+1] = streamOptMap[k].doc
+	for _, k := range keys {
+		b = append(b, ' ')
+		b = append(b, k[1:]...)
 	}
-	return
-}
+	b = append(b, " => "...)
+	b = append(b, retType...)
+	b = append(b, '\n')
 
-func Foo() {
-	fmt.Printf("*** args: %v\n", makeFuncArgs())
+	b = append(b, argDocs...)
+	for _, k := range keys {
+		b = append(b, "\n   _"...)
+		b = append(b, k...)
+		b = append(b, "_ ["...)
+		doc := streamOptMap[k].doc
+		b = append(b, doc.Type...)
+		b = append(b, "] "...)
+		b = append(b, doc.Text...)
+	}
+	b = append(b, '\n', '\n', '\n')
+	b = append(b, description...)
+	b = append(b, '\n')
+
+	return string(b)
 }
 
 func slipBool(v bool) slip.Object {

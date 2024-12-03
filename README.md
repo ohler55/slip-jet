@@ -27,13 +27,8 @@ Notes
 
 - client
  - as StreamManager
-  - :create-stream (name &key ...) [use
-  - make a map with all options along with docs
-   - also a parseStreamConfigArgs that populates a StreamConfig
-    - use for create, update and make-instance
-    - :info should return a compatible prop list
-    - make public to test without combination restriction
-
+  - :create-stream (name &key ...)
+   - add methods to stream
   - :update-stream [just :update on stream]
   - :create-or-update-stream
   - :get-stream or maybe just :stream on a client

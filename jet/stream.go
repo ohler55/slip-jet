@@ -9,6 +9,7 @@ import (
 	"github.com/ohler55/slip/pkg/flavors"
 
 	_ "github.com/nats-io/nats.go"
+	"github.com/nats-io/nats.go/jetstream"
 	_ "github.com/nats-io/nats.go/jetstream"
 )
 
@@ -72,4 +73,12 @@ func (caller streamInitCaller) Docs() string {
 
 Sets the initial value when _make-instance_ is called.
 `
+}
+
+// MakeStream makes a jet-stream.
+func MakeStream(stream jetstream.Stream) (inst *flavors.Instance) {
+	inst = streamFlavor.MakeInstance().(*flavors.Instance)
+	inst.Any = stream
+
+	return
 }
