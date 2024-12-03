@@ -23,39 +23,11 @@ Notes
 - does client instance need to keep track of subscription?
  - so that the error callback with subscription can return the correct instance?
 
+- describe-flavor should honor _x_ and __x__
+
 - client
  - as StreamManager
-  - :create-stream (name &key ...) [also make-instance with a client and lots of &key options]
-   - :description string
-   - :subjects []string
-   - :retention [:limit :interest :queue]
-   - :max-consumers int
-   - :max-msgs int
-   - :max-bytes int
-   - :discard [:old :new]
-   - :discard-new-per-subject bool
-   - :max-age real [duration]
-   - :max-msgs-per-subject int
-   - :max-msg-size int
-   - :storage [:file :memory]
-   - :replicas int
-   - :no-ack bool
-   - :duplicates real [time.Duration]
-   - :placement list of strings (cluster tags...)
-   - :mirror list [property list]
-   - :sources list of list [property list] or maybe jet-stream-source flavor instance
-   - :sealed bool
-   - :deny-delete bool
-   - :deny-purge bool
-   - :allow-rollup bool
-   - :compression bool [maps to none or s2]
-   - :first-seq int
-   - :subject-transform list of (source destination)
-   - :re-publish list of (source destination headers-only)
-   - :allow-direct bool
-   - :mirror-direct bool
-   - :consumer-limits list of (inactive-threshold[real] max-ack-pending[int])
-   - :metadata list [property list]
+  - :create-stream (name &key ...) [use
   - make a map with all options along with docs
    - also a parseStreamConfigArgs that populates a StreamConfig
     - use for create, update and make-instance

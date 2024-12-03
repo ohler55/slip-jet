@@ -3,11 +3,13 @@
 package jet
 
 import (
+	"fmt"
 	"sort"
 	"time"
 
 	"github.com/nats-io/nats.go/jetstream"
 	"github.com/ohler55/slip"
+	"github.com/ohler55/slip/pkg/flavors"
 )
 
 type streamOpt struct {
@@ -302,7 +304,13 @@ v2.10.0 or later.`,
 			Text: `Defines the configuration for mirroring another stream.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			if inst, ok := v.(*flavors.Instance); ok && inst.IsA(streamSourceFlavor) {
+				var jss jetstream.StreamSource
+				SetJetstreamStreamSource(&jss, inst)
+				config.Mirror = &jss
+			} else {
+				slip.PanicType(":mirror", v, "jet-stream-source instance")
+			}
 		},
 	},
 	":mirror-direct": {
@@ -359,10 +367,21 @@ a matching tag.`,
 		doc: &slip.DocArg{
 			Name: "re-publish",
 			Type: "list of (source destination headers-only)",
-			Text: `x`,
+			Text: `Allows immediate republishing a message to the configured subject
+after it's stored. The source is the subject pattern to match incoming messages against.
+The destination is the subject pattern to republish the subject to. While the headers if
+present is a flag to indicate that only the headers should be republished.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			list, ok := v.(slip.List)
+			if !ok || len(list) < 2 {
+				slip.PanicType(":re-publish", v, "list of source, destination, and headers-only")
+			}
+			config.RePublish = &jetstream.RePublish{
+				Source:      slip.MustBeString(list[0], ":re-publish source"),
+				Destination: slip.MustBeString(list[1], ":re-publish destination"),
+				HeadersOnly: (2 < len(list) && list[2] != nil),
+			}
 		},
 	},
 	":replicas": {
@@ -419,10 +438,22 @@ be set on already created streams via the Update API.`,
 		doc: &slip.DocArg{
 			Name: "sources",
 			Type: "list of list [property list] or maybe jet-stream-source flavor instance",
-			Text: `x`,
+			Text: `A list of other streams this stream sources messages from.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			// TBD
+			list, ok := v.(slip.List)
+			if !ok || len(list) != 2 {
+				slip.PanicType(":subject-transform", v, "list")
+			}
+			for _, x := range list {
+				if inst, ok := x.(*flavors.Instance); ok && inst.IsA(streamSourceFlavor) {
+					var jss jetstream.StreamSource
+					SetJetstreamStreamSource(&jss, inst)
+					config.Sources = append(config.Sources, &jss)
+				} else {
+					slip.PanicType(":sources", x, "jet-stream-source instance")
+				}
+			}
 		},
 	},
 	":storage": {
@@ -486,20 +517,18 @@ created as a mirror.`,
 // InitStreamConfig sets or updates the fields in a jetstream.StreamConfig
 // based on the slip arguments provided.
 func InitStreamConfig(config *jetstream.StreamConfig, args slip.List) {
-
+	// TBD
 }
 
 // StreamConfigPropList returns a property list built from a
 // jetstream.StreamConfig. The returned list is suitable as arguments to a
 // stream creation.
-func StreamConfigPropList(config *jetstream.StreamConfig) slip.List {
+func StreamConfigPropList(config *jetstream.StreamConfig, skipDefaults bool) slip.List {
 
 	// TBD
 
 	return nil
 }
-
-// TBD docs from list or maybe just a list of
 
 func makeFuncArgs() (args []*slip.DocArg) {
 	args = make([]*slip.DocArg, len(streamOptMap)+1)
@@ -513,4 +542,8 @@ func makeFuncArgs() (args []*slip.DocArg) {
 		args[i+1] = streamOptMap[k].doc
 	}
 	return
+}
+
+func Foo() {
+	fmt.Printf("*** args: %v\n", makeFuncArgs())
 }

@@ -18,11 +18,12 @@ var (
 
 func init() {
 	Pkg.Initialize(map[string]*slip.VarVal{})
+	defAck()
 	defClient()
-	defStream()
 	defConsumer()
 	defMsg()
-	defAck()
+	defStream()
+	defStreamSource()
 
 	initConnect()
 
