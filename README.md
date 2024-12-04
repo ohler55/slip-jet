@@ -23,7 +23,9 @@ Notes
 - does client instance need to keep track of subscription?
  - so that the error callback with subscription can return the correct instance?
 
-- describe-flavor should honor _x_ and __x__
+- stream
+ - create mock stream for testing
+  - write to log to verify calls
 
 - client
  - as StreamManager

@@ -3,8 +3,6 @@
 package jet
 
 import (
-	"fmt"
-
 	"github.com/ohler55/slip"
 	"github.com/ohler55/slip/pkg/flavors"
 
@@ -24,10 +22,9 @@ func defStream() {
 		slip.List{
 			slip.List{
 				slip.Symbol(":documentation"),
-				slip.String(`
-TBD
-
-`),
+				slip.String(`Stream contains CRUD methods on a consumer as well as operations
+on an existing stream. It allows fetching and removing messages from a stream, as well as
+purging a stream.`),
 			},
 			slip.List{
 				slip.Symbol(":init-keywords"),
@@ -39,40 +36,17 @@ TBD
 		},
 		&Pkg,
 	)
-	streamFlavor.DefMethod(":init", "", streamInitCaller{})
-	// info &key cached timeout ... other options
-	// purge &key timeout ... other options
-	// get-msg seq &key subject timeout ... other options
-	// delete-msg seq &key secure ... other options
+	streamFlavor.Final = true
+	streamFlavor.GoMakeOnly = true
 
-}
+	streamFlavor.DefMethod(":info", "", streamInfoCaller{})
+	flavors.FlosFun("jet-stream-info", ":info", streamInfoCaller{}.Docs(), &Pkg)
 
-type stream struct {
-	self *flavors.Instance
-}
-
-type streamInitCaller struct{}
-
-func (caller streamInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
-	obj := s.Get("self").(*flavors.Instance)
-	if 0 < len(args) {
-		args = args[0].(slip.List)
-	}
-	st := stream{self: obj}
-	obj.Any = &st
-
-	fmt.Printf("*** init args: %s\n", args)
+	// :purge &key timeout keep sequence subject
+	// :get-msg seq &key subject timeout
+	// :get-last-msg subject &key timeout
+	// :delete-msg seq &key secure
 	// TBD
-
-	return nil
-}
-
-func (caller streamInitCaller) Docs() string {
-	return `__:init__
-
-
-Sets the initial value when _make-instance_ is called.
-`
 }
 
 // MakeStream makes a jet-stream.
