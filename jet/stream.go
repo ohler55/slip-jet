@@ -42,6 +42,12 @@ purging a stream.`),
 	streamFlavor.DefMethod(":info", "", streamInfoCaller{})
 	flavors.FlosFun("jet-stream-info", ":info", streamInfoCaller{}.Docs(), &Pkg)
 
+	streamFlavor.DefMethod(":name", "", streamNameCaller{})
+	flavors.FlosFun("jet-stream-name", ":name", streamNameCaller{}.Docs(), &Pkg)
+
+	streamFlavor.DefMethod(":subjects", "", streamSubjectsCaller{})
+	flavors.FlosFun("jet-stream-subjects", ":subjects", streamSubjectsCaller{}.Docs(), &Pkg)
+
 	// :purge &key timeout keep sequence subject
 	// :get-msg seq &key subject timeout
 	// :get-last-msg subject &key timeout

@@ -14,7 +14,45 @@ import (
 func TestStreamConfigOk(t *testing.T) {
 	var cfg jetstream.StreamConfig
 
-	jet.InitStreamConfig(&cfg, slip.List{
+	sampleStreamConfig(&cfg)
+
+	plist := jet.StreamConfigPropList(&cfg)
+
+	checkPlistValue(t, ":name", plist, slip.String("river"))
+	checkPlistValue(t, ":allow-direct", plist, slip.True)
+	checkPlistValue(t, ":allow-rollup", plist, slip.True)
+	checkPlistValue(t, ":compression", plist, slip.True)
+	checkPlistValue(t, ":consumer-limits", plist, slip.List{slip.DoubleFloat(2.5), slip.Fixnum(7)})
+	checkPlistValue(t, ":deny-delete", plist, slip.True)
+	checkPlistValue(t, ":deny-purge", plist, slip.True)
+	checkPlistValue(t, ":description", plist, slip.String("description"))
+	checkPlistValue(t, ":discard", plist, slip.Symbol(":new"))
+	checkPlistValue(t, ":discard-new-per-subject", plist, slip.True)
+	checkPlistValue(t, ":duplicates", plist, slip.DoubleFloat(1.5))
+	checkPlistValue(t, ":first-seq", plist, slip.Fixnum(3))
+	checkPlistValue(t, ":max-age", plist, slip.DoubleFloat(99))
+	checkPlistValue(t, ":max-bytes", plist, slip.Fixnum(4096))
+	checkPlistValue(t, ":max-consumers", plist, slip.Fixnum(9))
+	checkPlistValue(t, ":max-msg-size", plist, slip.Fixnum(1024))
+	checkPlistValue(t, ":max-msgs", plist, slip.Fixnum(5))
+	checkPlistValue(t, ":max-msgs-per-subject", plist, slip.Fixnum(2))
+	checkPlistValue(t, ":metadata", plist, slip.List{slip.String("meta"), slip.String("data")})
+	checkPlistValue(t, ":mirror", plist, jet.MakeStreamSource(&jetstream.StreamSource{Name: "source"}))
+	checkPlistValue(t, ":mirror-direct", plist, slip.True)
+	checkPlistValue(t, ":no-ack", plist, slip.True)
+	checkPlistValue(t, ":placement", plist, slip.List{slip.String("cluster"), slip.String("tag")})
+	checkPlistValue(t, ":re-publish", plist, slip.List{slip.String("source"), slip.String("destination"), slip.True})
+	checkPlistValue(t, ":replicas", plist, slip.Fixnum(2))
+	checkPlistValue(t, ":retention", plist, slip.Symbol(":limit"))
+	checkPlistValue(t, ":sealed", plist, slip.True)
+	checkPlistValue(t, ":sources", plist, slip.List{jet.MakeStreamSource(&jetstream.StreamSource{Name: "source2"})})
+	checkPlistValue(t, ":storage", plist, slip.Symbol(":memory"))
+	checkPlistValue(t, ":subject-transform", plist, slip.List{slip.String("src"), slip.String("dest")})
+	checkPlistValue(t, ":subjects", plist, slip.List{slip.String("test.one"), slip.String("test.two")})
+}
+
+func sampleStreamConfig(cfg *jetstream.StreamConfig) {
+	jet.InitStreamConfig(cfg, slip.List{
 		slip.Symbol(":name"), slip.String("river"),
 		slip.Symbol(":allow-direct"), slip.True,
 		slip.Symbol(":allow-rollup"), slip.True,
@@ -50,40 +88,6 @@ func TestStreamConfigOk(t *testing.T) {
 		slip.Symbol(":subject-transform"), slip.List{slip.String("src"), slip.String("dest")},
 		slip.Symbol(":subjects"), slip.List{slip.String("test.one"), slip.String("test.two")},
 	})
-
-	plist := jet.StreamConfigPropList(&cfg)
-
-	checkPlistValue(t, ":name", plist, slip.String("river"))
-	checkPlistValue(t, ":allow-direct", plist, slip.True)
-	checkPlistValue(t, ":allow-rollup", plist, slip.True)
-	checkPlistValue(t, ":compression", plist, slip.True)
-	checkPlistValue(t, ":consumer-limits", plist, slip.List{slip.DoubleFloat(2.5), slip.Fixnum(7)})
-	checkPlistValue(t, ":deny-delete", plist, slip.True)
-	checkPlistValue(t, ":deny-purge", plist, slip.True)
-	checkPlistValue(t, ":description", plist, slip.String("description"))
-	checkPlistValue(t, ":discard", plist, slip.Symbol(":new"))
-	checkPlistValue(t, ":discard-new-per-subject", plist, slip.True)
-	checkPlistValue(t, ":duplicates", plist, slip.DoubleFloat(1.5))
-	checkPlistValue(t, ":first-seq", plist, slip.Fixnum(3))
-	checkPlistValue(t, ":max-age", plist, slip.DoubleFloat(99))
-	checkPlistValue(t, ":max-bytes", plist, slip.Fixnum(4096))
-	checkPlistValue(t, ":max-consumers", plist, slip.Fixnum(9))
-	checkPlistValue(t, ":max-msg-size", plist, slip.Fixnum(1024))
-	checkPlistValue(t, ":max-msgs", plist, slip.Fixnum(5))
-	checkPlistValue(t, ":max-msgs-per-subject", plist, slip.Fixnum(2))
-	checkPlistValue(t, ":metadata", plist, slip.List{slip.String("meta"), slip.String("data")})
-	checkPlistValue(t, ":mirror", plist, jet.MakeStreamSource(&jetstream.StreamSource{Name: "source"}))
-	checkPlistValue(t, ":mirror-direct", plist, slip.True)
-	checkPlistValue(t, ":no-ack", plist, slip.True)
-	checkPlistValue(t, ":placement", plist, slip.List{slip.String("cluster"), slip.String("tag")})
-	checkPlistValue(t, ":re-publish", plist, slip.List{slip.String("source"), slip.String("destination"), slip.True})
-	checkPlistValue(t, ":replicas", plist, slip.Fixnum(2))
-	checkPlistValue(t, ":retention", plist, slip.Symbol(":limit"))
-	checkPlistValue(t, ":sealed", plist, slip.True)
-	checkPlistValue(t, ":sources", plist, slip.List{jet.MakeStreamSource(&jetstream.StreamSource{Name: "source2"})})
-	checkPlistValue(t, ":storage", plist, slip.Symbol(":memory"))
-	checkPlistValue(t, ":subject-transform", plist, slip.List{slip.String("src"), slip.String("dest")})
-	checkPlistValue(t, ":subjects", plist, slip.List{slip.String("test.one"), slip.String("test.two")})
 }
 
 func TestStreamConfigBoolNil(t *testing.T) {

@@ -8,16 +8,14 @@ import (
 	"github.com/ohler55/slip"
 	"github.com/ohler55/slip/pkg/flavors"
 
-	_ "github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
-	_ "github.com/nats-io/nats.go/jetstream"
 )
 
 type streamInfoCaller struct{}
 
 func (caller streamInfoCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":info", len(args), 0, 4)
+	flavors.CheckMethodArgCount(self, ":info", len(args), 0, 6)
 	stream := self.Any.(jetstream.Stream)
 	var si *jetstream.StreamInfo
 
@@ -30,8 +28,12 @@ func (caller streamInfoCaller) Call(s *slip.Scope, args slip.List, _ int) slip.O
 			ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
 			defer cf()
 		}
+		var opts []jetstream.StreamInfoOpt
+		if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":deleted")); has {
+			opts = append(opts, jetstream.WithDeletedDetails(v != nil))
+		}
 		var err error
-		if si, err = stream.Info(ctx); err != nil {
+		if si, err = stream.Info(ctx, opts...); err != nil {
 			panic(err)
 		}
 	}
@@ -39,9 +41,10 @@ func (caller streamInfoCaller) Call(s *slip.Scope, args slip.List, _ int) slip.O
 }
 
 func (caller streamInfoCaller) Docs() string {
-	return `__:info__ &key _timeout_ _cached_ => _state_[property list], _config_[property list]
+	return `__:info__ &key _timeout_ _cached_ _deleted_ => _state_[property list], _config_[property list]
    _:timeout_ [real] the number of seconds to wait before timing out.
    _:cached_ [boolean] return the cached information instead of fetching from the server.
+   _:deleted_ [boolean] if true, include the information about messages deleted from a stream.
 
 
 Returns the stream information as a two part value of the stream state as a
