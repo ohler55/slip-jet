@@ -29,15 +29,14 @@ Notes
 
 - client
  - as StreamManager
-  - :create-stream (name &key ...)
-   - add methods to stream
-  - :update-stream [just :update on stream]
-  - :create-or-update-stream
-  - :get-stream or maybe just :stream on a client
-  - :stream-name-by-subject
-  - :delete-stream [or use stream to :delete]
-  - :list-streams
-  - :stream-names [use for loop on channel then check for error]
+  - :create-stream (name &key timeout ...)
+  - :update-stream (name &key timeout ...)
+  - :create-or-update-stream (name &key timeout ...)
+  - :stream (name &key timeout)
+  - :stream-name-by-subject (subject &key timeout)
+  - :delete-stream (name &key timeout)
+  - :list-streams (name &key timeout subject) => channels or list (from range loop)
+  - :stream-names (name &key timeout subject) => channels or list (from range loop)
  - stream
   - consumer manager functions (create, update, get, delete, list, names, ordered, create-or-update)
 
