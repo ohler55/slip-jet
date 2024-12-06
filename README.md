@@ -39,13 +39,6 @@ Notes
   - :list-streams
   - :stream-names [use for loop on channel then check for error]
  - stream
-  + :name
-  + :subjects
-  + :info
-  - :purge (&key keep sequence-number subject)
-  - :get-msg (seq &key subject deleted)
-  - :delete-msg (seq &key secure)
-  - :get-last-msg (subject &key timeout)
   - consumer manager functions (create, update, get, delete, list, names, ordered, create-or-update)
 
  - as StreamConsumerManager

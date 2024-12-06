@@ -48,10 +48,18 @@ purging a stream.`),
 	streamFlavor.DefMethod(":subjects", "", streamSubjectsCaller{})
 	flavors.FlosFun("jet-stream-subjects", ":subjects", streamSubjectsCaller{}.Docs(), &Pkg)
 
-	// :purge &key timeout keep sequence subject
-	// :get-msg seq &key subject timeout
-	// :get-last-msg subject &key timeout
-	// :delete-msg seq &key secure
+	streamFlavor.DefMethod(":purge", "", streamPurgeCaller{})
+	flavors.FlosFun("jet-stream-purge", ":purge", streamPurgeCaller{}.Docs(), &Pkg)
+
+	streamFlavor.DefMethod(":get-msg", "", streamGetMsgCaller{})
+	flavors.FlosFun("jet-stream-get-msg", ":get-msg", streamGetMsgCaller{}.Docs(), &Pkg)
+
+	streamFlavor.DefMethod(":get-last-msg", "", streamGetLastMsgCaller{})
+	flavors.FlosFun("jet-stream-get-last-msg", ":get-last-msg", streamGetLastMsgCaller{}.Docs(), &Pkg)
+
+	streamFlavor.DefMethod(":delete-msg", "", streamDeleteMsgCaller{})
+	flavors.FlosFun("jet-stream-delete-msg", ":delete-msg", streamDeleteMsgCaller{}.Docs(), &Pkg)
+
 	// TBD
 }
 
