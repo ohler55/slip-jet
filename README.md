@@ -37,6 +37,8 @@ Notes
   - :delete-stream (name &key timeout)
   - :list-streams (name &key timeout subject) => channels or list (from range loop)
   - :stream-names (name &key timeout subject) => channels or list (from range loop)
+  - test with actual server/client or with mock stream manager?
+   - start with actual
  - stream
   - consumer manager functions (create, update, get, delete, list, names, ordered, create-or-update)
 
