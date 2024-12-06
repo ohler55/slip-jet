@@ -3,12 +3,11 @@
 package jet
 
 import (
-	"fmt"
-
 	"github.com/ohler55/slip"
 	"github.com/ohler55/slip/pkg/flavors"
 
 	_ "github.com/nats-io/nats.go"
+	"github.com/nats-io/nats.go/jetstream"
 	_ "github.com/nats-io/nats.go/jetstream"
 )
 
@@ -23,10 +22,9 @@ func defStream() {
 		slip.List{
 			slip.List{
 				slip.Symbol(":documentation"),
-				slip.String(`
-TBD
-
-`),
+				slip.String(`Stream contains CRUD methods on a consumer as well as operations
+on an existing stream. It allows fetching and removing messages from a stream, as well as
+purging a stream.`),
 			},
 			slip.List{
 				slip.Symbol(":init-keywords"),
@@ -38,38 +36,37 @@ TBD
 		},
 		&Pkg,
 	)
-	streamFlavor.DefMethod(":init", "", streamInitCaller{})
-	// info &key cached timeout ... other options
-	// purge &key timeout ... other options
-	// get-msg seq &key subject timeout ... other options
-	// delete-msg seq &key secure ... other options
+	streamFlavor.Final = true
+	streamFlavor.GoMakeOnly = true
 
-}
+	streamFlavor.DefMethod(":info", "", streamInfoCaller{})
+	flavors.FlosFun("jet-stream-info", ":info", streamInfoCaller{}.Docs(), &Pkg)
 
-type stream struct {
-	self *flavors.Instance
-}
+	streamFlavor.DefMethod(":name", "", streamNameCaller{})
+	flavors.FlosFun("jet-stream-name", ":name", streamNameCaller{}.Docs(), &Pkg)
 
-type streamInitCaller struct{}
+	streamFlavor.DefMethod(":subjects", "", streamSubjectsCaller{})
+	flavors.FlosFun("jet-stream-subjects", ":subjects", streamSubjectsCaller{}.Docs(), &Pkg)
 
-func (caller streamInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
-	obj := s.Get("self").(*flavors.Instance)
-	if 0 < len(args) {
-		args = args[0].(slip.List)
-	}
-	st := stream{self: obj}
-	obj.Any = &st
+	streamFlavor.DefMethod(":purge", "", streamPurgeCaller{})
+	flavors.FlosFun("jet-stream-purge", ":purge", streamPurgeCaller{}.Docs(), &Pkg)
 
-	fmt.Printf("*** init args: %s\n", args)
+	streamFlavor.DefMethod(":get-msg", "", streamGetMsgCaller{})
+	flavors.FlosFun("jet-stream-get-msg", ":get-msg", streamGetMsgCaller{}.Docs(), &Pkg)
+
+	streamFlavor.DefMethod(":get-last-msg", "", streamGetLastMsgCaller{})
+	flavors.FlosFun("jet-stream-get-last-msg", ":get-last-msg", streamGetLastMsgCaller{}.Docs(), &Pkg)
+
+	streamFlavor.DefMethod(":delete-msg", "", streamDeleteMsgCaller{})
+	flavors.FlosFun("jet-stream-delete-msg", ":delete-msg", streamDeleteMsgCaller{}.Docs(), &Pkg)
+
 	// TBD
-
-	return nil
 }
 
-func (caller streamInitCaller) Docs() string {
-	return `__:init__
+// MakeStream makes a jet-stream.
+func MakeStream(stream jetstream.Stream) (inst *flavors.Instance) {
+	inst = streamFlavor.MakeInstance().(*flavors.Instance)
+	inst.Any = stream
 
-
-Sets the initial value when _make-instance_ is called.
-`
+	return
 }

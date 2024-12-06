@@ -54,6 +54,9 @@ func defClient() {
 	clientFlavor.DefMethod(":cleanup-publisher", "", cleanupPublisherCaller{})
 	flavors.FlosFun("jet-cleanup-publisher", ":cleanup-publisher", cleanupPublisherCaller{}.Docs(), &Pkg)
 
+	clientFlavor.DefMethod(":create-stream", "", createStreamCaller{})
+	flavors.FlosFun("jet-create-stream", ":create-stream", createStreamCaller{}.Docs(), &Pkg)
+
 	// TBD
 }
 

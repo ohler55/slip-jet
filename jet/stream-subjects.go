@@ -1,0 +1,34 @@
+// Copyright (c) 2024, Peter Ohler, All rights reserved.
+
+package jet
+
+import (
+	"github.com/ohler55/slip"
+	"github.com/ohler55/slip/pkg/flavors"
+
+	"github.com/nats-io/nats.go/jetstream"
+)
+
+type streamSubjectsCaller struct{}
+
+func (caller streamSubjectsCaller) Call(s *slip.Scope, args slip.List, _ int) (result slip.Object) {
+	self := s.Get("self").(*flavors.Instance)
+	flavors.CheckMethodArgCount(self, ":subjects", len(args), 0, 0)
+	stream := self.Any.(jetstream.Stream)
+	if si := stream.CachedInfo(); si != nil {
+		subjects := make(slip.List, len(si.Config.Subjects))
+		for i, subj := range si.Config.Subjects {
+			subjects[i] = slip.String(subj)
+		}
+		result = subjects
+	}
+	return
+}
+
+func (caller streamSubjectsCaller) Docs() string {
+	return `__:subjects__ => _list_
+
+
+Returns the cached stream subjects.
+`
+}
