@@ -24,6 +24,9 @@ func init() {
 	defMsg()
 	defStream()
 	defStreamSource()
+	defStreamInfo()
+	defStreamState()
+	defStreamSourceInfo()
 
 	initConnect()
 

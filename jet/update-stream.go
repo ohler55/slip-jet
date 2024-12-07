@@ -10,11 +10,11 @@ import (
 	"github.com/ohler55/slip/pkg/flavors"
 )
 
-type createStreamCaller struct{}
+type updateStreamCaller struct{}
 
-func (caller createStreamCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller updateStreamCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":create-stream", len(args), 1, len(streamOptMap)*2+1)
+	flavors.CheckMethodArgCount(self, ":update-stream", len(args), 1, len(streamOptMap)*2+1)
 	js := self.Any.(*Client).js
 
 	var cfg jetstream.StreamConfig
@@ -29,16 +29,15 @@ func (caller createStreamCaller) Call(s *slip.Scope, args slip.List, _ int) slip
 		ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
 		defer cf()
 	}
-	stream, err := js.CreateStream(ctx, cfg)
+	stream, err := js.UpdateStream(ctx, cfg)
 	if err != nil {
 		panic(err)
 	}
 	return MakeStream(stream)
 }
 
-func (caller createStreamCaller) Docs() string {
-	return makeStreamMethodDoc(":create-stream", "_name_ ", "<jet-stream>",
+func (caller updateStreamCaller) Docs() string {
+	return makeStreamMethodDoc(":update-stream", "_name_ ", "<jet-stream>",
 		"   _name_ [string] the name of the stream.",
-		`Creates a new stream with the provided options and returns the created stream.
-If a stream with the given name already exists, an error is raised.`)
+		`Updates an existing stream. If stream does not exist, and error is raised.`)
 }

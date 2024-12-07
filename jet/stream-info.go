@@ -11,6 +11,54 @@ import (
 	"github.com/nats-io/nats.go/jetstream"
 )
 
+// This file includes the jet-stream-info flavor definition as well as the
+// jet-stream :info method. Method for the jet-stream-info flavor are in file
+// prefixed with info-.
+
+var (
+	streamInfoFlavor *flavors.Flavor
+)
+
+func defStreamInfo() {
+	streamInfoFlavor = flavors.DefFlavor("jet-stream-info",
+		map[string]slip.Object{},
+		[]string{},
+		slip.List{
+			slip.List{
+				slip.Symbol(":documentation"),
+				slip.String(`TBD`),
+			},
+		},
+		&Pkg,
+	)
+	streamInfoFlavor.Final = true
+	streamInfoFlavor.GoMakeOnly = true
+
+	streamInfoFlavor.DefMethod(":state", "", infoStateCaller{})
+	flavors.FlosFun("jet-stream-info-state", ":state", infoStateCaller{}.Docs(), &Pkg)
+
+	streamInfoFlavor.DefMethod(":created", "", infoCreatedCaller{})
+	flavors.FlosFun("jet-stream-info-created", ":created", infoCreatedCaller{}.Docs(), &Pkg)
+
+	streamInfoFlavor.DefMethod(":cluster", "", infoClusterCaller{})
+	flavors.FlosFun("jet-stream-info-cluster", ":cluster", infoClusterCaller{}.Docs(), &Pkg)
+
+	// TBD
+	// mirror (stream-source-info as property list or instance?)
+	// source
+	// timestamp
+}
+
+// MakeStream makes a jet-stream.
+func MakeStreamInfo(info *jetstream.StreamInfo) (inst *flavors.Instance) {
+	inst = streamInfoFlavor.MakeInstance().(*flavors.Instance)
+	inst.Any = info
+
+	return
+}
+
+////////////////
+
 type streamInfoCaller struct{}
 
 func (caller streamInfoCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
@@ -37,18 +85,18 @@ func (caller streamInfoCaller) Call(s *slip.Scope, args slip.List, _ int) slip.O
 			panic(err)
 		}
 	}
+	// TBD return stream-info instance
 	return slip.Values{StreamStatePropList(&si.State), StreamConfigPropList(&si.Config)}
 }
 
 func (caller streamInfoCaller) Docs() string {
-	return `__:info__ &key _timeout_ _cached_ _deleted_ => _state_[property list], _config_[property list]
+	return `__:info__ &key _timeout_ _cached_ _deleted_ => _jet-stream-state_
    _:timeout_ [real] the number of seconds to wait before timing out.
    _:cached_ [boolean] return the cached information instead of fetching from the server.
    _:deleted_ [boolean] if true, include the information about messages deleted from a stream.
 
 
-Returns the stream information as a two part value of the stream state as a
-property list and the stream configuration as a property list.
+Returns the stream information as an instance of the _jet-stream-info_ flavor.
 `
 }
 

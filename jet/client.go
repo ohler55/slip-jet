@@ -57,6 +57,27 @@ func defClient() {
 	clientFlavor.DefMethod(":create-stream", "", createStreamCaller{})
 	flavors.FlosFun("jet-create-stream", ":create-stream", createStreamCaller{}.Docs(), &Pkg)
 
+	clientFlavor.DefMethod(":update-stream", "", updateStreamCaller{})
+	flavors.FlosFun("jet-update-stream", ":update-stream", updateStreamCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":create-or-update-stream", "", createOrUpdateStreamCaller{})
+	flavors.FlosFun("jet-create-or-update-stream", ":create-or-update-stream",
+		createOrUpdateStreamCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":get-stream", "", getStreamCaller{})
+	flavors.FlosFun("jet-get-stream", ":get-stream", getStreamCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":stream-name-by-subject", "", streamNameBySubjectCaller{})
+	flavors.FlosFun("jet-stream-name-by-subject", ":stream-name-by-subject", streamNameBySubjectCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":list-streams", "", listStreamsCaller{})
+	flavors.FlosFun("jet-list-streams", ":list-streams", listStreamsCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":stream-names", "", streamNamesCaller{})
+	flavors.FlosFun("jet-stream-names", ":stream-names", streamNamesCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":delete-stream", "", deleteStreamCaller{})
+	flavors.FlosFun("jet-delete-stream", ":delete-stream", deleteStreamCaller{}.Docs(), &Pkg)
 	// TBD
 }
 

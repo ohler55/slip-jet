@@ -23,22 +23,33 @@ Notes
 - does client instance need to keep track of subscription?
  - so that the error callback with subscription can return the correct instance?
 
-- stream
- - create mock stream for testing
-  - write to log to verify calls
+- use flavor instead of property list for info and state, leave config as plist
+  - or could make it an instance with a method to get plist, nah
+
+- jet-source-stream-info
+- jet-stream-info
+ - Any = StreamInfo
+ - create a stream-info flavor
+  - replaces the return from stream-info return
 
 - client
  - as StreamManager
-  - :create-stream (name &key timeout ...)
-  - :update-stream (name &key timeout ...)
-  - :create-or-update-stream (name &key timeout ...)
-  - :stream (name &key timeout)
-  - :stream-name-by-subject (subject &key timeout)
-  - :delete-stream (name &key timeout)
+  + :create-stream
+  + :update-stream
+  + :create-or-update-stream
+  + :get-stream
+  + :stream-name-by-subject
+  + :stream-names
+  + :delete-stream
   - :list-streams (name &key timeout subject) => channels or list (from range loop)
-  - :stream-names (name &key timeout subject) => channels or list (from range loop)
-  - test with actual server/client or with mock stream manager?
-   - start with actual
+
+- should managers be included in the objects so the api is more friendly?
+ - need a struct for each and not just the current assignment to Any
+  - methods
+   - :update
+   - :client
+   - :delete
+
  - stream
   - consumer manager functions (create, update, get, delete, list, names, ordered, create-or-update)
 
