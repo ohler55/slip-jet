@@ -23,25 +23,33 @@ Notes
 - does client instance need to keep track of subscription?
  - so that the error callback with subscription can return the correct instance?
 
-- use flavor instead of property list for info and state, leave config as plist
-  - or could make it an instance with a method to get plist, nah
+- consumer
+ - consumer config - plist
+ - jet-consumer
+  - fetch
+  - fetch-bytes
+  - fetch-no-wait
+  - consume
+  - messages
+  - next
+  - info (&key timeout cached)
+ - client
+  - create-consumer
+  - update-consumer
+  - create-or-update-consumer
+  - ordered-consumer
+  - get-consumer
+  - delete-consumer
+ - stream
+  - create-consumer
+  - update-consumer
+  - create-or-update-consumer
+  - ordered-consumer
+  - get-consumer
+  - delete-consumer
+  - list-consumers
+  - consumer-names
 
-- jet-source-stream-info
-- jet-stream-info
- - Any = StreamInfo
- - create a stream-info flavor
-  - replaces the return from stream-info return
-
-- client
- - as StreamManager
-  + :create-stream
-  + :update-stream
-  + :create-or-update-stream
-  + :get-stream
-  + :stream-name-by-subject
-  + :stream-names
-  + :delete-stream
-  - :list-streams (name &key timeout subject) => channels or list (from range loop)
 
 - should managers be included in the objects so the api is more friendly?
  - need a struct for each and not just the current assignment to Any

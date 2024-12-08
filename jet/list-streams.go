@@ -4,7 +4,6 @@ package jet
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/nats-io/nats.go/jetstream"
 	"github.com/ohler55/slip"
@@ -29,13 +28,11 @@ func (caller listStreamsCaller) Call(s *slip.Scope, args slip.List, _ int) slip.
 		opts = append(opts, jetstream.WithStreamListSubject(slip.MustBeString(v, "subject")))
 	}
 	sil := js.ListStreams(ctx, opts...)
-	if err := sil.Err(); err != nil {
-		panic(err)
-	}
+	var streams slip.List
 	for si := range sil.Info() {
-		fmt.Printf("*** %v\n", si)
+		streams = append(streams, MakeStreamInfo(si))
 	}
-	return nil
+	return streams
 }
 
 func (caller listStreamsCaller) Docs() string {

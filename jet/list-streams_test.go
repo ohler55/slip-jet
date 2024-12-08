@@ -27,17 +27,9 @@ func TestListStreamOk(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))
                                     (jss (send js :create-stream "list-test" :subjects '("test.list.>")))
-                                    (info (send js :list-streams :timeout 0.1)))
+                                    (info (send js :list-streams :timeout 0.1 :subject "test.list.one")))
                               (send js :close)
                               info)`, natsURL),
-		Expect: `nil`, // TBD
+		Expect: `/\(#<jet-stream-info [0-9a-f]+>\)/`,
 	}).Test(t)
 }
-
-// func TestListStreamError(t *testing.T) {
-// 	(&sliptest.Function{
-// 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password")))
-//                               (send js :list-stream "not-a-stream"))`, natsURL),
-// 		PanicType: slip.ErrorSymbol,
-// 	}).Test(t)
-// }
