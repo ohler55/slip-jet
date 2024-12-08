@@ -23,21 +23,41 @@ Notes
 - does client instance need to keep track of subscription?
  - so that the error callback with subscription can return the correct instance?
 
-- stream
- - create mock stream for testing
-  - write to log to verify calls
+- consumer
+ - consumer config - plist
+ - jet-consumer
+  - fetch
+  - fetch-bytes
+  - fetch-no-wait
+  - consume
+  - messages
+  - next
+  - info (&key timeout cached)
+ - client
+  - create-consumer
+  - update-consumer
+  - create-or-update-consumer
+  - ordered-consumer
+  - get-consumer
+  - delete-consumer
+ - stream
+  - create-consumer
+  - update-consumer
+  - create-or-update-consumer
+  - ordered-consumer
+  - get-consumer
+  - delete-consumer
+  - list-consumers
+  - consumer-names
 
-- client
- - as StreamManager
-  - :create-stream (name &key ...)
-   - add methods to stream
-  - :update-stream [just :update on stream]
-  - :create-or-update-stream
-  - :get-stream or maybe just :stream on a client
-  - :stream-name-by-subject
-  - :delete-stream [or use stream to :delete]
-  - :list-streams
-  - :stream-names [use for loop on channel then check for error]
+
+- should managers be included in the objects so the api is more friendly?
+ - need a struct for each and not just the current assignment to Any
+  - methods
+   - :update
+   - :client
+   - :delete
+
  - stream
   - consumer manager functions (create, update, get, delete, list, names, ordered, create-or-update)
 

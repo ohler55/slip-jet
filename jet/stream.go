@@ -26,13 +26,6 @@ func defStream() {
 on an existing stream. It allows fetching and removing messages from a stream, as well as
 purging a stream.`),
 			},
-			slip.List{
-				slip.Symbol(":init-keywords"),
-				slip.Symbol(":name"),
-			},
-			slip.Symbol(":gettable-instance-variables"),
-			slip.Symbol(":settable-instance-variables"),
-			slip.Symbol(":inittable-instance-variables"),
 		},
 		&Pkg,
 	)
