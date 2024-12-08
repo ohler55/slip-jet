@@ -23,32 +23,48 @@ Notes
 - does client instance need to keep track of subscription?
  - so that the error callback with subscription can return the correct instance?
 
+- make mocks for listers and parents to test error methods
+ - mockStream
+  - ListConsumers(context.Context) jetstream.ConsumerInfoLister {
+  - ConsumerNames(context.Context) jetstream.ConsumerNameLister {
+ - mockClient
+  - ListStreams
+  - StreamNames
+
 - consumer
  - consumer config - plist
  - jet-consumer
-  - fetch
-  - fetch-bytes
-  - fetch-no-wait
-  - consume
-  - messages
-  - next
+  - fetch (batch &key max-wait heartbeat) => list of msg
+   - MessageBatch is an interface as is Consumer so mock them to test Error()
+   - if max-wait is zero or less then use FetchNoWait
+  - fetch-bytes (batch &key max-wait heartbeat) => list of msg
+  - consume (handler &key error-handler)
+  - messages (&key error-on-missing-heartbeat) => message-context
+  - next (&key max-wait heartbeat)
   - info (&key timeout cached)
  - client
-  - create-consumer
-  - update-consumer
-  - create-or-update-consumer
-  - ordered-consumer
-  - get-consumer
-  - delete-consumer
+  - create-consumer (stream &key timeout ...) => consumer
+   - all consumer config options
+  - update-consumer (stream &key timeout ...) => consumer
+  - create-or-update-consumer (stream &key timeout ...) => consumer
+  - ordered-consumer (stream &key timeout ...) => consumer
+   - ordered consumer config options
+  - get-consumer (stream consumer &key timeout) => consumer
+  - delete-consumer (stream consumer &key timeout)
  - stream
-  - create-consumer
-  - update-consumer
-  - create-or-update-consumer
-  - ordered-consumer
-  - get-consumer
-  - delete-consumer
-  - list-consumers
-  - consumer-names
+  - create-consumer (&key timeout ...) => consumer
+  - update-consumer  (&key timeout ...) => consumer
+  - create-or-update-consumer  (&key timeout ...) => consumer
+  - ordered-consumer (name &key timeout ...) => consumer
+   - ordered consumer config options
+  - get-consumer (name &key timeout) => consumer
+  - delete-consumer (name &key timeout)
+  - list-consumers (&key timeout.)
+  - consumer-names (&key timeout.)
+ - jet-message-context
+  - :next
+  - :stop
+  - :drain
 
 
 - should managers be included in the objects so the api is more friendly?
