@@ -633,20 +633,6 @@ func StreamConfigPropList(config *jetstream.StreamConfig) slip.List {
 	}
 }
 
-// func makeFuncArgs() (args []*slip.DocArg) {
-// 	args = make([]*slip.DocArg, len(streamOptMap)+1)
-// 	keys := make([]string, 0, len(streamOptMap))
-// 	for k := range streamOptMap {
-// 		keys = append(keys, k)
-// 	}
-// 	sort.Strings(keys)
-// 	args[0] = &slip.DocArg{Name: "&key"}
-// 	for i, k := range keys {
-// 		args[i+1] = streamOptMap[k].doc
-// 	}
-// 	return
-// }
-
 func makeStreamMethodDoc(method, args, retType, argDocs, description string) string {
 	var b []byte
 	b = append(b, "__"...)
