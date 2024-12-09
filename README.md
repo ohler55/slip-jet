@@ -32,7 +32,17 @@ Notes
   - StreamNames
 
 - consumer
- - consumer config - plist
+ - stream
+  - create-consumer (&key timeout ...) => consumer
+   - test
+  - update-consumer  (&key timeout ...) => consumer
+  - create-or-update-consumer  (&key timeout ...) => consumer
+  - ordered-consumer (name &key timeout ...) => consumer
+   - ordered consumer config options
+  - get-consumer (name &key timeout) => consumer
+  - delete-consumer (name &key timeout)
+  - list-consumers (&key timeout.)
+  - consumer-names (&key timeout.)
  - jet-consumer
   - fetch (batch &key max-wait heartbeat) => list of msg
    - MessageBatch is an interface as is Consumer so mock them to test Error()
@@ -51,16 +61,6 @@ Notes
    - ordered consumer config options
   - get-consumer (stream consumer &key timeout) => consumer
   - delete-consumer (stream consumer &key timeout)
- - stream
-  - create-consumer (&key timeout ...) => consumer
-  - update-consumer  (&key timeout ...) => consumer
-  - create-or-update-consumer  (&key timeout ...) => consumer
-  - ordered-consumer (name &key timeout ...) => consumer
-   - ordered consumer config options
-  - get-consumer (name &key timeout) => consumer
-  - delete-consumer (name &key timeout)
-  - list-consumers (&key timeout.)
-  - consumer-names (&key timeout.)
  - jet-message-context
   - :next
   - :stop

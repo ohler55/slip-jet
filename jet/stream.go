@@ -53,6 +53,9 @@ purging a stream.`),
 	streamFlavor.DefMethod(":delete-msg", "", streamDeleteMsgCaller{})
 	flavors.FlosFun("jet-stream-delete-msg", ":delete-msg", streamDeleteMsgCaller{}.Docs(), &Pkg)
 
+	streamFlavor.DefMethod(":create-consumer", "", streamCreateConsumerCaller{})
+	flavors.FlosFun("jet-stream-create-consumer", ":create-consumer", streamCreateConsumerCaller{}.Docs(), &Pkg)
+
 	// TBD
 }
 

@@ -639,7 +639,7 @@ func makeStreamMethodDoc(method, args, retType, argDocs, description string) str
 	b = append(b, method...)
 	b = append(b, "__ "...)
 	b = append(b, args...)
-	b = append(b, "&key"...)
+	b = append(b, "&key _timeout_"...)
 	keys := make([]string, 0, len(streamOptMap))
 	for k := range streamOptMap {
 		keys = append(keys, k)
@@ -654,6 +654,7 @@ func makeStreamMethodDoc(method, args, retType, argDocs, description string) str
 	b = append(b, '\n')
 
 	b = append(b, argDocs...)
+	b = append(b, "   _:timeout_ [real] the number of seconds to wait before timing out."...)
 	for _, k := range keys {
 		b = append(b, "\n   _"...)
 		b = append(b, k...)
