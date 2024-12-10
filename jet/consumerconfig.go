@@ -53,9 +53,9 @@ non-printable characters.`,
 			config.Description = slip.MustBeString(v, ":description")
 		},
 	},
-	":delivery-policy": {
+	":deliver-policy": {
 		doc: &slip.DocArg{
-			Name: "delivery-policy",
+			Name: "deliver-policy",
 			Type: ":all|:last|:new|:start-sequence|:start-time|:last-per-subject",
 			Text: `Defines from which point to start delivering messages
 from the stream. Defaults to _:all_.`,
@@ -73,7 +73,7 @@ from the stream. Defaults to _:all_.`,
 			if pol, has := polMap[strings.ToLower(string(sym))]; has {
 				config.DeliverPolicy = pol
 			} else {
-				slip.PanicType(":delivery-policy", v,
+				slip.PanicType(":deliver-policy", v,
 					":all", ":last", ":new", ":start-sequence", ":start-time", ":last-per-subject")
 			}
 		},
@@ -156,7 +156,7 @@ default is -1 (unlimited).`,
 		},
 		update: func(config *jetstream.ConsumerConfig, v slip.Object) {
 			if num, ok := v.(slip.Fixnum); ok {
-				config.OptStartSeq = uint64(num)
+				config.MaxDeliver = int(num)
 			} else {
 				slip.PanicType(":max-deliver", v, "fixnum")
 			}
@@ -386,7 +386,7 @@ rather than inherit the storage type from the stream.`,
 	":filter-subjects": {
 		doc: &slip.DocArg{
 			Name: "filter-subjects",
-			Type: "string",
+			Type: "list",
 			Text: `Allows filtering messages from a stream by subject. This field is
 exclusive with FilterSubject. Requires nats-server v2.10.0 or later.`,
 		},
@@ -403,7 +403,7 @@ exclusive with FilterSubject. Requires nats-server v2.10.0 or later.`,
 	":metadata": {
 		doc: &slip.DocArg{
 			Name: "metadata",
-			Type: "string",
+			Type: "property list",
 			Text: `A set of application-defined key-value pairs for associating metadata
 on the consumer. This feature requires nats-server v2.10.0 or later.`,
 		},
@@ -433,6 +433,85 @@ func InitConsumerConfig(config *jetstream.ConsumerConfig, args slip.List) {
 		} else if key != ":timeout" {
 			slip.NewPanic("%s is not a valid keyword", key)
 		}
+	}
+}
+
+var (
+	delPolMap = map[jetstream.DeliverPolicy]string{
+		jetstream.DeliverAllPolicy:             ":all",
+		jetstream.DeliverLastPolicy:            ":last",
+		jetstream.DeliverNewPolicy:             ":new",
+		jetstream.DeliverByStartSequencePolicy: ":start-sequence",
+		jetstream.DeliverByStartTimePolicy:     ":start-time",
+		jetstream.DeliverLastPerSubjectPolicy:  ":last-per-subject",
+	}
+	ackPolMap = map[jetstream.AckPolicy]string{
+		jetstream.AckExplicitPolicy: ":explicit",
+		jetstream.AckAllPolicy:      ":all",
+		jetstream.AckNonePolicy:     ":none",
+	}
+	replayPolMap = map[jetstream.ReplayPolicy]string{
+		jetstream.ReplayInstantPolicy:  ":instant",
+		jetstream.ReplayOriginalPolicy: ":original",
+	}
+)
+
+// ConsumertConfigPropList returns a property list built from a
+// jetstream.ConsumerConfig. The returned list is suitable as arguments to a
+// consumer creation.
+func ConsumerConfigPropList(config *jetstream.ConsumerConfig) slip.List {
+	var (
+		startTime   slip.Object
+		backoff     slip.List
+		headersOnly slip.Object
+		memStore    slip.Object
+		filters     slip.List
+		meta        slip.List
+	)
+	if config.OptStartTime != nil {
+		startTime = slip.Time(*config.OptStartTime)
+	}
+	for _, dur := range config.BackOff {
+		backoff = append(backoff, slip.DoubleFloat(float64(dur)/float64(time.Second)))
+	}
+	if config.HeadersOnly {
+		headersOnly = slip.True
+	}
+	if config.MemoryStorage {
+		memStore = slip.True
+	}
+	for _, f := range config.FilterSubjects {
+		filters = append(filters, slip.String(f))
+	}
+	for k, v := range config.Metadata {
+		meta = append(meta, slip.String(k), slip.String(v))
+	}
+	return slip.List{
+		slip.Symbol(":name"), slip.String(config.Name),
+		slip.Symbol(":durable"), slip.String(config.Durable),
+		slip.Symbol(":description"), slip.String(config.Description),
+		slip.Symbol(":deliver-policy"), slip.Symbol(delPolMap[config.DeliverPolicy]),
+		slip.Symbol(":opt-start-seq"), slip.Fixnum(config.OptStartSeq),
+		slip.Symbol(":opt-start-time"), startTime,
+		slip.Symbol(":ack-policy"), slip.Symbol(ackPolMap[config.AckPolicy]),
+		slip.Symbol(":ack-wait"), slip.DoubleFloat(float64(config.AckWait) / float64(time.Second)),
+		slip.Symbol(":max-deliver"), slip.Fixnum(config.MaxDeliver),
+		slip.Symbol(":back-off"), backoff,
+		slip.Symbol(":filter-subject"), slip.String(config.FilterSubject),
+		slip.Symbol(":replay-policy"), slip.Symbol(replayPolMap[config.ReplayPolicy]),
+		slip.Symbol(":rate-limit"), slip.Fixnum(config.RateLimit),
+		slip.Symbol(":sample-frequency"), slip.String(config.SampleFrequency),
+		slip.Symbol(":max-waiting"), slip.Fixnum(config.MaxWaiting),
+		slip.Symbol(":max-ack-pending"), slip.Fixnum(config.MaxAckPending),
+		slip.Symbol(":headers-only"), headersOnly,
+		slip.Symbol(":max-request-batch"), slip.Fixnum(config.MaxRequestBatch),
+		slip.Symbol(":max-request-expires"), slip.DoubleFloat(float64(config.MaxRequestExpires) / float64(time.Second)),
+		slip.Symbol(":max-request-max-bytes"), slip.Fixnum(config.MaxRequestMaxBytes),
+		slip.Symbol(":inactive-threshold"), slip.DoubleFloat(float64(config.InactiveThreshold) / float64(time.Second)),
+		slip.Symbol(":replicas"), slip.Fixnum(config.Replicas),
+		slip.Symbol(":memory-storage"), memStore,
+		slip.Symbol(":filter-subjects"), filters,
+		slip.Symbol(":metadata"), meta,
 	}
 }
 

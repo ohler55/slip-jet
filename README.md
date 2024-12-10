@@ -31,10 +31,15 @@ Notes
   - ListStreams
   - StreamNames
 
+
+- next
+ - :consumer-info
+  - make mockConsumer
+   - test :consumer-info on consumer
+
 - consumer
  - stream
-  - create-consumer (&key timeout ...) => consumer
-   - test
+  + create-consumer
   - update-consumer  (&key timeout ...) => consumer
   - create-or-update-consumer  (&key timeout ...) => consumer
   - ordered-consumer (name &key timeout ...) => consumer
@@ -44,6 +49,8 @@ Notes
   - list-consumers (&key timeout.)
   - consumer-names (&key timeout.)
  - jet-consumer
+  - :info (&key timeout cached) => plist
+  + :name
   - fetch (batch &key max-wait heartbeat) => list of msg
    - MessageBatch is an interface as is Consumer so mock them to test Error()
    - if max-wait is zero or less then use FetchNoWait

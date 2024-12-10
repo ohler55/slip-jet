@@ -29,6 +29,13 @@ a stream, as well as fetching consumer info.
 	)
 	consumerFlavor.Final = true
 	consumerFlavor.GoMakeOnly = true
+
+	consumerFlavor.DefMethod(":info", "", consumerInfoCaller{})
+	flavors.FlosFun("jet-consumer-info", ":info", consumerInfoCaller{}.Docs(), &Pkg)
+
+	consumerFlavor.DefMethod(":name", "", consumerNameCaller{})
+	flavors.FlosFun("jet-consumer-name", ":name", consumerNameCaller{}.Docs(), &Pkg)
+
 	// fetch
 	// fetch-bytes
 	// fetch-no-wait

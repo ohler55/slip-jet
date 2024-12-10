@@ -27,6 +27,7 @@ func init() {
 	defStreamInfo()
 	defStreamState()
 	defStreamSourceInfo()
+	defConsumerInfo()
 
 	initConnect()
 

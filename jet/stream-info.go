@@ -13,8 +13,7 @@ import (
 )
 
 // This file includes the jet-stream-info flavor definition as well as the
-// jet-stream :info method. Method for the jet-stream-info flavor are in file
-// prefixed with info-.
+// jet-stream :info method.
 
 var (
 	streamInfoFlavor *flavors.Flavor
@@ -27,7 +26,7 @@ func defStreamInfo() {
 		slip.List{
 			slip.List{
 				slip.Symbol(":documentation"),
-				slip.String(`TBD`),
+				slip.String(`An instance with information about a stream.`),
 			},
 		},
 		&Pkg,
@@ -54,7 +53,7 @@ func defStreamInfo() {
 	flavors.FlosFun("jet-stream-info-timestamp", ":timestamp", infoTimestampCaller{}.Docs(), &Pkg)
 }
 
-// MakeStream makes a jet-stream.
+// MakeStream makes a jet-stream-info.
 func MakeStreamInfo(info *jetstream.StreamInfo) (inst *flavors.Instance) {
 	inst = streamInfoFlavor.MakeInstance().(*flavors.Instance)
 	inst.Any = info
@@ -233,7 +232,7 @@ func (caller streamInfoCaller) Call(s *slip.Scope, args slip.List, _ int) slip.O
 }
 
 func (caller streamInfoCaller) Docs() string {
-	return `__:info__ &key _timeout_ _cached_ _deleted_ => _jet-stream-state_
+	return `__:info__ &key _timeout_ _cached_ _deleted_ => _jet-stream-info_
    _:timeout_ [real] the number of seconds to wait before timing out.
    _:cached_ [boolean] return the cached information instead of fetching from the server.
    _:deleted_ [boolean] if true, include the information about messages deleted from a stream.
