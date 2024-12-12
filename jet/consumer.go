@@ -36,13 +36,14 @@ a stream, as well as fetching consumer info.
 	consumerFlavor.DefMethod(":name", "", consumerNameCaller{})
 	flavors.FlosFun("jet-consumer-name", ":name", consumerNameCaller{}.Docs(), &Pkg)
 
-	// fetch
+	consumerFlavor.DefMethod(":fetch", "", consumerFetchCaller{})
+	flavors.FlosFun("jet-consumer-fetch", ":fetch", consumerFetchCaller{}.Docs(), &Pkg)
+
 	// fetch-bytes
-	// fetch-no-wait
+	// fetch-all or fetch-list
 	// consume
+	// messages
 	// next
-	// info
-	// cache-info
 
 }
 

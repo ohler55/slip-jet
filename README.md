@@ -9,7 +9,8 @@ API described at
 https://github.com/nats-io/nats.go/blob/main/jetstream/README.md#jetstream-simplified-client
 or https://pkg.go.dev/github.com/nats-io/nats.go/jetstream. The
 JetStream API is object based and this package uses Flavors to
-implement an object based API for SLIP.
+implement an object based API for SLIP that closely follows the
+JetStream API.
 
 
 --------
@@ -33,15 +34,19 @@ Notes
 
 
 - next
- - :consumer-info
-  - make mockConsumer
-   - test :consumer-info on consumer
+ - mockMessageBatch
+  - expose channel
+   - add a range over channel to the gi package
+    - map-channel or mapchan or channel-loop or do-channel
+ - mockConsumer
+ - consumer
+  - test
 
 - consumer
  - stream
   + create-consumer
-  - update-consumer  (&key timeout ...) => consumer
-  - create-or-update-consumer  (&key timeout ...) => consumer
+  + update-consumer
+  - create-or-update-consumer (&key timeout ...) => consumer
   - ordered-consumer (name &key timeout ...) => consumer
    - ordered consumer config options
   - get-consumer (name &key timeout) => consumer
@@ -49,16 +54,18 @@ Notes
   - list-consumers (&key timeout.)
   - consumer-names (&key timeout.)
  - jet-consumer
-  - :info (&key timeout cached) => plist
   + :name
+  + info (&key timeout cached)
   - fetch (batch &key max-wait heartbeat) => list of msg
    - MessageBatch is an interface as is Consumer so mock them to test Error()
    - if max-wait is zero or less then use FetchNoWait
+   - loop over batch Messages channel
+    - mock with messages in place, on Messages create channel, push msgs, close
+  - fetch-all or fetfch-list - like fetch but returns all from channel as a list
   - fetch-bytes (batch &key max-wait heartbeat) => list of msg
   - consume (handler &key error-handler)
   - messages (&key error-on-missing-heartbeat) => message-context
   - next (&key max-wait heartbeat)
-  - info (&key timeout cached)
  - client
   - create-consumer (stream &key timeout ...) => consumer
    - all consumer config options
@@ -68,10 +75,8 @@ Notes
    - ordered consumer config options
   - get-consumer (stream consumer &key timeout) => consumer
   - delete-consumer (stream consumer &key timeout)
- - jet-message-context
-  - :next
-  - :stop
-  - :drain
+ - jet-messages-context
+  - test with mock
 
 
 - should managers be included in the objects so the api is more friendly?

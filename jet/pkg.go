@@ -28,6 +28,8 @@ func init() {
 	defStreamState()
 	defStreamSourceInfo()
 	defConsumerInfo()
+	defMessagesContext()
+	defMessagesBatch()
 
 	initConnect()
 
