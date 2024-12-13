@@ -32,16 +32,8 @@ Notes
   - ListStreams
   - StreamNames
 
-- slip
- - mapchan
-  - no return or goto, simple
-
-
 - next
  - mockMessageBatch
-  - expose channel
-   - add a range over channel to the gi package
-    - map-channel or mapchan or channel-loop or do-channel
  - mockConsumer
  - consumer
   - test
@@ -61,7 +53,7 @@ Notes
   + :name
   + info (&key timeout cached)
   + fetch
-  - fetch-bytes (batch &key max-wait heartbeat) => list of msg
+  + fetch-bytes
   - consume (handler &key error-handler)
   - messages (&key error-on-missing-heartbeat) => message-context
   - next (&key max-wait heartbeat)

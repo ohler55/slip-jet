@@ -27,3 +27,17 @@ func TestMsgChannel(t *testing.T) {
 	}).Test(t)
 	tt.Equal(t, 0, mc.Length())
 }
+
+func TestMsgChannelRange(t *testing.T) {
+	mc := make(chan jetstream.Msg, 3)
+	mc <- &jet.PubMsg{Body: []byte("hello"), Subj: "test.greeting"}
+	mc <- &jet.PubMsg{Body: []byte("goodbye"), Subj: "test.greeting"}
+	close(mc)
+	scope := slip.NewScope()
+	scope.Let(slip.Symbol("tc"), jet.MsgChannel(mc))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(let (result) (range (lambda (m) (addf result (coerce (send m :data) 'string))) tc) result)`,
+		Expect: `("hello" "goodbye")`,
+	}).Test(t)
+}

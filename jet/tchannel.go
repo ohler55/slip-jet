@@ -57,3 +57,10 @@ func (obj TChannel) Pop() slip.Object {
 	<-obj
 	return slip.True
 }
+
+// Range over the values in a channel.
+func (obj TChannel) Range(s *slip.Scope, caller slip.Caller, depth int) {
+	for range obj {
+		_ = caller.Call(s, slip.List{slip.True}, depth)
+	}
+}

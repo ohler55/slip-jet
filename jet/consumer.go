@@ -39,8 +39,9 @@ a stream, as well as fetching consumer info.
 	consumerFlavor.DefMethod(":fetch", "", consumerFetchCaller{})
 	flavors.FlosFun("jet-consumer-fetch", ":fetch", consumerFetchCaller{}.Docs(), &Pkg)
 
-	// fetch-bytes
-	// fetch-all or fetch-list
+	consumerFlavor.DefMethod(":fetch-bytes", "", consumerFetchBytesCaller{})
+	flavors.FlosFun("jet-consumer-fetch-bytes", ":fetch-bytes", consumerFetchBytesCaller{}.Docs(), &Pkg)
+
 	// consume
 	// messages
 	// next

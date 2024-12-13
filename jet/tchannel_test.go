@@ -26,3 +26,17 @@ func TestTChannel(t *testing.T) {
 	}).Test(t)
 	tt.Equal(t, 0, tc.Length())
 }
+
+func TestTChannelRange(t *testing.T) {
+	tc := make(chan struct{}, 3)
+	tc <- struct{}{}
+	tc <- struct{}{}
+	close(tc)
+	scope := slip.NewScope()
+	scope.Let(slip.Symbol("tc"), jet.TChannel(tc))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(let (result) (range (lambda (v) (addf result v)) tc) result)`,
+		Expect: `(t t)`,
+	}).Test(t)
+}

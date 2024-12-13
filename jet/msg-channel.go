@@ -60,3 +60,10 @@ func (obj MsgChannel) Pop() (result slip.Object) {
 	}
 	return
 }
+
+// Range over the values in a channel.
+func (obj MsgChannel) Range(s *slip.Scope, caller slip.Caller, depth int) {
+	for v := range obj {
+		_ = caller.Call(s, slip.List{MakeMsg(v)}, depth)
+	}
+}
