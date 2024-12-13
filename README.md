@@ -32,6 +32,10 @@ Notes
   - ListStreams
   - StreamNames
 
+- slip
+ - mapchan
+  - no return or goto, simple
+
 
 - next
  - mockMessageBatch
@@ -56,12 +60,7 @@ Notes
  - jet-consumer
   + :name
   + info (&key timeout cached)
-  - fetch (batch &key max-wait heartbeat) => list of msg
-   - MessageBatch is an interface as is Consumer so mock them to test Error()
-   - if max-wait is zero or less then use FetchNoWait
-   - loop over batch Messages channel
-    - mock with messages in place, on Messages create channel, push msgs, close
-  - fetch-all or fetfch-list - like fetch but returns all from channel as a list
+  + fetch
   - fetch-bytes (batch &key max-wait heartbeat) => list of msg
   - consume (handler &key error-handler)
   - messages (&key error-on-missing-heartbeat) => message-context

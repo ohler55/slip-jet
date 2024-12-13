@@ -47,11 +47,12 @@ func TestConsumerInfoNotCached(t *testing.T) {
 	}).Test(t)
 }
 
-func TestConsumerFetchChannel(t *testing.T) {
+func TestConsumerFetch(t *testing.T) {
 	var mc mockConsumer
 	tm := time.Date(2024, time.December, 9, 19, 00, 2, 123, time.UTC)
 	sampleConsumerInfo(&mc.info, tm)
-	mc.mb = &mockMessageBatch{msgs: []jetstream.Msg{}}
+	mb := mockMessageBatch{msgs: []jetstream.Msg{}}
+	mc.mb = &mb
 
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("mc"), jet.MakeConsumer(&mc))
@@ -61,5 +62,36 @@ func TestConsumerFetchChannel(t *testing.T) {
 		Expect: "nil",
 	}).Test(t)
 
-	// TBD test with multiple messages
+	mb.msgs = []jetstream.Msg{
+		&jet.PubMsg{Body: []byte("hello"), Subj: "test.greeting"},
+		&jet.PubMsg{Body: []byte("goodbye"), Subj: "test.greeting"},
+	}
+	mb.err = fmt.Errorf("dummy")
+	(&sliptest.Function{
+		Scope: scope,
+		Source: `(let* ((mb (send mc :fetch 3 :max-wait 2.0 :heartbeat 1.5))
+                        (msg-chan (send mb :messages))
+                        (m1 (channel-pop msg-chan))
+                        (m2 (channel-pop msg-chan))
+                        (m3 (channel-pop msg-chan))
+                        (err (send mb :error)))
+                  (list (when m1 (coerce (send m1 :data) 'string))
+                        (when m2 (coerce (send m2 :data) 'string))
+                        (when m3 (coerce (send m3 :data) 'string))
+                        (when err (send err :message))))`,
+		Expect: `("hello" "goodbye" nil "dummy")`,
+	}).Test(t)
+
+	(&sliptest.Function{
+		Scope:     scope,
+		Source:    `(send mc :fetch t)`,
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+
+	mc.err = fmt.Errorf("dummy")
+	(&sliptest.Function{
+		Scope:     scope,
+		Source:    `(send mc :fetch 1)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
 }
