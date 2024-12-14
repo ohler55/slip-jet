@@ -42,10 +42,13 @@ a stream, as well as fetching consumer info.
 	consumerFlavor.DefMethod(":fetch-bytes", "", consumerFetchBytesCaller{})
 	flavors.FlosFun("jet-consumer-fetch-bytes", ":fetch-bytes", consumerFetchBytesCaller{}.Docs(), &Pkg)
 
-	// consume
-	// messages
-	// next
+	consumerFlavor.DefMethod(":messages", "", consumerMessagesCaller{})
+	flavors.FlosFun("jet-consumer-messages", ":messages", consumerMessagesCaller{}.Docs(), &Pkg)
 
+	consumerFlavor.DefMethod(":next", "", consumerNextCaller{})
+	flavors.FlosFun("jet-consumer-next", ":next", consumerNextCaller{}.Docs(), &Pkg)
+
+	// TBD consume
 }
 
 // MakeConsumer makes a jet-stream.

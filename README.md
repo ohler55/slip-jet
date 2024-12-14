@@ -32,13 +32,17 @@ Notes
   - ListStreams
   - StreamNames
 
-- next
- - mockMessageBatch
- - mockConsumer
- - consumer
-  - test
-
 - consumer
+ - jet-consumer
+  + :name
+  + info (&key timeout cached)
+  + fetch
+  + fetch-bytes
+  + messages
+  + next
+  - consume (handler &key error-handler)
+   - need a consumer-context
+
  - stream
   + create-consumer
   + update-consumer
@@ -49,14 +53,6 @@ Notes
   - delete-consumer (name &key timeout)
   - list-consumers (&key timeout.)
   - consumer-names (&key timeout.)
- - jet-consumer
-  + :name
-  + info (&key timeout cached)
-  + fetch
-  + fetch-bytes
-  - consume (handler &key error-handler)
-  - messages (&key error-on-missing-heartbeat) => message-context
-  - next (&key max-wait heartbeat)
  - client
   - create-consumer (stream &key timeout ...) => consumer
    - all consumer config options

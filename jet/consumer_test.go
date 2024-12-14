@@ -138,3 +138,49 @@ func TestConsumerFetchBytes(t *testing.T) {
 		PanicType: slip.ErrorSymbol,
 	}).Test(t)
 }
+
+func TestConsumerMessages(t *testing.T) {
+	var mc mockConsumer
+	tm := time.Date(2024, time.December, 9, 19, 00, 2, 123, time.UTC)
+	sampleConsumerInfo(&mc.info, tm)
+	mmc := mockMessageContext{msg: &jet.PubMsg{Body: []byte("hello"), Subj: "test.greeting"}}
+	mc.mc = &mmc
+
+	scope := slip.NewScope()
+	scope.Let(slip.Symbol("mc"), jet.MakeConsumer(&mc))
+	(&sliptest.Function{
+		Scope: scope,
+		Source: `(let* ((mmc (send mc :messages :error-on-missing-heartbeat t)))
+                  (coerce (send (send mmc :next) :data) 'string))`,
+		Expect: `"hello"`,
+	}).Test(t)
+
+	mc.err = fmt.Errorf("dummy")
+	(&sliptest.Function{
+		Scope:     scope,
+		Source:    `(send mc :messages)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestConsumerNext(t *testing.T) {
+	var mc mockConsumer
+	tm := time.Date(2024, time.December, 9, 19, 00, 2, 123, time.UTC)
+	sampleConsumerInfo(&mc.info, tm)
+	mc.msg = &jet.PubMsg{Body: []byte("hello"), Subj: "test.greeting"}
+
+	scope := slip.NewScope()
+	scope.Let(slip.Symbol("mc"), jet.MakeConsumer(&mc))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(coerce (send (send mc :next :max-wait 1 :heartbeat 2) :data) 'string)`,
+		Expect: `"hello"`,
+	}).Test(t)
+
+	mc.err = fmt.Errorf("dummy")
+	(&sliptest.Function{
+		Scope:     scope,
+		Source:    `(send mc :next)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}

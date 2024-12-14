@@ -13,6 +13,8 @@ type mockConsumer struct {
 	log  []byte
 	info jetstream.ConsumerInfo
 	mb   jetstream.MessageBatch
+	mc   jetstream.MessagesContext
+	msg  jetstream.Msg
 	err  error
 }
 
@@ -54,11 +56,11 @@ func (mc *mockConsumer) Consume(
 func (mc *mockConsumer) Messages(opts ...jetstream.PullMessagesOpt) (jetstream.MessagesContext, error) {
 	mc.log = fmt.Appendf(mc.log, "Messages()\n")
 
-	return nil, mc.err
+	return mc.mc, mc.err
 }
 
 func (mc *mockConsumer) Next(opts ...jetstream.FetchOpt) (jetstream.Msg, error) {
 	mc.log = fmt.Appendf(mc.log, "Next()\n")
 
-	return nil, mc.err
+	return mc.msg, mc.err
 }
