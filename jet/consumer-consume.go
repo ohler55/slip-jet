@@ -19,7 +19,7 @@ func (caller consumerConsumeCaller) Call(s *slip.Scope, args slip.List, _ int) s
 	var opts []jetstream.PullConsumeOpt
 	msgCaller := cl.ResolveToCaller(s, args[0], 0)
 
-	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":error-handler")); has {
+	if v, has := slip.GetArgsKeyValue(args[1:], slip.Symbol(":error-handler")); has {
 		errCaller := cl.ResolveToCaller(s, v, 0)
 		opts = append(opts, jetstream.ConsumeErrHandler(
 			func(cc jetstream.ConsumeContext, err error) {

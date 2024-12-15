@@ -48,7 +48,8 @@ a stream, as well as fetching consumer info.
 	consumerFlavor.DefMethod(":next", "", consumerNextCaller{})
 	flavors.FlosFun("jet-consumer-next", ":next", consumerNextCaller{}.Docs(), &Pkg)
 
-	// TBD consume
+	consumerFlavor.DefMethod(":consume", "", consumerConsumeCaller{})
+	flavors.FlosFun("jet-consumer-consume", ":consume", consumerConsumeCaller{}.Docs(), &Pkg)
 }
 
 // MakeConsumer makes a jet-stream.

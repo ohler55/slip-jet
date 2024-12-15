@@ -30,6 +30,7 @@ func init() {
 	defConsumerInfo()
 	defMessagesContext()
 	defMessagesBatch()
+	defConsumeContext()
 
 	initConnect()
 

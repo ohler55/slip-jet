@@ -40,8 +40,7 @@ Notes
   + fetch-bytes
   + messages
   + next
-  - consume (handler &key error-handler)
-   - need a consumer-context
+  + consume
 
  - stream
   + create-consumer

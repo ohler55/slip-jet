@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/nats-io/nats.go/jetstream"
+	"github.com/ohler55/ojg/tt"
 	"github.com/ohler55/slip"
 	"github.com/ohler55/slip-jet/jet"
 	"github.com/ohler55/slip/sliptest"
@@ -181,6 +182,42 @@ func TestConsumerNext(t *testing.T) {
 	(&sliptest.Function{
 		Scope:     scope,
 		Source:    `(send mc :next)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestConsumerConsume(t *testing.T) {
+	var mc mockConsumer
+	tm := time.Date(2024, time.December, 9, 19, 00, 2, 123, time.UTC)
+	sampleConsumerInfo(&mc.info, tm)
+	ccc := make(chan struct{}, 10)
+	mc.cc.closed = ccc
+	ccc <- struct{}{}
+	close(ccc)
+
+	mc.cc.msgs = []jetstream.Msg{
+		&jet.PubMsg{Body: []byte("hello"), Subj: "test.greeting"},
+	}
+
+	scope := slip.NewScope()
+	scope.Let(slip.Symbol("mc"), jet.MakeConsumer(&mc))
+	(&sliptest.Function{
+		Scope: scope,
+		Source: `(let* (msgs
+                        (cc (send mc :consume (lambda (m) (addf msgs (coerce (send m :data) 'string)))
+                                     :error-handler (lambda (c err) (addf msgs err)))))
+                  (send cc :drain)
+                  (send cc :stop)
+                  (channel-pop (send cc :closed))
+                  msgs)`,
+		Expect: `("hello")`,
+	}).Test(t)
+	tt.Equal(t, "Drain()\nStop()\n", string(mc.cc.log))
+
+	mc.err = fmt.Errorf("dummy")
+	(&sliptest.Function{
+		Scope:     scope,
+		Source:    `(send mc :consume (lambda (m) nil))`,
 		PanicType: slip.ErrorSymbol,
 	}).Test(t)
 }

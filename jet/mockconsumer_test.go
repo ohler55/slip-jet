@@ -15,6 +15,7 @@ type mockConsumer struct {
 	mb   jetstream.MessageBatch
 	mc   jetstream.MessagesContext
 	msg  jetstream.Msg
+	cc   mockConsumeContext
 	err  error
 }
 
@@ -49,8 +50,9 @@ func (mc *mockConsumer) FetchNoWait(batch int) (jetstream.MessageBatch, error) {
 func (mc *mockConsumer) Consume(
 	handler jetstream.MessageHandler, opts ...jetstream.PullConsumeOpt) (jetstream.ConsumeContext, error) {
 	mc.log = fmt.Appendf(mc.log, "Consume()\n")
+	mc.cc.handler = handler
 
-	return nil, mc.err
+	return &mc.cc, mc.err
 }
 
 func (mc *mockConsumer) Messages(opts ...jetstream.PullMessagesOpt) (jetstream.MessagesContext, error) {
