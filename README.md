@@ -32,21 +32,20 @@ Notes
   - ListStreams
   - StreamNames
 
-- clinet :get-stream should return nil on not found instead of panic
+- client :get-stream should return nil on not found instead of panic
 
 - consumer
  - stream
   + create-consumer
   + update-consumer
-  - create-or-update-consumer (&key timeout ...) => consumer
-  - ordered-consumer (name &key timeout ...) => consumer
-   - ordered consumer config options
+  + create-or-update-consumer
+  + ordered-consumer
   - get-consumer (name &key timeout) => consumer
    - return nil if not found instead of panic
   - delete-consumer (name &key timeout)
-  - list-consumers (&key timeout.)
+  - list-consumers (&key timeout)
    - build list and return
-  - consumer-names (&key timeout.)
+  - consumer-names (&key timeout)
    - build list and return
 
  - client
