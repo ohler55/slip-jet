@@ -32,8 +32,6 @@ Notes
   - ListStreams
   - StreamNames
 
-- client :get-stream should return nil on not found instead of panic
-
 - consumer
  - stream
   + create-consumer
