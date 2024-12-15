@@ -33,25 +33,17 @@ Notes
   - StreamNames
 
 - consumer
- - jet-consumer
-  + :name
-  + info (&key timeout cached)
-  + fetch
-  + fetch-bytes
-  + messages
-  + next
-  + consume
 
  - stream
   + create-consumer
   + update-consumer
-  - create-or-update-consumer (&key timeout ...) => consumer
-  - ordered-consumer (name &key timeout ...) => consumer
-   - ordered consumer config options
+  + create-or-update-consumer
+  + ordered-consumer
   - get-consumer (name &key timeout) => consumer
   - delete-consumer (name &key timeout)
-  - list-consumers (&key timeout.)
-  - consumer-names (&key timeout.)
+  - list-consumers (&key timeout)
+  - consumer-names (&key timeout)
+
  - client
   - create-consumer (stream &key timeout ...) => consumer
    - all consumer config options

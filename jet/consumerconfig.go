@@ -456,7 +456,7 @@ var (
 	}
 )
 
-// ConsumertConfigPropList returns a property list built from a
+// ConsumerConfigPropList returns a property list built from a
 // jetstream.ConsumerConfig. The returned list is suitable as arguments to a
 // consumer creation.
 func ConsumerConfigPropList(config *jetstream.ConsumerConfig) slip.List {

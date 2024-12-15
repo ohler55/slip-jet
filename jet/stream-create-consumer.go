@@ -34,10 +34,10 @@ func (caller streamCreateConsumerCaller) Call(s *slip.Scope, args slip.List, _ i
 }
 
 func (caller streamCreateConsumerCaller) Docs() string {
-	return makeConsumerMethodDoc(":create-consumer", "", "<jet-stream>", "",
+	return makeConsumerMethodDoc(":create-consumer", "", "<jet-consumer>", "",
 		`Creates a consumer on a given stream with given config. If consumer already exists
 and the provided configuration differs from its configuration, an error is raised is returned.
 If the provided configuration is the same as the existing consumer, the existing consumer is
-returned. Consumer interface is returned, allowing to operate on a consumer (e.g. fetch messages).
+returned. The _jet-consumer_ is returned, allowing to operations on a consumer (e.g. fetch messages).
 `)
 }
