@@ -32,16 +32,9 @@ Notes
   - ListStreams
   - StreamNames
 
-- consumer
- - jet-consumer
-  + :name
-  + info (&key timeout cached)
-  + fetch
-  + fetch-bytes
-  + messages
-  + next
-  + consume
+- clinet :get-stream should return nil on not found instead of panic
 
+- consumer
  - stream
   + create-consumer
   + update-consumer
@@ -49,9 +42,13 @@ Notes
   - ordered-consumer (name &key timeout ...) => consumer
    - ordered consumer config options
   - get-consumer (name &key timeout) => consumer
+   - return nil if not found instead of panic
   - delete-consumer (name &key timeout)
   - list-consumers (&key timeout.)
+   - build list and return
   - consumer-names (&key timeout.)
+   - build list and return
+
  - client
   - create-consumer (stream &key timeout ...) => consumer
    - all consumer config options
