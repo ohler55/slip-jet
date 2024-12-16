@@ -66,6 +66,15 @@ purging a stream.`),
 	streamFlavor.DefMethod(":ordered-consumer", "", streamOrderedConsumerCaller{})
 	flavors.FlosFun("jet-stream-ordered-consumer", ":ordered-consumer", streamOrderedConsumerCaller{}.Docs(), &Pkg)
 
+	streamFlavor.DefMethod(":get-consumer", "", streamGetConsumerCaller{})
+	flavors.FlosFun("jet-stream-get-consumer", ":get-consumer", streamGetConsumerCaller{}.Docs(), &Pkg)
+
+	streamFlavor.DefMethod(":list-consumers", "", streamListConsumersCaller{})
+	flavors.FlosFun("jet-stream-list-consumers", ":list-consumers", streamListConsumersCaller{}.Docs(), &Pkg)
+
+	streamFlavor.DefMethod(":consumer-names", "", streamConsumerNamesCaller{})
+	flavors.FlosFun("jet-stream-consumer-names", ":consumer-names", streamConsumerNamesCaller{}.Docs(), &Pkg)
+
 	// TBD
 }
 

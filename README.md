@@ -38,13 +38,10 @@ Notes
   + update-consumer
   + create-or-update-consumer
   + ordered-consumer
-  - get-consumer (name &key timeout) => consumer
-   - return nil if not found instead of panic
+  + get-consumer
+  + list-consumers
+  + consumer-names
   - delete-consumer (name &key timeout)
-  - list-consumers (&key timeout)
-   - build list and return
-  - consumer-names (&key timeout)
-   - build list and return
 
  - client
   - create-consumer (stream &key timeout ...) => consumer
