@@ -32,6 +32,11 @@ Notes
   - ListStreams
   - StreamNames
 
+- in slip pkg/flavors/Instance.Equal
+ - if Any is set then use alt.Diff to check for equal
+
+- in get-consumer test, use equal to compare instances
+
 - consumer
  - stream
   + create-consumer
@@ -41,7 +46,7 @@ Notes
   + get-consumer
   + list-consumers
   + consumer-names
-  - delete-consumer (name &key timeout)
+  + delete-consumer
 
  - client
   - create-consumer (stream &key timeout ...) => consumer
@@ -52,8 +57,6 @@ Notes
    - ordered consumer config options
   - get-consumer (stream consumer &key timeout) => consumer
   - delete-consumer (stream consumer &key timeout)
- - jet-messages-context
-  - test with mock
 
 
 - should managers be included in the objects so the api is more friendly?
@@ -63,41 +66,13 @@ Notes
    - :client
    - :delete
 
- - stream
-  - consumer manager functions (create, update, get, delete, list, names, ordered, create-or-update)
-
- - as StreamConsumerManager
  - as AccountInfo
   - auth
    - support and test auth
     - users, accounts, nkeys, username, password
 
 
-
-- don't implement both client and stream APIs for pub sub, just stream
 - add publisher with saved PublishOpts
  - also tied to stream (but not subject?)
  - tied to sync vs async
- - publish just data abd form msg from that
-
-
-- flavors
- - jetstream
- - stream
- - consumer
-  - create from jetstream object or consumer :init
-   - jetstream follows api
-   - :init keep jetstream more "trim"
- - msg
-  - need to be able to create a message
-   - publish from jetstream
-  - test after jetstream can be created
-   - consumer needed as well
-
-- general, factory or make
- - factory matches jetstream api
- - make is maybe more lispy
- - pick and approach and use it throughout
- - if adding a new client
-  - factory requires support from the top and touches all
-  - make can make use of an alternate top or alternatives for testing
+ - publish just data and form msg from that

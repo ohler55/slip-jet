@@ -75,7 +75,8 @@ purging a stream.`),
 	streamFlavor.DefMethod(":consumer-names", "", streamConsumerNamesCaller{})
 	flavors.FlosFun("jet-stream-consumer-names", ":consumer-names", streamConsumerNamesCaller{}.Docs(), &Pkg)
 
-	// TBD
+	streamFlavor.DefMethod(":delete-consumer", "", streamDeleteConsumerCaller{})
+	flavors.FlosFun("jet-stream-delete-consumer", ":delete-consumer", streamDeleteConsumerCaller{}.Docs(), &Pkg)
 }
 
 // MakeStream makes a jet-stream.
