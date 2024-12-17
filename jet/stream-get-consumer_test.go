@@ -32,8 +32,10 @@ func TestStreamGetConsumerOk(t *testing.T) {
                                     (found (send jss :get-consumer "eater" :timeout 0.1))
                                     (not-found (send jss :get-consumer "no-one")))
                               (send js :close)
-                              (list not-found (when found (send found :name))))`, natsURL),
-		Expect: `(nil "eater")`,
+                              (list not-found
+                                    (send consumer :equal found)
+                                    (when found (send found :name))))`, natsURL),
+		Expect: `(nil t "eater")`,
 	}).Test(t)
 }
 
