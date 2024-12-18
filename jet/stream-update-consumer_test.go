@@ -3,27 +3,15 @@
 package jet_test
 
 import (
-	"context"
 	"fmt"
 	"testing"
 
-	"github.com/nats-io/nats.go"
-	"github.com/nats-io/nats.go/jetstream"
-	"github.com/ohler55/ojg/tt"
 	"github.com/ohler55/slip"
 	"github.com/ohler55/slip/sliptest"
 )
 
 func TestStreamUpdateConsumerOk(t *testing.T) {
-	options := nats.Options{
-		Url:      natsURL,
-		User:     "u1",
-		Password: "password",
-	}
-	nc, err := options.Connect()
-	tt.Nil(t, err)
-	js, _ := jetstream.New(nc)
-	defer func() { _ = js.DeleteStream(context.Background(), "update-test") }()
+	defer cleanupTestStream("update-test")
 
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))
@@ -45,15 +33,7 @@ func TestStreamUpdateConsumerOk(t *testing.T) {
 }
 
 func TestStreamUpdateConsumerError(t *testing.T) {
-	options := nats.Options{
-		Url:      natsURL,
-		User:     "u1",
-		Password: "password",
-	}
-	nc, err := options.Connect()
-	tt.Nil(t, err)
-	js, _ := jetstream.New(nc)
-	defer func() { _ = js.DeleteStream(context.Background(), "update-test") }()
+	defer cleanupTestStream("update-test")
 
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))

@@ -32,13 +32,28 @@ Notes
   - ListStreams
   - StreamNames
 
+- add PullConsumeOpt and PullMessagesOpt &keys on consumer methods
+ - methods
+  - consumer-consume
+  - consumer-messages
+ - use common function to parse and append to a list
+  - doesn't work since they are different types
+  - maybe append to two lists?
+  - or just copy code?
+ - StopAfter (consume only)
+ - PullExpiry
+ - PullMaxBytes
+ - PullHeartbeat
+ - PullMaxMessages
+ - PullThresholdBytes
+ - PullThresholdMessages
+
+
  - client
-  - create-consumer (stream &key timeout ...) => consumer
-   - all consumer config options
-  - update-consumer (stream &key timeout ...) => consumer
-  - create-or-update-consumer (stream &key timeout ...) => consumer
-  - ordered-consumer (stream &key timeout ...) => consumer
-   - ordered consumer config options
+  + create-consumer
+  + update-consumer
+  + create-or-update-consumer
+  + ordered-consumer
   - get-consumer (stream consumer &key timeout) => consumer
   - delete-consumer (stream consumer &key timeout)
 
