@@ -11,22 +11,23 @@ import (
 	"github.com/ohler55/slip/pkg/flavors"
 )
 
-type streamGetConsumerCaller struct{}
+type clientGetConsumerCaller struct{}
 
-func (caller streamGetConsumerCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller clientGetConsumerCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":get-consumer", len(args), 1, 3)
-	stream := self.Any.(jetstream.Stream)
+	flavors.CheckMethodArgCount(self, ":get-consumer", len(args), 2, 4)
+	js := self.Any.(*Client).js
 
-	name := slip.MustBeString(args[0], "name")
+	stream := slip.MustBeString(args[0], "stream")
+	name := slip.MustBeString(args[1], "name")
+
 	ctx := context.Background()
-
-	if v, has := slip.GetArgsKeyValue(args[1:], slip.Symbol(":timeout")); has {
+	if v, has := slip.GetArgsKeyValue(args[2:], slip.Symbol(":timeout")); has {
 		var cf context.CancelFunc
 		ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
 		defer cf()
 	}
-	consumer, err := stream.Consumer(ctx, name)
+	consumer, err := js.Consumer(ctx, stream, name)
 	if err != nil {
 		if errors.Is(err, jetstream.ErrConsumerNotFound) {
 			return nil
@@ -36,8 +37,9 @@ func (caller streamGetConsumerCaller) Call(s *slip.Scope, args slip.List, _ int)
 	return MakeConsumer(consumer)
 }
 
-func (caller streamGetConsumerCaller) Docs() string {
-	return `__:get-consumer__ _name_ &key _timeout_ => _jet-consumer_
+func (caller clientGetConsumerCaller) Docs() string {
+	return `__:get-consumer__ _stream_ _name_ &key _timeout_ => _jet-consumer_
+   _stream_ [string] the stream to search for the consumer in.
    _name_ [string] the consumer name of the consumer to get.
    _:timeout_ [real] the number of seconds to wait before timing out.
 

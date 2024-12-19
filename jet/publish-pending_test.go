@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ohler55/slip"
 	"github.com/ohler55/slip/sliptest"
 )
 
@@ -25,14 +24,5 @@ func TestPublishPendingOk(t *testing.T) {
                               (send js :close)
                               (list before after))`, natsURL),
 		Expect: `(1 0)`,
-	}).Test(t)
-}
-
-func TestPublishPendingNotClient(t *testing.T) {
-	(&sliptest.Function{
-		Source: fmt.Sprintf(`(let ((js (jet-connect :url %q :user "u1" :password "password")))
-                              (send js :close)
-                              (send js :publish-pending))`, natsURL),
-		PanicType: slip.ErrorSymbol,
 	}).Test(t)
 }

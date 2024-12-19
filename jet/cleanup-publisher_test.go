@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ohler55/slip"
 	"github.com/ohler55/slip/sliptest"
 )
 
@@ -23,14 +22,5 @@ func TestCleanupPublisherOk(t *testing.T) {
                               (send js :close)
                               nil)`, natsURL),
 		Expect: `nil`,
-	}).Test(t)
-}
-
-func TestCleanupPublisherNotClient(t *testing.T) {
-	(&sliptest.Function{
-		Source: fmt.Sprintf(`(let ((js (jet-connect :url %q :user "u1" :password "password")))
-                              (send js :close)
-                              (send js :cleanup-publisher))`, natsURL),
-		PanicType: slip.ErrorSymbol,
 	}).Test(t)
 }

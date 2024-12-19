@@ -12,10 +12,8 @@ type publishCompleteCaller struct{}
 func (caller publishCompleteCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	flavors.CheckMethodArgCount(self, ":publish-complete", len(args), 0, 0)
-	cl, ok := self.Any.(*Client)
-	if !ok || cl.nc == nil {
-		slip.NewPanic("%s is not a connected jet-client", self)
-	}
+	cl := self.Any.(*Client)
+
 	return TChannel(cl.js.PublishAsyncComplete())
 }
 

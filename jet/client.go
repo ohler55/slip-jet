@@ -92,7 +92,14 @@ func defClient() {
 	clientFlavor.DefMethod(":ordered-consumer", "", clientOrderedConsumerCaller{})
 	flavors.FlosFun("jet-client-ordered-consumer", ":ordered-consumer", clientOrderedConsumerCaller{}.Docs(), &Pkg)
 
-	// TBD
+	clientFlavor.DefMethod(":get-consumer", "", clientGetConsumerCaller{})
+	flavors.FlosFun("jet-client-get-consumer", ":get-consumer", clientGetConsumerCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":delete-consumer", "", clientDeleteConsumerCaller{})
+	flavors.FlosFun("jet-client-delete-consumer", ":delete-consumer", clientDeleteConsumerCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":account-info", "", accountInfoCaller{})
+	flavors.FlosFun("jet-account-info", ":account-info", accountInfoCaller{}.Docs(), &Pkg)
 }
 
 // Client is a container for the elements needed by an instance of the

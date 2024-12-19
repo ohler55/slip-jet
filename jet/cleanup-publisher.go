@@ -12,10 +12,7 @@ type cleanupPublisherCaller struct{}
 func (caller cleanupPublisherCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	flavors.CheckMethodArgCount(self, ":cleanup-publisher", len(args), 0, 0)
-	cl, ok := self.Any.(*Client)
-	if !ok || cl.nc == nil {
-		slip.NewPanic("%s is not a connected jet-client", self)
-	}
+	cl := self.Any.(*Client)
 	cl.js.CleanupPublisher()
 
 	return nil

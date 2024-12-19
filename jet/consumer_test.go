@@ -205,6 +205,13 @@ func TestConsumerConsume(t *testing.T) {
 		Scope: scope,
 		Source: `(let* (msgs
                         (cc (send mc :consume (lambda (m) (addf msgs (coerce (send m :data) 'string)))
+                                     :stop-after 3
+                                     :pull-expiry 10
+                                     :pull-max-bytes 4000
+                                     :pull-max-messages 4
+                                     :pull-heartbeat 2
+                                     :pull-threshold-bytes 4000
+                                     :pull-threshold-messages 4
                                      :error-handler (lambda (c err) (addf msgs err)))))
                   (send cc :drain)
                   (send cc :stop)

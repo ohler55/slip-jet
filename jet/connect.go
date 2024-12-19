@@ -42,8 +42,10 @@ var conOptMap = map[string]*conOpt{
 			caller := cl.ResolveToCaller(s, v, 0)
 			options.AsyncErrorCB = func(c *nats.Conn, sub *nats.Subscription, err error) {
 				self := s.Get("self").(*flavors.Instance)
-				// TBD add subscription arg
-				caller.Call(s, slip.List{self, nil, slip.NewError("%s", err)}, 0)
+				// Subscriptions are a nats only type and are kind of like
+				// consumers. In any case a Subscription has a subject so that
+				// is passed in the callback.
+				caller.Call(s, slip.List{self, slip.String(sub.Subject), slip.NewError("%s", err)}, 0)
 			}
 		},
 	},

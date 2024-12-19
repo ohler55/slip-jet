@@ -16,46 +16,11 @@ JetStream API.
 --------
 Notes
 
-- test use cases (start with connection)
- - with token ??
- - nkeys
- - start server with multiple accounts
-
-- does client instance need to keep track of subscription?
- - so that the error callback with subscription can return the correct instance?
-
-- make mocks for listers and parents to test error methods
- - mockStream
-  - ListConsumers(context.Context) jetstream.ConsumerInfoLister {
-  - ConsumerNames(context.Context) jetstream.ConsumerNameLister {
- - mockClient
-  - ListStreams
-  - StreamNames
-
-- add PullConsumeOpt and PullMessagesOpt &keys on consumer methods
- - methods
-  - consumer-consume
-  - consumer-messages
- - use common function to parse and append to a list
-  - doesn't work since they are different types
-  - maybe append to two lists?
-  - or just copy code?
- - StopAfter (consume only)
- - PullExpiry
- - PullMaxBytes
- - PullHeartbeat
- - PullMaxMessages
- - PullThresholdBytes
- - PullThresholdMessages
-
-
- - client
-  + create-consumer
-  + update-consumer
-  + create-or-update-consumer
-  + ordered-consumer
-  - get-consumer (stream consumer &key timeout) => consumer
-  - delete-consumer (stream consumer &key timeout)
+- connect
+ - test use cases (start with connection)
+  - with token ??
+  - nkeys
+  - start server with multiple accounts
 
 
 - should managers be included in the objects so the api is more friendly?
@@ -64,14 +29,3 @@ Notes
    - :update
    - :client
    - :delete
-
- - as AccountInfo
-  - auth
-   - support and test auth
-    - users, accounts, nkeys, username, password
-
-
-- add publisher with saved PublishOpts
- - also tied to stream (but not subject?)
- - tied to sync vs async
- - publish just data and form msg from that

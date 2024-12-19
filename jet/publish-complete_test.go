@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/ohler55/slip"
 	"github.com/ohler55/slip/sliptest"
 )
 
@@ -23,14 +22,5 @@ func TestPublishCompleteOk(t *testing.T) {
                               (send js :close)
                               complete)`, natsURL),
 		Expect: `t`,
-	}).Test(t)
-}
-
-func TestPublishCompleteNotClient(t *testing.T) {
-	(&sliptest.Function{
-		Source: fmt.Sprintf(`(let ((js (jet-connect :url %q :user "u1" :password "password")))
-                              (send js :close)
-                              (send js :publish-complete))`, natsURL),
-		PanicType: slip.ErrorSymbol,
 	}).Test(t)
 }

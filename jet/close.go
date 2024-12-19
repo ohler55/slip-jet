@@ -16,8 +16,6 @@ func (caller clientCloseCaller) Call(s *slip.Scope, args slip.List, _ int) slip.
 		if cl.nc != nil {
 			cl.nc.Close()
 		}
-		cl.nc = nil
-		cl.js = nil
 	}
 	return nil
 }
