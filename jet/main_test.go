@@ -117,3 +117,14 @@ func createStream(t *testing.T, name, subject string) (jetstream.JetStream, jets
 
 	return js, stream
 }
+
+func cleanupTestStream(stream string) {
+	options := nats.Options{
+		Url:      natsURL,
+		User:     "u1",
+		Password: "password",
+	}
+	nc, _ := options.Connect()
+	js, _ := jetstream.New(nc)
+	_ = js.DeleteStream(context.Background(), stream)
+}

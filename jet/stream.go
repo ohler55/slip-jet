@@ -53,7 +53,30 @@ purging a stream.`),
 	streamFlavor.DefMethod(":delete-msg", "", streamDeleteMsgCaller{})
 	flavors.FlosFun("jet-stream-delete-msg", ":delete-msg", streamDeleteMsgCaller{}.Docs(), &Pkg)
 
-	// TBD
+	streamFlavor.DefMethod(":create-consumer", "", streamCreateConsumerCaller{})
+	flavors.FlosFun("jet-stream-create-consumer", ":create-consumer", streamCreateConsumerCaller{}.Docs(), &Pkg)
+
+	streamFlavor.DefMethod(":update-consumer", "", streamUpdateConsumerCaller{})
+	flavors.FlosFun("jet-stream-update-consumer", ":update-consumer", streamUpdateConsumerCaller{}.Docs(), &Pkg)
+
+	streamFlavor.DefMethod(":create-or-update-consumer", "", streamCreateOrUpdateConsumerCaller{})
+	flavors.FlosFun("jet-stream-create-or-update-consumer", ":create-or-update-consumer",
+		streamCreateOrUpdateConsumerCaller{}.Docs(), &Pkg)
+
+	streamFlavor.DefMethod(":ordered-consumer", "", streamOrderedConsumerCaller{})
+	flavors.FlosFun("jet-stream-ordered-consumer", ":ordered-consumer", streamOrderedConsumerCaller{}.Docs(), &Pkg)
+
+	streamFlavor.DefMethod(":get-consumer", "", streamGetConsumerCaller{})
+	flavors.FlosFun("jet-stream-get-consumer", ":get-consumer", streamGetConsumerCaller{}.Docs(), &Pkg)
+
+	streamFlavor.DefMethod(":list-consumers", "", streamListConsumersCaller{})
+	flavors.FlosFun("jet-stream-list-consumers", ":list-consumers", streamListConsumersCaller{}.Docs(), &Pkg)
+
+	streamFlavor.DefMethod(":consumer-names", "", streamConsumerNamesCaller{})
+	flavors.FlosFun("jet-stream-consumer-names", ":consumer-names", streamConsumerNamesCaller{}.Docs(), &Pkg)
+
+	streamFlavor.DefMethod(":delete-consumer", "", streamDeleteConsumerCaller{})
+	flavors.FlosFun("jet-stream-delete-consumer", ":delete-consumer", streamDeleteConsumerCaller{}.Docs(), &Pkg)
 }
 
 // MakeStream makes a jet-stream.

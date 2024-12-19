@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/nats-io/nats.go"
 	"github.com/ohler55/ojg/tt"
 	"github.com/ohler55/slip"
 	"github.com/ohler55/slip-jet/jet"
@@ -55,7 +56,7 @@ func TestClientConnectAsyncErrorCallback(t *testing.T) {
 	tt.Equal(t, true, ok)
 	nc := inst.Any.(*jet.Client).NatsConn()
 	tt.NotNil(t, nc.Opts.AsyncErrorCB)
-	nc.Opts.AsyncErrorCB(nc, nil, fmt.Errorf("dummy"))
+	nc.Opts.AsyncErrorCB(nc, &nats.Subscription{Subject: "quux"}, fmt.Errorf("dummy"))
 	tt.Equal(t, slip.Symbol("error"), scope.Get("out"))
 }
 

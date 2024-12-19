@@ -78,7 +78,28 @@ func defClient() {
 
 	clientFlavor.DefMethod(":delete-stream", "", deleteStreamCaller{})
 	flavors.FlosFun("jet-delete-stream", ":delete-stream", deleteStreamCaller{}.Docs(), &Pkg)
-	// TBD
+
+	clientFlavor.DefMethod(":create-consumer", "", clientCreateConsumerCaller{})
+	flavors.FlosFun("jet-client-create-consumer", ":create-consumer", clientCreateConsumerCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":update-consumer", "", clientUpdateConsumerCaller{})
+	flavors.FlosFun("jet-client-update-consumer", ":update-consumer", clientUpdateConsumerCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":create-or-update-consumer", "", clientCreateOrUpdateConsumerCaller{})
+	flavors.FlosFun("jet-client-create-or-update-consumer", ":create-or-update-consumer",
+		clientCreateOrUpdateConsumerCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":ordered-consumer", "", clientOrderedConsumerCaller{})
+	flavors.FlosFun("jet-client-ordered-consumer", ":ordered-consumer", clientOrderedConsumerCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":get-consumer", "", clientGetConsumerCaller{})
+	flavors.FlosFun("jet-client-get-consumer", ":get-consumer", clientGetConsumerCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":delete-consumer", "", clientDeleteConsumerCaller{})
+	flavors.FlosFun("jet-client-delete-consumer", ":delete-consumer", clientDeleteConsumerCaller{}.Docs(), &Pkg)
+
+	clientFlavor.DefMethod(":account-info", "", accountInfoCaller{})
+	flavors.FlosFun("jet-account-info", ":account-info", accountInfoCaller{}.Docs(), &Pkg)
 }
 
 // Client is a container for the elements needed by an instance of the

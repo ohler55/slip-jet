@@ -4,7 +4,9 @@ package jet
 
 import (
 	"context"
+	"errors"
 
+	"github.com/nats-io/nats.go/jetstream"
 	"github.com/ohler55/slip"
 	"github.com/ohler55/slip/pkg/flavors"
 )
@@ -24,6 +26,9 @@ func (caller getStreamCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Ob
 	}
 	stream, err := js.Stream(ctx, slip.MustBeString(args[0], "name"))
 	if err != nil {
+		if errors.Is(err, jetstream.ErrStreamNotFound) {
+			return nil
+		}
 		panic(err)
 	}
 	return MakeStream(stream)
@@ -36,6 +41,6 @@ func (caller getStreamCaller) Docs() string {
 
 
 Fetches and returns a _jet-stream_ for the given stream name.
-If the stream does not exist, an error is raised.
+If the stream does not exist _nil_ is returned.
 `
 }

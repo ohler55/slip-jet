@@ -3,13 +3,10 @@
 package jet
 
 import (
-	"fmt"
-
 	"github.com/ohler55/slip"
 	"github.com/ohler55/slip/pkg/flavors"
 
-	_ "github.com/nats-io/nats.go"
-	_ "github.com/nats-io/nats.go/jetstream"
+	"github.com/nats-io/nats.go/jetstream"
 )
 
 var (
@@ -23,56 +20,42 @@ func defConsumer() {
 		slip.List{
 			slip.List{
 				slip.Symbol(":documentation"),
-				slip.String(`
-TBD
-
+				slip.String(`Consumer contains methods for fetching/processing messages from
+a stream, as well as fetching consumer info.
 `),
 			},
-			slip.List{
-				slip.Symbol(":init-keywords"),
-				slip.Symbol(":name"),
-			},
-			slip.Symbol(":gettable-instance-variables"),
-			slip.Symbol(":settable-instance-variables"),
-			slip.Symbol(":inittable-instance-variables"),
 		},
 		&Pkg,
 	)
-	consumerFlavor.DefMethod(":init", "", consumerInitCaller{})
-	// fetch
-	// fetch-bytes
-	// fetch-no-wait
-	// consume
-	// next
-	// info
-	// cache-info
+	consumerFlavor.Final = true
+	consumerFlavor.GoMakeOnly = true
 
+	consumerFlavor.DefMethod(":info", "", consumerInfoCaller{})
+	flavors.FlosFun("jet-consumer-info", ":info", consumerInfoCaller{}.Docs(), &Pkg)
+
+	consumerFlavor.DefMethod(":name", "", consumerNameCaller{})
+	flavors.FlosFun("jet-consumer-name", ":name", consumerNameCaller{}.Docs(), &Pkg)
+
+	consumerFlavor.DefMethod(":fetch", "", consumerFetchCaller{})
+	flavors.FlosFun("jet-consumer-fetch", ":fetch", consumerFetchCaller{}.Docs(), &Pkg)
+
+	consumerFlavor.DefMethod(":fetch-bytes", "", consumerFetchBytesCaller{})
+	flavors.FlosFun("jet-consumer-fetch-bytes", ":fetch-bytes", consumerFetchBytesCaller{}.Docs(), &Pkg)
+
+	consumerFlavor.DefMethod(":messages", "", consumerMessagesCaller{})
+	flavors.FlosFun("jet-consumer-messages", ":messages", consumerMessagesCaller{}.Docs(), &Pkg)
+
+	consumerFlavor.DefMethod(":next", "", consumerNextCaller{})
+	flavors.FlosFun("jet-consumer-next", ":next", consumerNextCaller{}.Docs(), &Pkg)
+
+	consumerFlavor.DefMethod(":consume", "", consumerConsumeCaller{})
+	flavors.FlosFun("jet-consumer-consume", ":consume", consumerConsumeCaller{}.Docs(), &Pkg)
 }
 
-type consumer struct {
-	self *flavors.Instance
-}
+// MakeConsumer makes a jet-stream.
+func MakeConsumer(consumer jetstream.Consumer) (inst *flavors.Instance) {
+	inst = consumerFlavor.MakeInstance().(*flavors.Instance)
+	inst.Any = consumer
 
-type consumerInitCaller struct{}
-
-func (caller consumerInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
-	obj := s.Get("self").(*flavors.Instance)
-	if 0 < len(args) {
-		args = args[0].(slip.List)
-	}
-	c := consumer{self: obj}
-	obj.Any = &c
-
-	fmt.Printf("*** init args: %s\n", args)
-	// TBD
-
-	return nil
-}
-
-func (caller consumerInitCaller) Docs() string {
-	return `__:init__
-
-
-Sets the initial value when _make-instance_ is called.
-`
+	return
 }
