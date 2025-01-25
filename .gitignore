@@ -27,3 +27,4 @@ go.work.sum
 stash.lisp
 nats-store
 .tramp_history
+.DS_Store
