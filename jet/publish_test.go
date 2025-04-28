@@ -103,7 +103,7 @@ func TestPublishBadPayload(t *testing.T) {
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("js"), nil)
 	defer func() {
-		_ = slip.ReadString("(send js :close)").Eval(scope, nil)
+		_ = slip.ReadString("(send js :close)", scope).Eval(scope, nil)
 	}()
 	(&sliptest.Function{
 		Scope: scope,
@@ -124,7 +124,7 @@ func TestPublishBadArgType(t *testing.T) {
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("js"), nil)
 	defer func() {
-		_ = slip.ReadString("(send js :close)").Eval(scope, nil)
+		_ = slip.ReadString("(send js :close)", scope).Eval(scope, nil)
 	}()
 	(&sliptest.Function{
 		Scope: scope,
@@ -148,7 +148,7 @@ func TestPublishFail(t *testing.T) {
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("js"), nil)
 	defer func() {
-		_ = slip.ReadString("(send js :close)").Eval(scope, nil)
+		_ = slip.ReadString("(send js :close)", scope).Eval(scope, nil)
 	}()
 	(&sliptest.Function{
 		Scope: scope,

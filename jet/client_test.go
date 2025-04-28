@@ -29,7 +29,7 @@ func TestClientDocs(t *testing.T) {
 		":publish-complete",
 		":publish-pending",
 	} {
-		_ = slip.ReadString(fmt.Sprintf(`(describe-method 'jet-client %s out)`, method)).Eval(scope, nil)
+		_ = slip.ReadString(fmt.Sprintf(`(describe-method 'jet-client %s out)`, method), scope).Eval(scope, nil)
 		tt.Equal(t, true, strings.Contains(out.String(), method))
 		out.Reset()
 	}
@@ -39,7 +39,7 @@ func TestClientJetStream(t *testing.T) {
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("js"), nil)
 	defer func() {
-		_ = slip.ReadString("(send js :close)").Eval(scope, nil)
+		_ = slip.ReadString("(send js :close)", scope).Eval(scope, nil)
 	}()
 	(&sliptest.Function{
 		Scope:  scope,

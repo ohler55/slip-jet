@@ -41,7 +41,7 @@ func TestClientConnectAsyncErrorCallback(t *testing.T) {
 	scope.Let(slip.Symbol("js"), nil)
 	scope.Let(slip.Symbol("out"), nil)
 	defer func() {
-		_ = slip.ReadString("(send js :close)").Eval(scope, nil)
+		_ = slip.ReadString("(send js :close)", scope).Eval(scope, nil)
 	}()
 	(&sliptest.Function{
 		Scope: scope,
@@ -104,7 +104,7 @@ func TestClientConnectCustomReconnectDelayCallback(t *testing.T) {
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("js"), nil)
 	defer func() {
-		_ = slip.ReadString("(send js :close)").Eval(scope, nil)
+		_ = slip.ReadString("(send js :close)", scope).Eval(scope, nil)
 	}()
 	(&sliptest.Function{
 		Scope: scope,
@@ -162,7 +162,7 @@ func TestClientConnectCustomDisconnectedErrorCallback(t *testing.T) {
 	scope.Let(slip.Symbol("js"), nil)
 	scope.Let(slip.Symbol("out"), nil)
 	defer func() {
-		_ = slip.ReadString("(send js :close)").Eval(scope, nil)
+		_ = slip.ReadString("(send js :close)", scope).Eval(scope, nil)
 	}()
 	(&sliptest.Function{
 		Scope: scope,
@@ -186,7 +186,7 @@ func TestClientConnectCustomDiscoveredServersCallback(t *testing.T) {
 	scope.Let(slip.Symbol("js"), nil)
 	scope.Let(slip.Symbol("out"), nil)
 	defer func() {
-		_ = slip.ReadString("(send js :close)").Eval(scope, nil)
+		_ = slip.ReadString("(send js :close)", scope).Eval(scope, nil)
 	}()
 	(&sliptest.Function{
 		Scope: scope,
@@ -262,7 +262,7 @@ func TestClientConnectLameDuckModeHandler(t *testing.T) {
 	scope.Let(slip.Symbol("js"), nil)
 	scope.Let(slip.Symbol("out"), nil)
 	defer func() {
-		_ = slip.ReadString("(send js :close)").Eval(scope, nil)
+		_ = slip.ReadString("(send js :close)", scope).Eval(scope, nil)
 	}()
 	(&sliptest.Function{
 		Scope: scope,
@@ -478,7 +478,7 @@ func TestClientConnectReconnectedCallback(t *testing.T) {
 	scope.Let(slip.Symbol("js"), nil)
 	scope.Let(slip.Symbol("out"), nil)
 	defer func() {
-		_ = slip.ReadString("(send js :close)").Eval(scope, nil)
+		_ = slip.ReadString("(send js :close)", scope).Eval(scope, nil)
 	}()
 	(&sliptest.Function{
 		Scope: scope,
@@ -543,7 +543,7 @@ func TestClientConnectSignatureCallbackOk(t *testing.T) {
 	scope.Let(slip.Symbol("js"), nil)
 	scope.Let(slip.Symbol("out"), nil)
 	defer func() {
-		_ = slip.ReadString("(send js :close)").Eval(scope, nil)
+		_ = slip.ReadString("(send js :close)", scope).Eval(scope, nil)
 	}()
 	(&sliptest.Function{
 		Scope: scope,
@@ -567,7 +567,7 @@ func TestClientConnectSignatureCallbackError(t *testing.T) {
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("js"), nil)
 	defer func() {
-		_ = slip.ReadString("(send js :close)").Eval(scope, nil)
+		_ = slip.ReadString("(send js :close)", scope).Eval(scope, nil)
 	}()
 	(&sliptest.Function{
 		Scope: scope,
@@ -655,7 +655,7 @@ func TestClientConnectTokenHandler(t *testing.T) {
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("js"), nil)
 	defer func() {
-		_ = slip.ReadString("(send js :close)").Eval(scope, nil)
+		_ = slip.ReadString("(send js :close)", scope).Eval(scope, nil)
 	}()
 	(&sliptest.Function{
 		Scope: scope,
@@ -704,7 +704,7 @@ func TestClientConnectBadUser(t *testing.T) {
 // 	scope := slip.NewScope()
 // 	scope.Let(slip.Symbol("js"), nil)
 // 	defer func() {
-// 		_ = slip.ReadString("(send js :close)").Eval(scope, nil)
+// 		_ = slip.ReadString("(send js :close)", scope).Eval(scope, nil)
 // 	}()
 // 	(&sliptest.Function{
 // 		Scope: scope,

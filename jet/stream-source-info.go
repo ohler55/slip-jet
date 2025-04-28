@@ -10,7 +10,6 @@ import (
 
 	_ "github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
-	_ "github.com/nats-io/nats.go/jetstream"
 )
 
 var (
