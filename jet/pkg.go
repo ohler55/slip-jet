@@ -17,7 +17,14 @@ var (
 )
 
 func init() {
-	Pkg.Initialize(map[string]*slip.VarVal{})
+	Pkg.Initialize(map[string]*slip.VarVal{
+		"*jet*": {
+			Val:    &Pkg,
+			Const:  true,
+			Export: true,
+			Doc:    `The jet package.`,
+		},
+	})
 	defAck()
 	defClient()
 	defConsumer()
@@ -34,7 +41,6 @@ func init() {
 
 	initConnect()
 
-	slip.DefConstant(slip.Symbol("*jet*"), &Pkg, "")
 	Pkg.Initialize(nil, &PubMsg{}) // lock
 	slip.AddPackage(&Pkg)
 	slip.UserPkg.Use(&Pkg)
