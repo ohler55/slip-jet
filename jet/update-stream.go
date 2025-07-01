@@ -14,7 +14,7 @@ type updateStreamCaller struct{}
 
 func (caller updateStreamCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":update-stream", len(args), 1, len(streamOptMap)*2+1)
+	slip.CheckMethodArgCount(self, ":update-stream", len(args), 1, len(streamOptMap)*2+1)
 	js := self.Any.(*Client).js
 
 	var cfg jetstream.StreamConfig

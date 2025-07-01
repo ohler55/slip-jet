@@ -14,7 +14,7 @@ type streamCreateOrUpdateConsumerCaller struct{}
 
 func (caller streamCreateOrUpdateConsumerCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":create-or-update-consumer", len(args), 0, len(consumerOptMap)*2+2)
+	slip.CheckMethodArgCount(self, ":create-or-update-consumer", len(args), 0, len(consumerOptMap)*2+2)
 	stream := self.Any.(jetstream.Stream)
 
 	var cfg jetstream.ConsumerConfig

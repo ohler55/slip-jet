@@ -14,7 +14,7 @@ type streamOrderedConsumerCaller struct{}
 
 func (caller streamOrderedConsumerCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":ordered-consumer", len(args), 0, len(orderedOptMap)*2+2)
+	slip.CheckMethodArgCount(self, ":ordered-consumer", len(args), 0, len(orderedOptMap)*2+2)
 	stream := self.Any.(jetstream.Stream)
 
 	var cfg jetstream.OrderedConsumerConfig

@@ -11,7 +11,7 @@ type publishCompleteCaller struct{}
 
 func (caller publishCompleteCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":publish-complete", len(args), 0, 0)
+	slip.CheckMethodArgCount(self, ":publish-complete", len(args), 0, 0)
 	cl := self.Any.(*Client)
 
 	return TChannel(cl.js.PublishAsyncComplete())

@@ -13,7 +13,7 @@ type clientDeleteConsumerCaller struct{}
 
 func (caller clientDeleteConsumerCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":delete-consumer", len(args), 2, 4)
+	slip.CheckMethodArgCount(self, ":delete-consumer", len(args), 2, 4)
 	js := self.Any.(*Client).js
 
 	stream := slip.MustBeString(args[0], "stream")

@@ -16,7 +16,7 @@ type accountInfoCaller struct{}
 
 func (caller accountInfoCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":account-info", len(args), 0, 2)
+	slip.CheckMethodArgCount(self, ":account-info", len(args), 0, 2)
 	js := self.Any.(*Client).js
 
 	ctx := context.Background()

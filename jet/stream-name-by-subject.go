@@ -15,7 +15,7 @@ type streamNameBySubjectCaller struct{}
 
 func (caller streamNameBySubjectCaller) Call(s *slip.Scope, args slip.List, _ int) (result slip.Object) {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":stream-name-by-subject", len(args), 1, 3)
+	slip.CheckMethodArgCount(self, ":stream-name-by-subject", len(args), 1, 3)
 	js := self.Any.(*Client).js
 
 	ctx := context.Background()

@@ -13,7 +13,7 @@ type publishAsyncCaller struct{}
 
 func (caller publishAsyncCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":publish-async", len(args), 1, 20)
+	slip.CheckMethodArgCount(self, ":publish-async", len(args), 1, 20)
 	js := self.Any.(*Client).js
 	var (
 		opts []jetstream.PublishOpt

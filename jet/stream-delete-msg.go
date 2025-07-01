@@ -15,7 +15,7 @@ type streamDeleteMsgCaller struct{}
 
 func (caller streamDeleteMsgCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":delete-msg", len(args), 1, 7)
+	slip.CheckMethodArgCount(self, ":delete-msg", len(args), 1, 7)
 	stream := self.Any.(jetstream.Stream)
 	seq, ok := args[0].(slip.Fixnum)
 	if !ok {

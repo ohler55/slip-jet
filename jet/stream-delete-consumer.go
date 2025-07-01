@@ -14,7 +14,7 @@ type streamDeleteConsumerCaller struct{}
 
 func (caller streamDeleteConsumerCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":delete-consumer", len(args), 1, 3)
+	slip.CheckMethodArgCount(self, ":delete-consumer", len(args), 1, 3)
 	stream := self.Any.(jetstream.Stream)
 
 	name := slip.MustBeString(args[0], "name")

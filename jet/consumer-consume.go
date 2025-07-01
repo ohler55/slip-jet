@@ -14,7 +14,7 @@ type consumerConsumeCaller struct{}
 
 func (caller consumerConsumeCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":consume", len(args), 1, 17)
+	slip.CheckMethodArgCount(self, ":consume", len(args), 1, 17)
 	consumer := self.Any.(jetstream.Consumer)
 
 	var opts []jetstream.PullConsumeOpt

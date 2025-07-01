@@ -14,7 +14,7 @@ type createStreamCaller struct{}
 
 func (caller createStreamCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":create-stream", len(args), 1, len(streamOptMap)*2+3)
+	slip.CheckMethodArgCount(self, ":create-stream", len(args), 1, len(streamOptMap)*2+3)
 	js := self.Any.(*Client).js
 
 	var cfg jetstream.StreamConfig

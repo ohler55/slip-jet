@@ -206,7 +206,7 @@ type streamInfoCaller struct{}
 
 func (caller streamInfoCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":info", len(args), 0, 6)
+	slip.CheckMethodArgCount(self, ":info", len(args), 0, 6)
 	stream := self.Any.(jetstream.Stream)
 	var si *jetstream.StreamInfo
 
