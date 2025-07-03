@@ -14,7 +14,7 @@ type streamListConsumersCaller struct{}
 
 func (caller streamListConsumersCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":list-consumers", len(args), 0, 2)
+	slip.CheckMethodArgCount(self, ":list-consumers", len(args), 0, 2)
 	stream := self.Any.(jetstream.Stream)
 
 	ctx := context.Background()
@@ -34,11 +34,18 @@ func (caller streamListConsumersCaller) Call(s *slip.Scope, args slip.List, _ in
 	return list
 }
 
-func (caller streamListConsumersCaller) Docs() string {
-	return `__:list-consumers__ &key _timeout_ => _list_
-   _:timeout_ [real] the number of seconds to wait before timing out.
-
-
-Returns a list of _jet-consumer-info_ instances.
-`
+func (caller streamListConsumersCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":list-consumers",
+		Text: `Returns a list of _jet-consumer-info_ instances.`,
+		Args: []*slip.DocArg{
+			{Name: "&key"},
+			{
+				Name: ":timeout",
+				Type: "real",
+				Text: `The number of seconds to wait before timing out.`,
+			},
+		},
+		Return: "list",
+	}
 }

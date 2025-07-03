@@ -15,7 +15,7 @@ type clientGetConsumerCaller struct{}
 
 func (caller clientGetConsumerCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":get-consumer", len(args), 2, 4)
+	slip.CheckMethodArgCount(self, ":get-consumer", len(args), 2, 4)
 	js := self.Any.(*Client).js
 
 	stream := slip.MustBeString(args[0], "stream")
@@ -37,14 +37,29 @@ func (caller clientGetConsumerCaller) Call(s *slip.Scope, args slip.List, _ int)
 	return MakeConsumer(consumer)
 }
 
-func (caller clientGetConsumerCaller) Docs() string {
-	return `__:get-consumer__ _stream_ _name_ &key _timeout_ => _jet-consumer_
-   _stream_ [string] the stream to search for the consumer in.
-   _name_ [string] the consumer name of the consumer to get.
-   _:timeout_ [real] the number of seconds to wait before timing out.
-
-
-Returns a _jet-consumer_ for an existing consumer, allowing processing
-of messages. If consumer does not exist, _nil_ is returned.
-`
+func (caller clientGetConsumerCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":get-consumer",
+		Text: `Returns a _jet-consumer_ for an existing consumer, allowing processing
+of messages. If consumer does not exist, _nil_ is returned.`,
+		Args: []*slip.DocArg{
+			{
+				Name: "stream",
+				Type: "string",
+				Text: "The stream to search for the consumer in.",
+			},
+			{
+				Name: "name",
+				Type: "string",
+				Text: "The consumer name of the consumer to get.",
+			},
+			{Name: "&key"},
+			{
+				Name: ":timeout",
+				Type: "real",
+				Text: `The number of seconds to wait before timing out.`,
+			},
+		},
+		Return: "jet-consumer",
+	}
 }

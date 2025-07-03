@@ -13,7 +13,7 @@ type streamSubjectsCaller struct{}
 
 func (caller streamSubjectsCaller) Call(s *slip.Scope, args slip.List, _ int) (result slip.Object) {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":subjects", len(args), 0, 0)
+	slip.CheckMethodArgCount(self, ":subjects", len(args), 0, 0)
 	stream := self.Any.(jetstream.Stream)
 	if si := stream.CachedInfo(); si != nil {
 		subjects := make(slip.List, len(si.Config.Subjects))
@@ -25,10 +25,10 @@ func (caller streamSubjectsCaller) Call(s *slip.Scope, args slip.List, _ int) (r
 	return
 }
 
-func (caller streamSubjectsCaller) Docs() string {
-	return `__:subjects__ => _list_
-
-
-Returns the cached stream subjects.
-`
+func (caller streamSubjectsCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name:   ":subjects",
+		Text:   `Returns the cached stream subjects.`,
+		Return: "list",
+	}
 }

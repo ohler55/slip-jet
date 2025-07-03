@@ -15,7 +15,7 @@ type streamGetMsgCaller struct{}
 
 func (caller streamGetMsgCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":get-msg", len(args), 1, 7)
+	slip.CheckMethodArgCount(self, ":get-msg", len(args), 1, 7)
 	stream := self.Any.(jetstream.Stream)
 	seq, ok := args[0].(slip.Fixnum)
 	if !ok {
@@ -48,15 +48,30 @@ func (caller streamGetMsgCaller) Call(s *slip.Scope, args slip.List, _ int) slip
 	return MakeMsg(&pm)
 }
 
-func (caller streamGetMsgCaller) Docs() string {
-	return `__:get-msg__ _sequence_ &key _timeout_ _subject_ => _jet-msg_
-   _sequence_ [fixnum] the sequence number of the message to get.
-   _:timeout_ [real] the number of seconds to wait before timing out.
-   _:subject_ [string] sets the stream subject from which the message should be
+func (caller streamGetMsgCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":get-msg",
+		Text: `Retrieves a message stored in JetStream by sequence number.`,
+		Args: []*slip.DocArg{
+			{
+				Name: "sequence",
+				Type: "fixnum",
+				Text: "The sequence number of the message to get.",
+			},
+			{Name: "&key"},
+			{
+				Name: ":timeout",
+				Type: "real",
+				Text: "The number of seconds to wait before timing out.",
+			},
+			{
+				Name: ":subject",
+				Type: "string",
+				Text: `Sets the stream subject from which the message should be
 retrieved. Server will return a first message with a seq >= to the input seq that has
-the specified subject.
-
-
-Retrieves a message stored in JetStream by sequence number.
-`
+the specified subject.`,
+			},
+		},
+		Return: "jet-msg",
+	}
 }

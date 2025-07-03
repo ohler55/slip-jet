@@ -29,13 +29,13 @@ func defConsumeContext() {
 	consumeContextFlavor.GoMakeOnly = true
 
 	consumeContextFlavor.DefMethod(":stop", "", consumeContextStopCaller{})
-	flavors.FlosFun("jet-consume-context-stop", ":stop", consumeContextStopCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-consume-context-stop", ":stop", consumeContextStopCaller{}.FuncDocs(), &Pkg)
 
 	consumeContextFlavor.DefMethod(":drain", "", consumeContextDrainCaller{})
-	flavors.FlosFun("jet-consume-context-drain", ":drain", consumeContextDrainCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-consume-context-drain", ":drain", consumeContextDrainCaller{}.FuncDocs(), &Pkg)
 
 	consumeContextFlavor.DefMethod(":closed", "", consumeContextClosedCaller{})
-	flavors.FlosFun("jet-consume-context-closed", ":closed", consumeContextClosedCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-consume-context-closed", ":closed", consumeContextClosedCaller{}.FuncDocs(), &Pkg)
 }
 
 // MakeConsumeContext makes a jet-consume-context.
@@ -57,14 +57,13 @@ func (caller consumeContextStopCaller) Call(s *slip.Scope, args slip.List, _ int
 	return nil
 }
 
-func (caller consumeContextStopCaller) Docs() string {
-	return `__:stop__
-
-
-Unsubscribes from the stream and cancels subscription.
+func (caller consumeContextStopCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":stop",
+		Text: `Unsubscribes from the stream and cancels subscription.
 No more messages will be received after calling this method.
-All messages that are already in the buffer are discarded.
-`
+All messages that are already in the buffer are discarded.`,
+	}
 }
 
 type consumeContextDrainCaller struct{}
@@ -78,13 +77,12 @@ func (caller consumeContextDrainCaller) Call(s *slip.Scope, args slip.List, _ in
 	return nil
 }
 
-func (caller consumeContextDrainCaller) Docs() string {
-	return `__:drain__
-
-
-Unsubscribes from the stream and cancels subscription.
-All messages that are already in the buffer will be processed in callback function.
-`
+func (caller consumeContextDrainCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":drain",
+		Text: `Unsubscribes from the stream and cancels subscription.
+All messages that are already in the buffer will be processed in callback function.`,
+	}
 }
 
 type consumeContextClosedCaller struct{}
@@ -96,12 +94,12 @@ func (caller consumeContextClosedCaller) Call(s *slip.Scope, args slip.List, _ i
 	return TChannel(cc.Closed())
 }
 
-func (caller consumeContextClosedCaller) Docs() string {
-	return `__:closed__ => _channel_
-
-
-Returns a channel that is closed when the consuming is
+func (caller consumeContextClosedCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":closed",
+		Text: `Returns a channel that is closed when the consuming is
 fully stopped/drained. When the channel is closed, no more messages
-will be received and processing is complete.
-`
+will be received and processing is complete.`,
+		Return: "channel",
+	}
 }

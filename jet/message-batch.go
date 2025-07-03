@@ -29,10 +29,10 @@ func defMessagesBatch() {
 	messageBatchFlavor.GoMakeOnly = true
 
 	messageBatchFlavor.DefMethod(":messages", "", messageBatchMessagesCaller{})
-	flavors.FlosFun("jet-messages-batch-messages", ":messages", messageBatchMessagesCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-messages-batch-messages", ":messages", messageBatchMessagesCaller{}.FuncDocs(), &Pkg)
 
 	messageBatchFlavor.DefMethod(":error", "", messageBatchErrorCaller{})
-	flavors.FlosFun("jet-messages-batch-error", ":error", messageBatchErrorCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-messages-batch-error", ":error", messageBatchErrorCaller{}.FuncDocs(), &Pkg)
 }
 
 // MakeMessagesBatch makes a jet-messages-batch.
@@ -52,12 +52,12 @@ func (caller messageBatchMessagesCaller) Call(s *slip.Scope, args slip.List, _ i
 	return MsgChannel(mb.Messages())
 }
 
-func (caller messageBatchMessagesCaller) Docs() string {
-	return `__:messages__ => _channel_
-
-
-Returns a _channel_ that provides the messages in the batch.
-`
+func (caller messageBatchMessagesCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name:   ":messages",
+		Text:   `Returns a _channel_ that provides the messages in the batch.`,
+		Return: "channel",
+	}
 }
 
 type messageBatchErrorCaller struct{}
@@ -72,10 +72,10 @@ func (caller messageBatchErrorCaller) Call(s *slip.Scope, args slip.List, _ int)
 	return
 }
 
-func (caller messageBatchErrorCaller) Docs() string {
-	return `__:error__ => _error_|_nil_
-
-
-Returns an _error_ or _nil_.
-`
+func (caller messageBatchErrorCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name:   ":error",
+		Text:   `Returns an _error_ or _nil_.`,
+		Return: "error|nil",
+	}
 }

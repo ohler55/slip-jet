@@ -15,7 +15,7 @@ type streamNameBySubjectCaller struct{}
 
 func (caller streamNameBySubjectCaller) Call(s *slip.Scope, args slip.List, _ int) (result slip.Object) {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":stream-name-by-subject", len(args), 1, 3)
+	slip.CheckMethodArgCount(self, ":stream-name-by-subject", len(args), 1, 3)
 	js := self.Any.(*Client).js
 
 	ctx := context.Background()
@@ -32,13 +32,24 @@ func (caller streamNameBySubjectCaller) Call(s *slip.Scope, args slip.List, _ in
 	return
 }
 
-func (caller streamNameBySubjectCaller) Docs() string {
-	return `__:stream-name-by-subject__ _subject_ &key _timeout_ => _string__
-   _subject_ [string] subject to find the the stream name of.
-   _:timeout_ [real] the number of seconds to wait before timing out.
-
-
-Returns a stream name stream listening on given subject. If no
-stream is bound to given subject, _nil_ is returned.
-`
+func (caller streamNameBySubjectCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":stream-name-by-subject",
+		Text: `Returns a stream name stream listening on given subject. If no
+stream is bound to given subject, _nil_ is returned.`,
+		Args: []*slip.DocArg{
+			{
+				Name: "subject",
+				Type: "string",
+				Text: "Subject to find the the stream name of.",
+			},
+			{Name: "&key"},
+			{
+				Name: ":timeout",
+				Type: "real",
+				Text: `The number of seconds to wait before timing out.`,
+			},
+		},
+		Return: "string",
+	}
 }

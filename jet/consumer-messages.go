@@ -13,7 +13,7 @@ type consumerMessagesCaller struct{}
 
 func (caller consumerMessagesCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":messages", len(args), 0, 16)
+	slip.CheckMethodArgCount(self, ":messages", len(args), 0, 16)
 	consumer := self.Any.(jetstream.Consumer)
 	var opts []jetstream.PullMessagesOpt
 
@@ -29,40 +29,10 @@ func (caller consumerMessagesCaller) Call(s *slip.Scope, args slip.List, _ int) 
 	return MakeMessagesContext(mc)
 }
 
-func (caller consumerMessagesCaller) Docs() string {
-	return `__:messages__ &key
-error-on-missing-heartbeat
-stop-after
-pull-expiry
-pull-max-bytes
-pull-max-messages
-pull-heartbeat
-pull-threshold-bytes
-pull-threshold-messages
-=> _jet-message-context_
-   _:error-on-missing-heartbeat_ [boolean] sets whether a missing heartbeat error should be
-raised when calling [jet-messages-context :next] (Default: true).
-   _:stop-after_ [fixnum] sets the number of messages after which the consumer is
-automatically stopped and no more messages are pulled from the server.
-   _:pull-expiry_ [real] sets timeout insecond on a single pull request, waiting until
-at least one message is available. If not provided, a default of 30 seconds will be used.
-   _:pull-max-bytes_ [fixnum] limits the number of bytes to be buffered in the client.
-If not provided, the limit is not set (max messages will be used instead). This option
-is exclusive with _:pull-max-messages_.
-   _:pull-max-messages_ [fixnum] limits the number of messages to be buffered in the
-client. If not provided, a default of 500 messages will be used. This option is
-exclusive with _:pull-max-bytes_.
-   _:pull-heartbeat_ [real] sets the idle heartbeat duration for a pull subscription.
-If a client does not receive a heartbeat message from a stream for more than the idle
-heartbeat setting, the subscription will be removed and error will be passed to the
-message handler. If not provided, a default _:pull-expiry_ / 2 will be used (capped at 30 seconds).
-   _:pull-threshold-bytes_ [fixnum] sets the byte count on which Consume will trigger
-new pull request to the server. Defaults to 50% of _:max-bytes_ (if set).
-   _:pull-threshold-messages_ [fixnum] sets the message count on which Consume will
-trigger new pull request to the server. Defaults to 50% of _:max-messages_.
-
-
-Returns _jet-messages-context_, allowing continuously iterating
+func (caller consumerMessagesCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":messages",
+		Text: `Returns _jet-messages-context_, allowing continuously iterating
 over messages on a stream.
 
 
@@ -74,6 +44,64 @@ options should not be used.
 
 _:error-on-missing-heartbeat_ can be used to enable/disable
 erroring out on the _jet-messages-context_ _:next_ method when a
-heartbeat is missing. This option is enabled by default.
-`
+heartbeat is missing. This option is enabled by default.`,
+		Args: []*slip.DocArg{
+			{Name: "&key"},
+			{
+				Name: ":error-on-missing-heartbeat",
+				Type: "boolean",
+				Text: `Sets whether a missing heartbeat error should be
+raised when calling [jet-messages-context :next].`,
+				Default: slip.True,
+			},
+			{
+				Name: ":stop-after",
+				Type: "fixnum",
+				Text: `Sets the number of messages after which the consumer is
+automatically stopped and no more messages are pulled from the server.`,
+			},
+			{
+				Name: ":pull-expiry",
+				Type: "real",
+				Text: `Sets timeout in second on a single pull request, waiting until
+at least one message is available.`,
+				Default: slip.Fixnum(30),
+			},
+			{
+				Name: ":pull-max-bytes",
+				Type: "fixnum",
+				Text: `Limits the number of bytes to be buffered in the client.
+If not provided, the limit is not set (max messages will be used instead). This option
+is exclusive with _:pull-max-messages_.`,
+			},
+			{
+				Name: ":pull-max-messages",
+				Type: "fixnum",
+				Text: `Limits the number of messages to be buffered in the
+client. This option is exclusive with _:pull-max-bytes_.`,
+				Default: slip.Fixnum(500),
+			},
+			{
+				Name: ":pull-heartbeat",
+				Type: "real",
+				Text: `Sets the idle heartbeat duration for a pull subscription.
+If a client does not receive a heartbeat message from a stream for more than the idle
+heartbeat setting, the subscription will be removed and error will be passed to the
+message handler. If not provided, a default _:pull-expiry_ / 2 will be used (capped at 30 seconds).`,
+			},
+			{
+				Name: ":pull-threshold-bytes",
+				Type: "fixnum",
+				Text: `Sets the byte count on which Consume will trigger
+new pull request to the server. Defaults to 50% of _:max-bytes_ (if set).`,
+			},
+			{
+				Name: ":pull-threshold-messages",
+				Type: "fixnum",
+				Text: `Sets the message count on which Consume will
+trigger new pull request to the server. Defaults to 50% of _:max-messages_.`,
+			},
+		},
+		Return: "jet-message-context",
+	}
 }

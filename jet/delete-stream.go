@@ -13,7 +13,7 @@ type deleteStreamCaller struct{}
 
 func (caller deleteStreamCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":delete-stream", len(args), 1, len(streamOptMap)*2+1)
+	slip.CheckMethodArgCount(self, ":delete-stream", len(args), 1, len(streamOptMap)*2+1)
 	js := self.Any.(*Client).js
 
 	ctx := context.Background()
@@ -28,12 +28,22 @@ func (caller deleteStreamCaller) Call(s *slip.Scope, args slip.List, _ int) slip
 	return nil
 }
 
-func (caller deleteStreamCaller) Docs() string {
-	return `__:delete-stream__ _name_ &key _timeout_
-   _name_ [string] name of the stream to delete.
-   _:timeout_ [real] the number of seconds to wait before timing out.
-
-
-Removes a stream with given name. If stream does not exist, and error is raised.
-`
+func (caller deleteStreamCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":delete-stream",
+		Text: `Removes a stream with given name. If stream does not exist, and error is raised.`,
+		Args: []*slip.DocArg{
+			{
+				Name: "name",
+				Type: "string",
+				Text: "The name of the stream to delete.",
+			},
+			{Name: "&key"},
+			{
+				Name: ":timeout",
+				Type: "real",
+				Text: `The number of seconds to wait before timing out.`,
+			},
+		},
+	}
 }

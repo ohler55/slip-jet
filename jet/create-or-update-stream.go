@@ -14,7 +14,7 @@ type createOrUpdateStreamCaller struct{}
 
 func (caller createOrUpdateStreamCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":create-or-update-stream", len(args), 1, len(streamOptMap)*2+1)
+	slip.CheckMethodArgCount(self, ":create-or-update-stream", len(args), 1, len(streamOptMap)*2+1)
 	js := self.Any.(*Client).js
 
 	var cfg jetstream.StreamConfig
@@ -36,9 +36,11 @@ func (caller createOrUpdateStreamCaller) Call(s *slip.Scope, args slip.List, _ i
 	return MakeStream(stream)
 }
 
-func (caller createOrUpdateStreamCaller) Docs() string {
-	return makeStreamMethodDoc(":create-or-update-stream", "_name_ ", "<jet-stream>",
-		"   _name_ [string] the name of the stream.",
+func (caller createOrUpdateStreamCaller) FuncDocs() *slip.FuncDoc {
+	return makeStreamMethodFuncDoc(
+		":create-or-update-stream",
+		&slip.DocArg{Name: "name", Type: "string", Text: "The name of the stream."},
+		"<jet-stream>",
 		`Creates a stream with the given options. If stream already exists,
 it will be updated (if possible).`)
 }

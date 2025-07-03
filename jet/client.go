@@ -34,72 +34,73 @@ func defClient() {
 	clientFlavor.DefMethod(":init", "", clientInitCaller{})
 
 	clientFlavor.DefMethod(":close", "", clientCloseCaller{})
-	flavors.FlosFun("jet-client-close", ":close", clientCloseCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-client-close", ":close", clientCloseCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":options", "", optionsCaller{})
-	flavors.FlosFun("jet-client-options", ":options", optionsCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-client-options", ":options", optionsCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":publish", "", publishCaller{})
-	flavors.FlosFun("jet-publish", ":publish", publishCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-publish", ":publish", publishCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":publish-async", "", publishAsyncCaller{})
-	flavors.FlosFun("jet-publish-async", ":publish-async", publishAsyncCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-publish-async", ":publish-async", publishAsyncCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":publish-pending", "", publishPendingCaller{})
-	flavors.FlosFun("jet-publish-pending", ":publish-pending", publishPendingCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-publish-pending", ":publish-pending", publishPendingCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":publish-complete", "", publishCompleteCaller{})
-	flavors.FlosFun("jet-publish-complete", ":publish-complete", publishCompleteCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-publish-complete", ":publish-complete", publishCompleteCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":cleanup-publisher", "", cleanupPublisherCaller{})
-	flavors.FlosFun("jet-cleanup-publisher", ":cleanup-publisher", cleanupPublisherCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-cleanup-publisher", ":cleanup-publisher", cleanupPublisherCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":create-stream", "", createStreamCaller{})
-	flavors.FlosFun("jet-create-stream", ":create-stream", createStreamCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-create-stream", ":create-stream", createStreamCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":update-stream", "", updateStreamCaller{})
-	flavors.FlosFun("jet-update-stream", ":update-stream", updateStreamCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-update-stream", ":update-stream", updateStreamCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":create-or-update-stream", "", createOrUpdateStreamCaller{})
 	flavors.FlosFun("jet-create-or-update-stream", ":create-or-update-stream",
-		createOrUpdateStreamCaller{}.Docs(), &Pkg)
+		createOrUpdateStreamCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":get-stream", "", getStreamCaller{})
-	flavors.FlosFun("jet-get-stream", ":get-stream", getStreamCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-get-stream", ":get-stream", getStreamCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":stream-name-by-subject", "", streamNameBySubjectCaller{})
-	flavors.FlosFun("jet-stream-name-by-subject", ":stream-name-by-subject", streamNameBySubjectCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-name-by-subject", ":stream-name-by-subject",
+		streamNameBySubjectCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":list-streams", "", listStreamsCaller{})
-	flavors.FlosFun("jet-list-streams", ":list-streams", listStreamsCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-list-streams", ":list-streams", listStreamsCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":stream-names", "", streamNamesCaller{})
-	flavors.FlosFun("jet-stream-names", ":stream-names", streamNamesCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-names", ":stream-names", streamNamesCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":delete-stream", "", deleteStreamCaller{})
-	flavors.FlosFun("jet-delete-stream", ":delete-stream", deleteStreamCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-delete-stream", ":delete-stream", deleteStreamCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":create-consumer", "", clientCreateConsumerCaller{})
-	flavors.FlosFun("jet-client-create-consumer", ":create-consumer", clientCreateConsumerCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-client-create-consumer", ":create-consumer", clientCreateConsumerCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":update-consumer", "", clientUpdateConsumerCaller{})
-	flavors.FlosFun("jet-client-update-consumer", ":update-consumer", clientUpdateConsumerCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-client-update-consumer", ":update-consumer", clientUpdateConsumerCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":create-or-update-consumer", "", clientCreateOrUpdateConsumerCaller{})
 	flavors.FlosFun("jet-client-create-or-update-consumer", ":create-or-update-consumer",
-		clientCreateOrUpdateConsumerCaller{}.Docs(), &Pkg)
+		clientCreateOrUpdateConsumerCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":ordered-consumer", "", clientOrderedConsumerCaller{})
-	flavors.FlosFun("jet-client-ordered-consumer", ":ordered-consumer", clientOrderedConsumerCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-client-ordered-consumer", ":ordered-consumer", clientOrderedConsumerCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":get-consumer", "", clientGetConsumerCaller{})
-	flavors.FlosFun("jet-client-get-consumer", ":get-consumer", clientGetConsumerCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-client-get-consumer", ":get-consumer", clientGetConsumerCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":delete-consumer", "", clientDeleteConsumerCaller{})
-	flavors.FlosFun("jet-client-delete-consumer", ":delete-consumer", clientDeleteConsumerCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-client-delete-consumer", ":delete-consumer", clientDeleteConsumerCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":account-info", "", accountInfoCaller{})
-	flavors.FlosFun("jet-account-info", ":account-info", accountInfoCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-account-info", ":account-info", accountInfoCaller{}.FuncDocs(), &Pkg)
 }
 
 // Client is a container for the elements needed by an instance of the

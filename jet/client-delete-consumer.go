@@ -13,7 +13,7 @@ type clientDeleteConsumerCaller struct{}
 
 func (caller clientDeleteConsumerCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":delete-consumer", len(args), 2, 4)
+	slip.CheckMethodArgCount(self, ":delete-consumer", len(args), 2, 4)
 	js := self.Any.(*Client).js
 
 	stream := slip.MustBeString(args[0], "stream")
@@ -32,14 +32,28 @@ func (caller clientDeleteConsumerCaller) Call(s *slip.Scope, args slip.List, _ i
 	return nil
 }
 
-func (caller clientDeleteConsumerCaller) Docs() string {
-	return `__:delete-consumer__ _stream_ _name_ &key _timeout_
-   _stream_ [string] the stream to remove the consumer from.
-   _name_ [string] the consumer name of the consumer to delete.
-   _:timeout_ [real] the number of seconds to wait before timing out.
-
-
-Removes a consumer with given name from a stream. If consumer does not
-exist an error is raised.
-`
+func (caller clientDeleteConsumerCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":delete-consumer",
+		Text: `Removes a consumer with given name from a stream. If consumer does not
+exist an error is raised.`,
+		Args: []*slip.DocArg{
+			{
+				Name: "stream",
+				Type: "string",
+				Text: "The stream to remove the consumer from.",
+			},
+			{
+				Name: "name",
+				Type: "string",
+				Text: "The consumer name of the consumer to delete.",
+			},
+			{Name: "&key"},
+			{
+				Name: ":timeout",
+				Type: "real",
+				Text: `The number of seconds to wait before timing out.`,
+			},
+		},
+	}
 }

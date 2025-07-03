@@ -19,7 +19,7 @@ type consumerOpt struct {
 var consumerOptMap = map[string]*consumerOpt{
 	":name": {
 		doc: &slip.DocArg{
-			Name: "name",
+			Name: ":name",
 			Type: "string",
 			Text: `Name is an optional name for the consumer. If not set, one is
 generated automatically. The name cannot contain whitespace, ., *, >, path
@@ -31,7 +31,7 @@ separators (forward or backwards slash), and non-printable characters.`,
 	},
 	":durable": {
 		doc: &slip.DocArg{
-			Name: "durable",
+			Name: ":durable",
 			Type: "string",
 			Text: `Durable is an optional durable name for the consumer. If both
 _:durable_ and _:name_ are set, they have to be equal. Unless _:inactive-threshold_
@@ -45,7 +45,7 @@ non-printable characters.`,
 	},
 	":description": {
 		doc: &slip.DocArg{
-			Name: "description",
+			Name: ":description",
 			Type: "string",
 			Text: `An optional description of the consumer.`,
 		},
@@ -55,7 +55,7 @@ non-printable characters.`,
 	},
 	":deliver-policy": {
 		doc: &slip.DocArg{
-			Name: "deliver-policy",
+			Name: ":deliver-policy",
 			Type: ":all|:last|:new|:start-sequence|:start-time|:last-per-subject",
 			Text: `Defines from which point to start delivering messages
 from the stream. Defaults to _:all_.`,
@@ -80,7 +80,7 @@ from the stream. Defaults to _:all_.`,
 	},
 	":opt-start-seq": {
 		doc: &slip.DocArg{
-			Name: "opt-start-seq",
+			Name: ":opt-start-seq",
 			Type: "fixnum",
 			Text: `An optional sequence number from which to start
  message delivery. Only applicable when _:deliver-policy_ is set to
@@ -96,7 +96,7 @@ _:start-sequence_.`,
 	},
 	":opt-start-time": {
 		doc: &slip.DocArg{
-			Name: "opt-start-time",
+			Name: ":opt-start-time",
 			Type: "time",
 			Text: `An optional time from which to start message
 delivery. Only applicable when _:deliver-policy_ is set to
@@ -113,7 +113,7 @@ _:start-time_.`,
 	},
 	":ack-policy": {
 		doc: &slip.DocArg{
-			Name: "ack-policy",
+			Name: ":ack-policy",
 			Type: ":explicit|:all|:none",
 			Text: `The acknowledgement policy for the consumer. Defaults to _:explicit_.`,
 		},
@@ -133,7 +133,7 @@ _:start-time_.`,
 	},
 	":ack-wait": {
 		doc: &slip.DocArg{
-			Name: "ack-wait",
+			Name: ":ack-wait",
 			Type: "real",
 			Text: `Defines how long in seconds the server will wait for an acknowledgement
 before resending a message. If not set, server default is 30 seconds.`,
@@ -148,7 +148,7 @@ before resending a message. If not set, server default is 30 seconds.`,
 	},
 	":max-deliver": {
 		doc: &slip.DocArg{
-			Name: "max-deliver",
+			Name: ":max-deliver",
 			Type: "fixnum",
 			Text: `Defines the maximum number of delivery attempts for a message.
 Applies to any message that is re-sent due to ack policy. If not set, server
@@ -164,7 +164,7 @@ default is -1 (unlimited).`,
 	},
 	":back-off": {
 		doc: &slip.DocArg{
-			Name: "back-off",
+			Name: ":back-off",
 			Type: "list of real",
 			Text: `Specifies the optional back-off intervals for retrying
 message delivery after a failed acknowledgement. It overrides _:ack-wait_ option.
@@ -191,7 +191,7 @@ used for all remaining attempts.`,
 	},
 	":filter-subject": {
 		doc: &slip.DocArg{
-			Name: "filter-subject",
+			Name: ":filter-subject",
 			Type: "string",
 			Text: `Used to filter messages delivered from the stream. _:filter-subject_
 is exclusive with _:filter-subjects_.`,
@@ -202,7 +202,7 @@ is exclusive with _:filter-subjects_.`,
 	},
 	":replay-policy": {
 		doc: &slip.DocArg{
-			Name: "replay-policy",
+			Name: ":replay-policy",
 			Type: ":instant|:original",
 			Text: `Defines the rate at which messages are sent to the consumer. If
 _:replay-original-policy_ is set, messages are sent in the same intervals in which
@@ -223,7 +223,7 @@ Defaults to _:instant_.`,
 	},
 	":rate-limit": {
 		doc: &slip.DocArg{
-			Name: "rate-limit",
+			Name: ":rate-limit",
 			Type: "fixnum",
 			Text: `An optional maximum rate of message delivery in bits per second.`,
 		},
@@ -237,7 +237,7 @@ Defaults to _:instant_.`,
 	},
 	":sample-frequency": {
 		doc: &slip.DocArg{
-			Name: "sample-frequency",
+			Name: ":sample-frequency",
 			Type: "string",
 			Text: `An optional frequency for sampling how often acknowledgements are
 sampled for observability. See
@@ -249,7 +249,7 @@ https://docs.nats.io/running-a-nats-service/nats_admin/monitoring/monitoring_jet
 	},
 	":max-waiting": {
 		doc: &slip.DocArg{
-			Name: "max-waiting",
+			Name: ":max-waiting",
 			Type: "fixnum",
 			Text: `A maximum number of pull requests waiting to be fulfilled. If not set,
 this will inherit settings from stream's ConsumerLimits or (if those are not set) from
@@ -265,7 +265,7 @@ account settings. If neither are set, server default is 512.`,
 	},
 	":max-ack-pending": {
 		doc: &slip.DocArg{
-			Name: "max-ack-pending",
+			Name: ":max-ack-pending",
 			Type: "fixnum",
 			Text: `A maximum number of outstanding unacknowledged messages. Once this
 limit is reached, the server will suspend sending messages to the consumer. If not set,
@@ -281,7 +281,7 @@ server default is 1000. Set to -1 for unlimited.`,
 	},
 	":headers-only": {
 		doc: &slip.DocArg{
-			Name: "headers-only",
+			Name: ":headers-only",
 			Type: "boolean",
 			Text: `Indicates whether only headers of messages should be sent
 (with no payload). Defaults to false.`,
@@ -292,7 +292,7 @@ server default is 1000. Set to -1 for unlimited.`,
 	},
 	":max-request-batch": {
 		doc: &slip.DocArg{
-			Name: "max-request-batch",
+			Name: ":max-request-batch",
 			Type: "fixnum",
 			Text: `The optional maximum batch size a single pull request can make.
 When set with MaxRequestMaxBytes, the batch size will be constrained by whichever
@@ -308,7 +308,7 @@ limit is hit first.`,
 	},
 	":max-request-expires": {
 		doc: &slip.DocArg{
-			Name: "max-request-expires",
+			Name: ":max-request-expires",
 			Type: "real",
 			Text: `The maximum duration a single pull request will
 wait for messages to be available to pull.`,
@@ -323,7 +323,7 @@ wait for messages to be available to pull.`,
 	},
 	":max-request-max-bytes": {
 		doc: &slip.DocArg{
-			Name: "max-request-max-bytes",
+			Name: ":max-request-max-bytes",
 			Type: "fixnum",
 			Text: `The optional maximum total bytes that can be requested in a given
 batch. When set with MaxRequestBatch, the batch size will be constrained by whichever
@@ -339,7 +339,7 @@ limit is hit first.`,
 	},
 	":inactive-threshold": {
 		doc: &slip.DocArg{
-			Name: "inactive-threshold",
+			Name: ":inactive-threshold",
 			Type: "real",
 			Text: `The duration which instructs the server to clean up the consumer
 if it has been inactive for the specified duration. Durable consumers will not be
@@ -359,7 +359,7 @@ deliver subject (for push consumers), not if there are no messages to be deliver
 	},
 	":replicas": {
 		doc: &slip.DocArg{
-			Name: "replicas",
+			Name: ":replicas",
 			Type: "fixnum",
 			Text: `The number of replicas for the consumer's state. By default,
 consumers inherit the number of replicas from the stream.`,
@@ -374,7 +374,7 @@ consumers inherit the number of replicas from the stream.`,
 	},
 	":memory-storage": {
 		doc: &slip.DocArg{
-			Name: "memory-storage",
+			Name: ":memory-storage",
 			Type: "boolean",
 			Text: `A flag to force the consumer to use memory storage
 rather than inherit the storage type from the stream.`,
@@ -385,7 +385,7 @@ rather than inherit the storage type from the stream.`,
 	},
 	":filter-subjects": {
 		doc: &slip.DocArg{
-			Name: "filter-subjects",
+			Name: ":filter-subjects",
 			Type: "list",
 			Text: `Allows filtering messages from a stream by subject. This field is
 exclusive with FilterSubject. Requires nats-server v2.10.0 or later.`,
@@ -402,7 +402,7 @@ exclusive with FilterSubject. Requires nats-server v2.10.0 or later.`,
 	},
 	":metadata": {
 		doc: &slip.DocArg{
-			Name: "metadata",
+			Name: ":metadata",
 			Type: "property list",
 			Text: `A set of application-defined key-value pairs for associating metadata
 on the consumer. This feature requires nats-server v2.10.0 or later.`,
@@ -515,40 +515,28 @@ func ConsumerConfigPropList(config *jetstream.ConsumerConfig) slip.List {
 	}
 }
 
-func makeConsumerMethodDoc(method, args, retType, argDocs, description string) string {
-	var b []byte
-	b = append(b, "__"...)
-	b = append(b, method...)
-	b = append(b, "__ "...)
-	b = append(b, args...)
-	b = append(b, "&key _timeout_"...)
-	keys := make([]string, 0, len(streamOptMap))
+func makeConsumerMethodFuncDoc(method string, arg *slip.DocArg, retType, description string) *slip.FuncDoc {
+	fd := slip.FuncDoc{
+		Name:   method,
+		Return: retType,
+		Text:   description,
+		Kind:   slip.MethodSymbol,
+	}
+	if arg != nil {
+		fd.Args = append(fd.Args, arg)
+	}
+	fd.Args = append(fd.Args,
+		&slip.DocArg{Name: "&key"},
+		&slip.DocArg{Name: ":timeout", Type: "real", Text: "The number of seconds to wait before timing out."},
+	)
+	keys := make([]string, 0, len(consumerOptMap))
 	for k := range consumerOptMap {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 	for _, k := range keys {
-		b = append(b, ' ')
-		b = append(b, k[1:]...)
-	}
-	b = append(b, " => "...)
-	b = append(b, retType...)
-	b = append(b, '\n')
-
-	b = append(b, argDocs...)
-	b = append(b, "   _:timeout_ [real] the number of seconds to wait before timing out."...)
-	for _, k := range keys {
-		b = append(b, "\n   _"...)
-		b = append(b, k...)
-		b = append(b, "_ ["...)
 		doc := consumerOptMap[k].doc
-		b = append(b, doc.Type...)
-		b = append(b, "] "...)
-		b = append(b, doc.Text...)
+		fd.Args = append(fd.Args, doc)
 	}
-	b = append(b, '\n', '\n', '\n')
-	b = append(b, description...)
-	b = append(b, '\n')
-
-	return string(b)
+	return &fd
 }

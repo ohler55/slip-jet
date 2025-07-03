@@ -14,7 +14,7 @@ type streamOrderedConsumerCaller struct{}
 
 func (caller streamOrderedConsumerCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":ordered-consumer", len(args), 0, len(orderedOptMap)*2+2)
+	slip.CheckMethodArgCount(self, ":ordered-consumer", len(args), 0, len(orderedOptMap)*2+2)
 	stream := self.Any.(jetstream.Stream)
 
 	var cfg jetstream.OrderedConsumerConfig
@@ -33,8 +33,10 @@ func (caller streamOrderedConsumerCaller) Call(s *slip.Scope, args slip.List, _ 
 	return MakeConsumer(consumer)
 }
 
-func (caller streamOrderedConsumerCaller) Docs() string {
-	return makeOrderedMethodDoc(":ordered-consumer", "", "<jet-consumer>", "",
+func (caller streamOrderedConsumerCaller) FuncDocs() *slip.FuncDoc {
+	return makeOrderedMethodFuncDoc(
+		":ordered-consumer",
+		"<jet-consumer>",
 		`Returns a _jet-consumer_ instance. Ordered consumers are managed by the
 library and provide a simple way to consume messages from a stream. Ordered
 consumers are ephemeral in-memory pull consumers and are resilient to deletes and restarts.

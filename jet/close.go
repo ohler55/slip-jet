@@ -11,7 +11,7 @@ type clientCloseCaller struct{}
 
 func (caller clientCloseCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":close", len(args), 0, 0)
+	slip.CheckMethodArgCount(self, ":close", len(args), 0, 0)
 	if cl, ok := self.Any.(*Client); ok {
 		if cl.nc != nil {
 			cl.nc.Close()
@@ -20,10 +20,9 @@ func (caller clientCloseCaller) Call(s *slip.Scope, args slip.List, _ int) slip.
 	return nil
 }
 
-func (caller clientCloseCaller) Docs() string {
-	return `__:close__
-
-
-Closes the client connection to the NATS server.
-`
+func (caller clientCloseCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":close",
+		Text: `Closes the client connection to the NATS server.`,
+	}
 }

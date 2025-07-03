@@ -11,17 +11,17 @@ type cleanupPublisherCaller struct{}
 
 func (caller cleanupPublisherCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":cleanup-publisher", len(args), 0, 0)
+	slip.CheckMethodArgCount(self, ":cleanup-publisher", len(args), 0, 0)
 	cl := self.Any.(*Client)
 	cl.js.CleanupPublisher()
 
 	return nil
 }
 
-func (caller cleanupPublisherCaller) Docs() string {
-	return `__:cleanup-publisher__
-
-
+func (caller cleanupPublisherCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":cleanup-publisher",
+		Text: `
 Will cleanup the publishing side of a jet-client.
 
 
@@ -36,5 +36,6 @@ publish and PublishAsyncComplete will be closed.
 After completing JetStreamContext is still usable - internal subscription will
 be recreated on next publish, but the acks from previous publishes will be
 lost.
-`
+`,
+	}
 }

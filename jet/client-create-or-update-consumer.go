@@ -14,7 +14,7 @@ type clientCreateOrUpdateConsumerCaller struct{}
 
 func (caller clientCreateOrUpdateConsumerCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	flavors.CheckMethodArgCount(self, ":create-consumer", len(args), 1, len(consumerOptMap)*2+3)
+	slip.CheckMethodArgCount(self, ":create-consumer", len(args), 1, len(consumerOptMap)*2+3)
 	js := self.Any.(*Client).js
 
 	stream := slip.MustBeString(args[0], "stream")
@@ -37,9 +37,11 @@ func (caller clientCreateOrUpdateConsumerCaller) Call(s *slip.Scope, args slip.L
 	return MakeConsumer(consumer)
 }
 
-func (caller clientCreateOrUpdateConsumerCaller) Docs() string {
-	return makeConsumerMethodDoc(":create-or-update-consumer", "_stream_ ", "<jet-consumer>",
-		"   _stream_ [string] the name of the stream.",
+func (caller clientCreateOrUpdateConsumerCaller) FuncDocs() *slip.FuncDoc {
+	return makeConsumerMethodFuncDoc(
+		":create-or-update-consumer",
+		&slip.DocArg{Name: "stream", Type: "string", Text: "The name of the stream."},
+		"<jet-consumer>",
 		`Creates a consumer on a given stream with given
 config. If consumer already exists, it will be updated (if possible) otherwise
 a _jet-consumer_ is returned, allowing operations on a

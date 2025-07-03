@@ -24,7 +24,7 @@ type conOpt struct {
 var conOptMap = map[string]*conOpt{
 	":allow-reconnect": {
 		doc: &slip.DocArg{
-			Name: "allow-reconnect",
+			Name: ":allow-reconnect",
 			Type: "boolean",
 			Text: `Enables reconnection logic to be used when we encounter a disconnect from the current server.`,
 		},
@@ -34,7 +34,7 @@ var conOptMap = map[string]*conOpt{
 	},
 	":async-error-callback": {
 		doc: &slip.DocArg{
-			Name: "async-error-callback",
+			Name: ":async-error-callback",
 			Type: "function",
 			Text: `Sets the async-error-callback.`,
 		},
@@ -51,7 +51,7 @@ var conOptMap = map[string]*conOpt{
 	},
 	":closed-callback": {
 		doc: &slip.DocArg{
-			Name: "closed-callback",
+			Name: ":closed-callback",
 			Type: "function",
 			Text: `Sets the closed-callback.`,
 		},
@@ -65,7 +65,7 @@ var conOptMap = map[string]*conOpt{
 	},
 	":compression": {
 		doc: &slip.DocArg{
-			Name: "compression",
+			Name: ":compression",
 			Type: "boolean",
 			Text: `For websocket connections, indicates to the server that the connection
 supports compression. If the server does too, then data will be compressed.`,
@@ -76,7 +76,7 @@ supports compression. If the server does too, then data will be compressed.`,
 	},
 	":connected-callback": {
 		doc: &slip.DocArg{
-			Name: "connected-callback",
+			Name: ":connected-callback",
 			Type: "function",
 			Text: `Sets the connected-callback.`,
 		},
@@ -91,7 +91,7 @@ supports compression. If the server does too, then data will be compressed.`,
 	// CustomDialer, a CustomDialer not supporter yet
 	":custom-reconnect-delay-callback": {
 		doc: &slip.DocArg{
-			Name: "custom-reconnect-delay-callback",
+			Name: ":custom-reconnect-delay-callback",
 			Type: "function",
 			Text: `Invoked after the library tried every
 URL in the server list and failed to reconnect. It passes to the
@@ -116,7 +116,7 @@ jitter to prevent all connections to attempt reconnecting at the same time.`,
 	// Dialer, a *net.Dialer not supporter yet
 	":disconnected-callback": {
 		doc: &slip.DocArg{
-			Name: "disconnected-callback",
+			Name: ":disconnected-callback",
 			Type: "function",
 			Text: `Sets the disconnected handler that is called
 whenever the connection is disconnected.
@@ -134,7 +134,7 @@ the disconnect event.`,
 	},
 	":disconnected-error-callback": {
 		doc: &slip.DocArg{
-			Name: "disconnected-error-callback",
+			Name: ":disconnected-error-callback",
 			Type: "function",
 			Text: `Sets the disconnected error handler that is called
 whenever the connection is disconnected.
@@ -151,7 +151,7 @@ DisconnectedCB will not be called if DisconnectedErrCB is set.`,
 	},
 	":discovered-servers-callback": {
 		doc: &slip.DocArg{
-			Name: "discovered-servers-callback",
+			Name: ":discovered-servers-callback",
 			Type: "function",
 			Text: `Sets the callback that is invoked whenever a new server has joined the cluster.`,
 		},
@@ -165,7 +165,7 @@ DisconnectedCB will not be called if DisconnectedErrCB is set.`,
 	},
 	":drain-timeout": {
 		doc: &slip.DocArg{
-			Name: "drain-timeout",
+			Name: ":drain-timeout",
 			Type: "real",
 			Text: "Sets the timeout for a Drain Operation to complete. Defaults to 30s.",
 		},
@@ -179,7 +179,7 @@ DisconnectedCB will not be called if DisconnectedErrCB is set.`,
 	},
 	":flusher-timeout": {
 		doc: &slip.DocArg{
-			Name: "flusher-timeout",
+			Name: ":flusher-timeout",
 			Type: "real",
 			Text: `Is the maximum time to wait for write operations
 to the underlying connection to complete (including the flusher loop).
@@ -195,7 +195,7 @@ Defaults to 1m.`,
 	},
 	":ignore-auth-error-abort": {
 		doc: &slip.DocArg{
-			Name: "ignore-auth-error-abort",
+			Name: ":ignore-auth-error-abort",
 			Type: "boolean",
 			Text: `If set to true, client opts out of the default connect behavior of aborting
 subsequent reconnect attempts if server returns the same auth error twice (regardless of reconnect policy).`,
@@ -207,7 +207,7 @@ subsequent reconnect attempts if server returns the same auth error twice (regar
 	// InProcessServer, a InProcessConnProvider not supporter yet
 	":inbox-prefix": {
 		doc: &slip.DocArg{
-			Name: "inbox-prefix",
+			Name: ":inbox-prefix",
 			Type: "string",
 			Text: `Sets the default _INBOX prefix.`,
 		},
@@ -221,7 +221,7 @@ subsequent reconnect attempts if server returns the same auth error twice (regar
 	},
 	":lame-duck-mode-handler": {
 		doc: &slip.DocArg{
-			Name: "lame-duck-mode-handler",
+			Name: ":lame-duck-mode-handler",
 			Type: "function",
 			Text: `Sets the callback to invoke when the server notifies
 the connection that it entered lame duck mode, that is, going to
@@ -238,7 +238,7 @@ often used in deployments when upgrading NATS Servers.`,
 	},
 	":max-pings-out": {
 		doc: &slip.DocArg{
-			Name: "max-pings-out",
+			Name: ":max-pings-out",
 			Type: "string",
 			Text: `The maximum number of pending ping commands that can
 be awaiting a response before raising an ErrStaleConnection error.
@@ -254,7 +254,7 @@ Defaults to 2.`,
 	},
 	":max-reconnect": {
 		doc: &slip.DocArg{
-			Name: "max-reconnect",
+			Name: ":max-reconnect",
 			Type: "string",
 			Text: `Sets the number of reconnect attempts that will be
 tried before giving up. If negative, then it will never give up
@@ -271,7 +271,7 @@ Defaults to 60.`,
 	},
 	":name": {
 		doc: &slip.DocArg{
-			Name: "name",
+			Name: ":name",
 			Type: "string",
 			Text: `An optional name label which will be sent to the server
 on CONNECT to identify the client.`,
@@ -286,7 +286,7 @@ on CONNECT to identify the client.`,
 	},
 	":nkey": {
 		doc: &slip.DocArg{
-			Name: "nkey",
+			Name: ":nkey",
 			Type: "string",
 			Text: `Sets the public nkey that will be used to authenticate
 when connecting to the server. UserJWT and Nkey are mutually exclusive
@@ -302,7 +302,7 @@ and if defined, UserJWT will take precedence.`,
 	},
 	":no-callbacks-after-client-close": {
 		doc: &slip.DocArg{
-			Name: "no-callbacks-after-client-close",
+			Name: ":no-callbacks-after-client-close",
 			Type: "boolean",
 			Text: `Allows preventing the invocation of
 callbacks after __close__ is called. Client won't receive notifications
@@ -314,7 +314,7 @@ when __close__ is invoked by user code. Default is to invoke the callbacks.`,
 	},
 	":no-echo": {
 		doc: &slip.DocArg{
-			Name: "no-echo",
+			Name: ":no-echo",
 			Type: "boolean",
 			Text: `Configures whether the server will echo back messages
 that are sent on this connection if we also have matching subscriptions.
@@ -326,7 +326,7 @@ Note this is supported on servers >= version 1.2. Proto 1 or greater.`,
 	},
 	":no-randomize": {
 		doc: &slip.DocArg{
-			Name: "no-randomize",
+			Name: ":no-randomize",
 			Type: "boolean",
 			Text: `Configures whether we will randomize the server pool.`,
 		},
@@ -336,7 +336,7 @@ Note this is supported on servers >= version 1.2. Proto 1 or greater.`,
 	},
 	":password": {
 		doc: &slip.DocArg{
-			Name: "password",
+			Name: ":password",
 			Type: "string",
 			Text: `Sets the password to be used when connecting to a server.`,
 		},
@@ -350,7 +350,7 @@ Note this is supported on servers >= version 1.2. Proto 1 or greater.`,
 	},
 	":pedantic": {
 		doc: &slip.DocArg{
-			Name: "pedantic",
+			Name: ":pedantic",
 			Type: "boolean",
 			Text: `Signals the server whether it should be doing further validation of subjects.`,
 		},
@@ -360,7 +360,7 @@ Note this is supported on servers >= version 1.2. Proto 1 or greater.`,
 	},
 	":ping-interval": {
 		doc: &slip.DocArg{
-			Name: "ping-interval",
+			Name: ":ping-interval",
 			Type: "real",
 			Text: `The period at which the client will be sending ping
 commands to the server, disabled if 0 or negative.
@@ -376,7 +376,7 @@ Defaults to 2m.`,
 	},
 	":proxy-path": {
 		doc: &slip.DocArg{
-			Name: "proxy-path",
+			Name: ":proxy-path",
 			Type: "string",
 			Text: `For websocket connections, adds a path to connections url.
 This is useful when connecting to NATS behind a proxy.`,
@@ -391,7 +391,7 @@ This is useful when connecting to NATS behind a proxy.`,
 	},
 	":reconnect-buf-size": {
 		doc: &slip.DocArg{
-			Name: "reconnect-buf-size",
+			Name: ":reconnect-buf-size",
 			Type: "string",
 			Text: `The size of the backing bufio during reconnect.
 Once this has been exhausted publish operations will return an error.
@@ -407,7 +407,7 @@ Defaults to 8388608 bytes (8MB).`,
 	},
 	":reconnect-jitter": {
 		doc: &slip.DocArg{
-			Name: "reconnect-jitter",
+			Name: ":reconnect-jitter",
 			Type: "real",
 			Text: `Sets the upper bound for a random delay added to
 ReconnectWait during a reconnect when no TLS is used.
@@ -423,7 +423,7 @@ Defaults to 100ms.`,
 	},
 	":reconnect-jitter-tls": {
 		doc: &slip.DocArg{
-			Name: "reconnect-jitter-tls",
+			Name: ":reconnect-jitter-tls",
 			Type: "real",
 			Text: `Sets the upper bound for a random delay added to
 ReconnectWait during a reconnect when TLS is used.
@@ -439,7 +439,7 @@ Defaults to 1s.`,
 	},
 	":reconnect-wait": {
 		doc: &slip.DocArg{
-			Name: "reconnect-wait",
+			Name: ":reconnect-wait",
 			Type: "real",
 			Text: `Sets the time to backoff after attempting a reconnect
 to a server that we were already connected to previously.
@@ -455,7 +455,7 @@ Defaults to 2s.`,
 	},
 	":reconnected-callback": {
 		doc: &slip.DocArg{
-			Name: "reconnected-callback",
+			Name: ":reconnected-callback",
 			Type: "function",
 			Text: `Sets the reconnected handler called whenever
 the connection is successfully reconnected.`,
@@ -470,7 +470,7 @@ the connection is successfully reconnected.`,
 	},
 	":retry-on-failed-connect": {
 		doc: &slip.DocArg{
-			Name: "retry-on-failed-connect",
+			Name: ":retry-on-failed-connect",
 			Type: "boolean",
 			Text: `Sets the connection in reconnecting state right
 away if it can't connect to a server in the initial set. The
@@ -488,7 +488,7 @@ it fails to connect (after exhausting the MaxReconnect attempts).`,
 	// RootCAsCB, a RootCAsHandler not supported yet
 	":secure": {
 		doc: &slip.DocArg{
-			Name: "secure",
+			Name: ":secure",
 			Type: "boolean",
 			Text: `Enables TLS secure connections that skip server
 verification by default. NOT RECOMMENDED.`,
@@ -499,7 +499,7 @@ verification by default. NOT RECOMMENDED.`,
 	},
 	":servers": {
 		doc: &slip.DocArg{
-			Name: "servers",
+			Name: ":servers",
 			Type: "list",
 			Text: `A configured set of servers which this client will use when attempting to connect.`,
 		},
@@ -520,7 +520,7 @@ verification by default. NOT RECOMMENDED.`,
 	},
 	":signature-callback": {
 		doc: &slip.DocArg{
-			Name: "signature-callback",
+			Name: ":signature-callback",
 			Type: "function",
 			Text: `Designates the function used to sign the nonce
 presented from the server.`,
@@ -540,7 +540,7 @@ presented from the server.`,
 	},
 	":skip-host-lookup": {
 		doc: &slip.DocArg{
-			Name: "skip-host-lookup",
+			Name: ":skip-host-lookup",
 			Type: "boolean",
 			Text: `Skips the DNS lookup for the server hostname.`,
 		},
@@ -550,7 +550,7 @@ presented from the server.`,
 	},
 	":sub-chan-len": {
 		doc: &slip.DocArg{
-			Name: "sub-chan-len",
+			Name: ":sub-chan-len",
 			Type: "string",
 			Text: `The size of the buffered channel used between the socket
 Go routine and the message delivery for SyncSubscriptions.
@@ -568,7 +568,7 @@ Defaults to 65536.`,
 	},
 	":timeout": {
 		doc: &slip.DocArg{
-			Name: "timeout",
+			Name: ":timeout",
 			Type: "real",
 			Text: "Is the number of seconds to wait before timing out on the connection attempt.",
 		},
@@ -584,7 +584,7 @@ Defaults to 65536.`,
 	// TLSConfig, a *tls.Config not supported yet
 	":tls-handshake-first": {
 		doc: &slip.DocArg{
-			Name: "tls-handshake-first",
+			Name: ":tls-handshake-first",
 			Type: "boolean",
 			Text: `Used to instruct the library perform
 the TLS handshake right after the connect and before receiving
@@ -598,7 +598,7 @@ first, the connection will fail.`,
 	},
 	":token": {
 		doc: &slip.DocArg{
-			Name: "token",
+			Name: ":token",
 			Type: "string",
 			Text: `Sets the token to be used when connecting to a server.`,
 		},
@@ -612,7 +612,7 @@ first, the connection will fail.`,
 	},
 	":token-handler": {
 		doc: &slip.DocArg{
-			Name: "token-handler",
+			Name: ":token-handler",
 			Type: "function",
 			Text: `Designates the function used to generate the token to be used when connecting to a server.`,
 		},
@@ -625,7 +625,7 @@ first, the connection will fail.`,
 	},
 	":url": {
 		doc: &slip.DocArg{
-			Name: "url",
+			Name: ":url",
 			Type: "string",
 			Text: `URL of the jetstream server to connect to.`,
 		},
@@ -639,7 +639,7 @@ first, the connection will fail.`,
 	},
 	":use-old-request-style": {
 		doc: &slip.DocArg{
-			Name: "use-old-request-style",
+			Name: ":use-old-request-style",
 			Type: "boolean",
 			Text: `Forces the old method of Requests that utilize
 a new Inbox and a new Subscription for each request.`,
@@ -650,7 +650,7 @@ a new Inbox and a new Subscription for each request.`,
 	},
 	":user": {
 		doc: &slip.DocArg{
-			Name: "user",
+			Name: ":user",
 			Type: "string",
 			Text: `Sets the username to be used when connecting to the server.`,
 		},
@@ -664,7 +664,7 @@ a new Inbox and a new Subscription for each request.`,
 	},
 	":user-jwt": {
 		doc: &slip.DocArg{
-			Name: "user-jwt",
+			Name: ":user-jwt",
 			Type: "function",
 			Text: `Sets the callback handler that will fetch a user's JWT.`,
 		},
@@ -683,7 +683,7 @@ a new Inbox and a new Subscription for each request.`,
 	},
 	":verbose": {
 		doc: &slip.DocArg{
-			Name: "verbose",
+			Name: ":verbose",
 			Type: "boolean",
 			Text: `Signals the server to send an OK ack for commands
 successfully processed by the server.`,
@@ -695,7 +695,7 @@ successfully processed by the server.`,
 	// jetstream options
 	":trace": {
 		doc: &slip.DocArg{
-			Name: "trace",
+			Name: ":trace",
 			Type: "list",
 			Text: `Enables request/response API calls tracing. A list of two functions is expected.
 The first is called when a request is sent and will be called with a subject string and payload as
@@ -731,7 +731,7 @@ payload as octets, and a header as an association list.`,
 	},
 	":publish-async-error-handler": {
 		doc: &slip.DocArg{
-			Name: "publish-async-error-handler",
+			Name: ":publish-async-error-handler",
 			Type: "function",
 			Text: ``,
 		},
@@ -753,7 +753,7 @@ payload as octets, and a header as an association list.`,
 	},
 	":publish-async-max-pending": {
 		doc: &slip.DocArg{
-			Name: "publish-async-max-pending",
+			Name: ":publish-async-max-pending",
 			Type: "fixnum",
 			Text: `Sets the maximum outstanding async publishes that can be inflight at one time.`,
 		},
@@ -859,29 +859,30 @@ func (caller clientInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.O
 	return nil
 }
 
-func (caller clientInitCaller) Docs() string {
-	var doc []byte
-
-	doc = append(doc, "__:init__ &key"...)
+func (caller clientInitCaller) FuncDocs() *slip.FuncDoc {
+	fd := slip.FuncDoc{
+		Name: ":init",
+		Args: []*slip.DocArg{
+			{Name: "&key"},
+		},
+		Text: "Sets the initial value when _make-instance_ is called.",
+		Kind: slip.MethodSymbol,
+	}
 	keys := make([]string, 0, len(conOptMap))
 	for k := range conOptMap {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 	for _, k := range keys {
-		co := conOptMap[k]
-		doc = append(doc, ' ', '_')
-		doc = append(doc, co.doc.Name...)
-		doc = append(doc, '_')
+		doc := conOptMap[k].doc
+		fd.Args = append(fd.Args, doc)
 	}
-	for _, k := range keys {
-		co := conOptMap[k]
-		doc = append(doc, "\n   _"...)
-		doc = append(doc, k...)
-		doc = append(doc, '_', ' ', '[')
-		doc = append(doc, co.doc.Type...)
-		doc = append(doc, ']', ' ')
-		doc = append(doc, co.doc.Text...)
+	return &fd
+}
+
+func slipBool(v bool) slip.Object {
+	if v {
+		return slip.True
 	}
-	return string(append(doc, "\n\n\nSets the initial value when _make-instance_ is called.\n"...))
+	return nil
 }
