@@ -76,12 +76,12 @@ func (caller optionsCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Obje
 	return options
 }
 
-func (caller optionsCaller) Docs() string {
-	return `__:options__ => _property-list_
-
-
-Returns the options used for the client connection as a property list.
-`
+func (caller optionsCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name:   ":options",
+		Text:   `Returns the options used for the client connection as a property list.`,
+		Return: "property-list",
+	}
 }
 
 func (caller optionsCaller) appendBool(options slip.List, name string, value bool) slip.List {

@@ -37,9 +37,11 @@ func (caller clientCreateConsumerCaller) Call(s *slip.Scope, args slip.List, _ i
 	return MakeConsumer(consumer)
 }
 
-func (caller clientCreateConsumerCaller) Docs() string {
-	return makeConsumerMethodDoc(":create-consumer", "_stream_ ", "<jet-consumer>",
-		"   _stream_ [string] the name of the stream.",
+func (caller clientCreateConsumerCaller) FuncDocs() *slip.FuncDoc {
+	return makeConsumerMethodFuncDoc(
+		":create-consumer",
+		&slip.DocArg{Name: "stream", Type: "string", Text: "The name of the stream."},
+		"<jet-consumer>",
 		`Creates a consumer on a given stream with given
 config. If consumer already exists and the provided configuration
 differs from its configuration, an error is raised. If the

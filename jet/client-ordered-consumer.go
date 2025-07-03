@@ -37,9 +37,11 @@ func (caller clientOrderedConsumerCaller) Call(s *slip.Scope, args slip.List, _ 
 	return MakeConsumer(consumer)
 }
 
-func (caller clientOrderedConsumerCaller) Docs() string {
-	return makeConsumerMethodDoc(":ordered-consumer", "_stream_ ", "<jet-consumer>",
-		"   _stream_ [string] the name of the stream.",
+func (caller clientOrderedConsumerCaller) FuncDocs() *slip.FuncDoc {
+	return makeConsumerMethodFuncDoc(
+		":ordered-consumer",
+		&slip.DocArg{Name: "stream", Type: "string", Text: "The name of the stream."},
+		"<jet-consumer>",
 		`Returns an OrderedConsumer as a _jet-consumer_ instance. OrderedConsumers
 are managed by the library and provide a simple way to consume
 messages from a stream. Ordered consumers are ephemeral in-memory

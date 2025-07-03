@@ -21,10 +21,10 @@ func (caller streamNameCaller) Call(s *slip.Scope, args slip.List, _ int) (resul
 	return
 }
 
-func (caller streamNameCaller) Docs() string {
-	return `__:name__ => _string_
-
-
-Returns the cached stream name.
-`
+func (caller streamNameCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name:   ":name",
+		Text:   `Returns the cached stream name.`,
+		Return: "string",
+	}
 }

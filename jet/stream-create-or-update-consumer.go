@@ -33,8 +33,11 @@ func (caller streamCreateOrUpdateConsumerCaller) Call(s *slip.Scope, args slip.L
 	return MakeConsumer(consumer)
 }
 
-func (caller streamCreateOrUpdateConsumerCaller) Docs() string {
-	return makeConsumerMethodDoc(":create-or-update-consumer", "", "<jet-consumer>", "",
+func (caller streamCreateOrUpdateConsumerCaller) FuncDocs() *slip.FuncDoc {
+	return makeConsumerMethodFuncDoc(
+		":create-or-update-consumer",
+		nil,
+		"<jet-consumer>",
 		`Create a consumer on a given stream with given config. If consumer already
 exists, it will be updated (if possible). A _jet-consumer_ is returned, allowing to
 operations on a consumer (e.g. fetch messages).

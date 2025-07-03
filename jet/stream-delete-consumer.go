@@ -32,13 +32,23 @@ func (caller streamDeleteConsumerCaller) Call(s *slip.Scope, args slip.List, _ i
 	return nil
 }
 
-func (caller streamDeleteConsumerCaller) Docs() string {
-	return `__:delete-consumer__ _name_ &key _timeout_
-   _name_ [string] the consumer name of the consumer to delete.
-   _:timeout_ [real] the number of seconds to wait before timing out.
-
-
-Removes a consumer with given name from a stream. If consumer does not
-exist an error is raised.
-`
+func (caller streamDeleteConsumerCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":delete-consumer",
+		Text: `Removes a consumer with given name from a stream. If consumer does not
+exist an error is raised.`,
+		Args: []*slip.DocArg{
+			{
+				Name: "name",
+				Type: "string",
+				Text: `The consumer name of the consumer to delete.`,
+			},
+			{Name: "&key"},
+			{
+				Name: ":timeout",
+				Type: "real",
+				Text: `The number of seconds to wait before timing out.`,
+			},
+		},
+	}
 }

@@ -34,11 +34,18 @@ func (caller streamConsumerNamesCaller) Call(s *slip.Scope, args slip.List, _ in
 	return list
 }
 
-func (caller streamConsumerNamesCaller) Docs() string {
-	return `__:consumer-names__ &key _timeout_ => _list_
-   _:timeout_ [real] the number of seconds to wait before timing out.
-
-
-Returns a list of consumer names.
-`
+func (caller streamConsumerNamesCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":consumer-names",
+		Text: `Returns a list of consumer names.`,
+		Args: []*slip.DocArg{
+			{Name: "&key"},
+			{
+				Name: ":timeout",
+				Type: "real",
+				Text: `The number of seconds to wait before timing out.`,
+			},
+		},
+		Return: "list",
+	}
 }

@@ -31,25 +31,25 @@ a stream, as well as fetching consumer info.
 	consumerFlavor.GoMakeOnly = true
 
 	consumerFlavor.DefMethod(":info", "", consumerInfoCaller{})
-	flavors.FlosFun("jet-consumer-info", ":info", consumerInfoCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-consumer-info", ":info", consumerInfoCaller{}.FuncDocs(), &Pkg)
 
 	consumerFlavor.DefMethod(":name", "", consumerNameCaller{})
-	flavors.FlosFun("jet-consumer-name", ":name", consumerNameCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-consumer-name", ":name", consumerNameCaller{}.FuncDocs(), &Pkg)
 
 	consumerFlavor.DefMethod(":fetch", "", consumerFetchCaller{})
-	flavors.FlosFun("jet-consumer-fetch", ":fetch", consumerFetchCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-consumer-fetch", ":fetch", consumerFetchCaller{}.FuncDocs(), &Pkg)
 
 	consumerFlavor.DefMethod(":fetch-bytes", "", consumerFetchBytesCaller{})
-	flavors.FlosFun("jet-consumer-fetch-bytes", ":fetch-bytes", consumerFetchBytesCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-consumer-fetch-bytes", ":fetch-bytes", consumerFetchBytesCaller{}.FuncDocs(), &Pkg)
 
 	consumerFlavor.DefMethod(":messages", "", consumerMessagesCaller{})
-	flavors.FlosFun("jet-consumer-messages", ":messages", consumerMessagesCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-consumer-messages", ":messages", consumerMessagesCaller{}.FuncDocs(), &Pkg)
 
 	consumerFlavor.DefMethod(":next", "", consumerNextCaller{})
-	flavors.FlosFun("jet-consumer-next", ":next", consumerNextCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-consumer-next", ":next", consumerNextCaller{}.FuncDocs(), &Pkg)
 
 	consumerFlavor.DefMethod(":consume", "", consumerConsumeCaller{})
-	flavors.FlosFun("jet-consumer-consume", ":consume", consumerConsumeCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-consumer-consume", ":consume", consumerConsumeCaller{}.FuncDocs(), &Pkg)
 }
 
 // MakeConsumer makes a jet-stream.

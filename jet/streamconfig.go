@@ -20,7 +20,7 @@ type streamOpt struct {
 var streamOptMap = map[string]*streamOpt{
 	":name": {
 		doc: &slip.DocArg{
-			Name: "name",
+			Name: ":name",
 			Type: "string",
 			Text: `Name is the name of the stream. It is required and must be
 unique across the JetStream account. Names cannot contain whitespace, ., *, >,
@@ -32,7 +32,7 @@ path separators (forward or backwards slash), and non-printable characters.`,
 	},
 	":allow-direct": {
 		doc: &slip.DocArg{
-			Name: "allow-direct",
+			Name: ":allow-direct",
 			Type: "boolean",
 			Text: `Enables direct access to individual messages using direct get API. Defaults to _nil_.`,
 		},
@@ -42,7 +42,7 @@ path separators (forward or backwards slash), and non-printable characters.`,
 	},
 	":allow-rollup": {
 		doc: &slip.DocArg{
-			Name: "allow-rollup",
+			Name: ":allow-rollup",
 			Type: "boolean",
 			Text: `Allows the use of the Nats-Rollup header to replace all
 contents of a stream, or subject in a stream, with a single new message.`,
@@ -53,7 +53,7 @@ contents of a stream, or subject in a stream, with a single new message.`,
 	},
 	":compression": {
 		doc: &slip.DocArg{
-			Name: "compression",
+			Name: ":compression",
 			Type: "bool",
 			Text: `Specifies the message storage compression algorithm. Defaults to NoCompression.`,
 		},
@@ -67,7 +67,7 @@ contents of a stream, or subject in a stream, with a single new message.`,
 	},
 	":consumer-limits": {
 		doc: &slip.DocArg{
-			Name: "consumer-limits",
+			Name: ":consumer-limits",
 			Type: "list",
 			Text: `Defines limits of certain values that consumers can set, defaults for those
 who don't set these settings. The value expected is a list of two
@@ -97,7 +97,7 @@ unacknowledged messages for a consumer.`,
 	},
 	":deny-delete": {
 		doc: &slip.DocArg{
-			Name: "deny-delete",
+			Name: ":deny-delete",
 			Type: "boolean",
 			Text: `Restricts the ability to delete messages from a stream via  the API. Defaults to false.`,
 		},
@@ -107,7 +107,7 @@ unacknowledged messages for a consumer.`,
 	},
 	":deny-purge": {
 		doc: &slip.DocArg{
-			Name: "deny-purge",
+			Name: ":deny-purge",
 			Type: "boolean",
 			Text: `Restricts the ability to purge messages from a stream via the API. Defaults to false.`,
 		},
@@ -117,7 +117,7 @@ unacknowledged messages for a consumer.`,
 	},
 	":description": {
 		doc: &slip.DocArg{
-			Name: "description",
+			Name: ":description",
 			Type: "string",
 			Text: `An optional description of the stream.`,
 		},
@@ -127,7 +127,7 @@ unacknowledged messages for a consumer.`,
 	},
 	":discard": {
 		doc: &slip.DocArg{
-			Name: "discard",
+			Name: ":discard",
 			Type: ":old|:new",
 			Text: `Defines the policy for handling messages when the stream reaches
 its limits in terms of number of messages or total bytes. :old, the default, will
@@ -147,7 +147,7 @@ once the limits are reached.`,
 	},
 	":discard-new-per-subject": {
 		doc: &slip.DocArg{
-			Name: "discard-new-per-subject",
+			Name: ":discard-new-per-subject",
 			Type: "boolean",
 			Text: `A flag to enable discarding new messages per subject when limits
 are reached. Requires DiscardPolicy to be DiscardNew and the MaxMsgsPerSubject to be set.`,
@@ -158,7 +158,7 @@ are reached. Requires DiscardPolicy to be DiscardNew and the MaxMsgsPerSubject t
 	},
 	":duplicates": {
 		doc: &slip.DocArg{
-			Name: "duplicates",
+			Name: ":duplicates",
 			Type: "real",
 			Text: `Is the window within which to track duplicate messages.
 If not set, server default is 2 minutes. The value must be a real and is
@@ -174,7 +174,7 @@ assumed to be seconds.`,
 	},
 	":first-seq": {
 		doc: &slip.DocArg{
-			Name: "first-seq",
+			Name: ":first-seq",
 			Type: "fixnum",
 			Text: `The initial sequence number of the first message in the stream.`,
 		},
@@ -188,7 +188,7 @@ assumed to be seconds.`,
 	},
 	":max-age": {
 		doc: &slip.DocArg{
-			Name: "max-age",
+			Name: ":max-age",
 			Type: "real",
 			Text: `The maximum age in seconds of messages that the stream will retain.`,
 		},
@@ -202,7 +202,7 @@ assumed to be seconds.`,
 	},
 	":max-bytes": {
 		doc: &slip.DocArg{
-			Name: "max-bytes",
+			Name: ":max-bytes",
 			Type: "fixnum",
 			Text: `The maximum total size of messages the stream will store.
 After reaching the limit, stream adheres to the discard policy.
@@ -218,7 +218,7 @@ If not set, server default is -1 (unlimited).`,
 	},
 	":max-consumers": {
 		doc: &slip.DocArg{
-			Name: "max-consumers",
+			Name: ":max-consumers",
 			Type: "fixnum",
 			Text: `Specifies the maximum number of consumers allowed for the stream.`,
 		},
@@ -232,7 +232,7 @@ If not set, server default is -1 (unlimited).`,
 	},
 	":max-msg-size": {
 		doc: &slip.DocArg{
-			Name: "max-msg-size",
+			Name: ":max-msg-size",
 			Type: "fixnum",
 			Text: `The maximum size of any single message in the stream.`,
 		},
@@ -246,7 +246,7 @@ If not set, server default is -1 (unlimited).`,
 	},
 	":max-msgs": {
 		doc: &slip.DocArg{
-			Name: "max-msgs",
+			Name: ":max-msgs",
 			Type: "fixnum",
 			Text: `The maximum number of messages the stream will store.
 After reaching the limit, stream adheres to the discard policy.
@@ -262,7 +262,7 @@ If not set, server default is -1 (unlimited).`,
 	},
 	":max-msgs-per-subject": {
 		doc: &slip.DocArg{
-			Name: "max-msgs-per-subject",
+			Name: ":max-msgs-per-subject",
 			Type: "fixnum",
 			Text: `The maximum number of messages per subject that the stream will retain.`,
 		},
@@ -276,7 +276,7 @@ If not set, server default is -1 (unlimited).`,
 	},
 	":metadata": {
 		doc: &slip.DocArg{
-			Name: "metadata",
+			Name: ":metadata",
 			Type: "property list",
 			Text: `A set of application-defined key-value pairs for
 associating metadata on the stream. This feature requires nats-server
@@ -297,7 +297,7 @@ v2.10.0 or later.`,
 	},
 	":mirror": {
 		doc: &slip.DocArg{
-			Name: "mirror",
+			Name: ":mirror",
 			Type: "jet-stream-source instance",
 			Text: `Defines the configuration for mirroring another stream.`,
 		},
@@ -313,7 +313,7 @@ v2.10.0 or later.`,
 	},
 	":mirror-direct": {
 		doc: &slip.DocArg{
-			Name: "mirror-direct",
+			Name: ":mirror-direct",
 			Type: "boolean",
 			Text: `Enables direct access to individual messages from the
 origin stream using direct get API. Defaults to _nil_.`,
@@ -324,7 +324,7 @@ origin stream using direct get API. Defaults to _nil_.`,
 	},
 	":no-ack": {
 		doc: &slip.DocArg{
-			Name: "no-ack",
+			Name: ":no-ack",
 			Type: "boolean",
 			Text: `A flag to disable acknowledging messages received by this stream.
 If set to true, publish methods from the JetStream client will not
@@ -338,7 +338,7 @@ message delivery less reliable.`,
 	},
 	":placement": {
 		doc: &slip.DocArg{
-			Name: "placement",
+			Name: ":placement",
 			Type: "list of strings (cluster tags...)",
 			Text: `Used to declare where the stream should be placed via
 tags and/or an explicit cluster name. The list of string starts with a cluster
@@ -361,7 +361,7 @@ a matching tag.`,
 	},
 	":re-publish": {
 		doc: &slip.DocArg{
-			Name: "re-publish",
+			Name: ":re-publish",
 			Type: "list of (source destination headers-only)",
 			Text: `Allows immediate republishing a message to the configured subject
 after it's stored. The source is the subject pattern to match incoming messages against.
@@ -382,7 +382,7 @@ present is a flag to indicate that only the headers should be republished.`,
 	},
 	":replicas": {
 		doc: &slip.DocArg{
-			Name: "replicas",
+			Name: ":replicas",
 			Type: "fixnum",
 			Text: `The number of stream replicas in clustered JetStream. Defaults to 1, maximum is 5.`,
 		},
@@ -396,7 +396,7 @@ present is a flag to indicate that only the headers should be republished.`,
 	},
 	":retention": {
 		doc: &slip.DocArg{
-			Name: "retention",
+			Name: ":retention",
 			Type: ":limit|:interest|:queue]",
 			Text: `Defines the message retention policy for the stream.
 Defaults to LimitsPolicy. :limits (default) means that messages are retained until any given limit is
@@ -420,7 +420,7 @@ acknowledges the message it can be removed.`,
 	},
 	":sealed": {
 		doc: &slip.DocArg{
-			Name: "sealed",
+			Name: ":sealed",
 			Type: "boolean",
 			Text: `Sealed streams do not allow messages to be published or deleted via limits or API,
 sealed streams can not be unsealed via configuration update. Can only
@@ -432,7 +432,7 @@ be set on already created streams via the Update API.`,
 	},
 	":sources": {
 		doc: &slip.DocArg{
-			Name: "sources",
+			Name: ":sources",
 			Type: "list of jet-stream-source instances",
 			Text: `A list of other streams this stream sources messages from.`,
 		},
@@ -456,7 +456,7 @@ be set on already created streams via the Update API.`,
 	},
 	":storage": {
 		doc: &slip.DocArg{
-			Name: "storage",
+			Name: ":storage",
 			Type: ":file|:memory",
 			Text: `Specifies the type of storage backend used for the stream as either
 file or memory. :file specifies on disk storage. It's the default. :memory specifies in
@@ -475,7 +475,7 @@ memory only.`,
 	},
 	":subject-transform": {
 		doc: &slip.DocArg{
-			Name: "subject-transform",
+			Name: ":subject-transform",
 			Type: "list",
 			Text: `Allows applying a transformation to matching messages' subjects. The
 list must be a list of source and destination as strings. Source is the subject pattern
@@ -496,7 +496,7 @@ to match incoming messages against. Destination is the subject pattern to remap 
 	},
 	":subjects": {
 		doc: &slip.DocArg{
-			Name: "subjects",
+			Name: ":subjects",
 			Type: "list",
 			Text: `A list of subjects that the stream is listening on.
 Wildcards are supported. Subjects cannot be set if the stream is
@@ -633,47 +633,28 @@ func StreamConfigPropList(config *jetstream.StreamConfig) slip.List {
 	}
 }
 
-func makeStreamMethodDoc(method, args, retType, argDocs, description string) string {
-	var b []byte
-	b = append(b, "__"...)
-	b = append(b, method...)
-	b = append(b, "__ "...)
-	b = append(b, args...)
-	b = append(b, "&key _timeout_"...)
+func makeStreamMethodFuncDoc(method string, arg *slip.DocArg, retType, description string) *slip.FuncDoc {
+	fd := slip.FuncDoc{
+		Name:   method,
+		Return: retType,
+		Text:   description,
+		Kind:   slip.MethodSymbol,
+	}
+	if arg != nil {
+		fd.Args = append(fd.Args, arg)
+	}
+	fd.Args = append(fd.Args,
+		&slip.DocArg{Name: "&key"},
+		&slip.DocArg{Name: ":timeout", Type: "real", Text: "The number of seconds to wait before timing out."},
+	)
 	keys := make([]string, 0, len(streamOptMap))
 	for k := range streamOptMap {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 	for _, k := range keys {
-		b = append(b, ' ')
-		b = append(b, k[1:]...)
-	}
-	b = append(b, " => "...)
-	b = append(b, retType...)
-	b = append(b, '\n')
-
-	b = append(b, argDocs...)
-	b = append(b, "   _:timeout_ [real] the number of seconds to wait before timing out."...)
-	for _, k := range keys {
-		b = append(b, "\n   _"...)
-		b = append(b, k...)
-		b = append(b, "_ ["...)
 		doc := streamOptMap[k].doc
-		b = append(b, doc.Type...)
-		b = append(b, "] "...)
-		b = append(b, doc.Text...)
+		fd.Args = append(fd.Args, doc)
 	}
-	b = append(b, '\n', '\n', '\n')
-	b = append(b, description...)
-	b = append(b, '\n')
-
-	return string(b)
-}
-
-func slipBool(v bool) slip.Object {
-	if v {
-		return slip.True
-	}
-	return nil
+	return &fd
 }

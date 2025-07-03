@@ -52,42 +52,10 @@ func (caller publishAsyncCaller) Call(s *slip.Scope, args slip.List, _ int) slip
 	return MakeAckFuture(paf)
 }
 
-func (caller publishAsyncCaller) Docs() string {
-	return `__:publish-async__ _payload_ &optional _subject_ &key
-_expect-last-msg-id_
-_expect-last-sequence_
-_expect-last-subject-sequence_
-_expect-stream_
-_msg-id_
-_retry-attempts_
-_retry-wait_
-_stall-wait_
-=> _jet-ack__
-   _payload_ [octets|string|jet-msg] to publish-async as the content of a message.
-   _subject_ [string] to publish-async the message on. It must be bound to a stream.
-   _:timeout_ [real] for the publish-async.
-   _:expect-last-msg-id_ [fixnum] sets the expected message ID the last message on a stream
-should have. If the last message has a different message ID server will reject the message
-and publish-async will fail.
-   _:expect-last-sequence_ [fixnum] sets the expected sequence number the last message on a
-stream should have. If the last message has a different sequence number server will reject
-the message and publish-async will fail.
-   _:expect-last-subject-sequence_ [fixnum] sets the expected sequence number the last message
-on a subject the message is publish-asynced to. If the last message on a subject has a different
-sequence number server will reject the message and publish-async will fail.
-   _:expect-stream_ [string] sets the expected stream the message should be publish-asynced to. If
-the message is publish-asynced to a different stream server will reject the message and publish-async will
-fail.
-   _:msg-id_ [fixnum] sets the message ID used for deduplication.
-   _:retry-attempts_ [fixnum] sets the retry number of attempts when ErrNoResponders is
-encountered. Defaults to 2.
-   _:retry-wait_ [real] sets the retry wait time in seconds when ErrNoResponders is encountered.
-Defaults to 0.250 seconds.
-   _:stall-wait_ [real] sets the max wait when the producer becomes stall producing messages.
-If a publish call is blocked for this long, ErrTooManyStalledMsgs is returned.
-
-
-Performs a publish to a stream and returns a _jet-ack-future_, not blocking
+func (caller publishAsyncCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":publish-async",
+		Text: `Performs a publish to a stream and returns a _jet-ack-future_, not blocking
 while waiting for an acknowledgement. It accepts a message payload and
 optional subject name (which must be bound to a stream) which can be _octets_,
 _string_, or a _jet-msg_ instance. If the _payload_ is not a _jet-msg_
@@ -97,6 +65,77 @@ keywords and values are supported. A _jet-ack-future_ instance is returned.
 
 PublishMsgAsync does not guarantee that the message has been
 sent to the server and thus messages can be stored in the stream
-received by the server.
-`
+received by the server.`,
+		Args: []*slip.DocArg{
+			{
+				Name: "payload",
+				Type: "octets|string|jet-msg",
+				Text: "Data to publish as the content of a message.",
+			},
+			{Name: "&optional"},
+			{
+				Name: "subject",
+				Type: "string",
+				Text: `Subject to publish the message on. The subject must be bound to a stream.`,
+			},
+			{Name: "&key"},
+			{
+				Name: ":timeout",
+				Type: "real",
+				Text: `Timeout in seconds for the publish.`,
+			},
+			{
+				Name: ":expect-last-msg-id",
+				Type: "fixnum",
+				Text: `Sets the expected message ID the last message on a stream
+should have. If the last message has a different message ID server will reject the message
+and publish will fail.`,
+			},
+			{
+				Name: ":expect-last-sequence",
+				Type: "fixnum",
+				Text: `Sets the expected sequence number the last message on a
+stream should have. If the last message has a different sequence number server will reject
+the message and publish will fail.`,
+			},
+			{
+				Name: ":expect-last-subject-sequence",
+				Type: "fixnum",
+				Text: `Sets the expected sequence number the last message
+on a subject the message is published to. If the last message on a subject has a different
+sequence number server will reject the message and publish will fail.`,
+			},
+			{
+				Name: ":expect-stream",
+				Type: "string",
+				Text: `Sets the expected stream the message should be published to. If
+the message is published to a different stream server will reject the message and publish will
+fail.`,
+			},
+			{
+				Name: ":msg-id",
+				Type: "fixnum",
+				Text: `Sets the message ID used for deduplication.`,
+			},
+			{
+				Name:    ":retry-attempts",
+				Type:    "fixnum",
+				Text:    `Sets the retry number of attempts when ErrNoResponders is encountered.`,
+				Default: slip.Fixnum(2),
+			},
+			{
+				Name:    ":retry-wait",
+				Type:    "real",
+				Text:    `Sets the retry wait time in seconds when ErrNoResponders is encountered.`,
+				Default: slip.DoubleFloat(0.25),
+			},
+			{
+				Name: ":stall-wait",
+				Type: "real",
+				Text: `Sets the max wait when the producer becomes stall producing messages.
+If a publish call is blocked for this long, ErrTooManyStalledMsgs is returned.`,
+			},
+		},
+		Return: "jet-ack",
+	}
 }

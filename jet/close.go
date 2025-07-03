@@ -20,10 +20,9 @@ func (caller clientCloseCaller) Call(s *slip.Scope, args slip.List, _ int) slip.
 	return nil
 }
 
-func (caller clientCloseCaller) Docs() string {
-	return `__:close__
-
-
-Closes the client connection to the NATS server.
-`
+func (caller clientCloseCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":close",
+		Text: `Closes the client connection to the NATS server.`,
+	}
 }

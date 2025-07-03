@@ -29,13 +29,13 @@ func defMessagesContext() {
 	messagesContextFlavor.GoMakeOnly = true
 
 	messagesContextFlavor.DefMethod(":next", "", messagesContextNextCaller{})
-	flavors.FlosFun("jet-messages-context-next", ":next", messagesContextNextCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-messages-context-next", ":next", messagesContextNextCaller{}.FuncDocs(), &Pkg)
 
 	messagesContextFlavor.DefMethod(":stop", "", messagesContextStopCaller{})
-	flavors.FlosFun("jet-messages-context-stop", ":stop", messagesContextStopCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-messages-context-stop", ":stop", messagesContextStopCaller{}.FuncDocs(), &Pkg)
 
 	messagesContextFlavor.DefMethod(":drain", "", messagesContextDrainCaller{})
-	flavors.FlosFun("jet-messages-context-drain", ":drain", messagesContextDrainCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-messages-context-drain", ":drain", messagesContextDrainCaller{}.FuncDocs(), &Pkg)
 
 }
 
@@ -60,12 +60,12 @@ func (caller messagesContextNextCaller) Call(s *slip.Scope, args slip.List, _ in
 	return MakeMsg(m)
 }
 
-func (caller messagesContextNextCaller) Docs() string {
-	return `__:next__ => _jet-msg_
-
-
-Retrieves next message on a stream. It will block until the next message is available.
-`
+func (caller messagesContextNextCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name:   ":next",
+		Text:   `Retrieves next message on a stream. It will block until the next message is available.`,
+		Return: "jet-msg",
+	}
 }
 
 type messagesContextStopCaller struct{}
@@ -79,13 +79,12 @@ func (caller messagesContextStopCaller) Call(s *slip.Scope, args slip.List, _ in
 	return nil
 }
 
-func (caller messagesContextStopCaller) Docs() string {
-	return `__:stop__
-
-
-Unsubscribes from the stream and cancels subscription. Calling _:next_ after calling
-_:stop_ will raise an error. All messages that are already in the buffer are discarded.
-`
+func (caller messagesContextStopCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":stop",
+		Text: `Unsubscribes from the stream and cancels subscription. Calling _:next_ after calling
+_:stop_ will raise an error. All messages that are already in the buffer are discarded.`,
+	}
 }
 
 type messagesContextDrainCaller struct{}
@@ -99,12 +98,11 @@ func (caller messagesContextDrainCaller) Call(s *slip.Scope, args slip.List, _ i
 	return nil
 }
 
-func (caller messagesContextDrainCaller) Docs() string {
-	return `__:drain__
-
-
-Unsubscribes from the stream and cancels subscription. All messages that are already
+func (caller messagesContextDrainCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":drain",
+		Text: `Unsubscribes from the stream and cancels subscription. All messages that are already
 in the buffer will be available on subsequent calls to _:next_. After the buffer
-is drained, _:next_ will raise an error.
-`
+is drained, _:next_ will raise an error.`,
+	}
 }

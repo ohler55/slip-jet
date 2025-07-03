@@ -25,10 +25,10 @@ func (caller streamSubjectsCaller) Call(s *slip.Scope, args slip.List, _ int) (r
 	return
 }
 
-func (caller streamSubjectsCaller) Docs() string {
-	return `__:subjects__ => _list_
-
-
-Returns the cached stream subjects.
-`
+func (caller streamSubjectsCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name:   ":subjects",
+		Text:   `Returns the cached stream subjects.`,
+		Return: "list",
+	}
 }

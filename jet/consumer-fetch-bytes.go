@@ -42,14 +42,10 @@ func (caller consumerFetchBytesCaller) Call(s *slip.Scope, args slip.List, _ int
 	return MakeMessageBatch(mb)
 }
 
-func (caller consumerFetchBytesCaller) Docs() string {
-	return `__:fetch-bytes__ batch &key max-wait heartbeat => _jet-message-batch_
-   _max-bytes_ [fixnum] the maximum number of bytes in a batch
-   _:max-wait_ [real] the number of seconds to wait before closing the batch.
-   _:heartbeat_ [real] the number of seconds in a heartbeat.
-
-
-Used to retrieve up to a provided bytes from the
+func (caller consumerFetchBytesCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":fetch-bytes",
+		Text: `Used to retrieve up to a provided bytes from the
 stream. This method will send a single request and deliver the
 provided number of bytes unless time out is met earlier. _:fetch-bytes_
 timeout defaults to 30 seconds and can be configured using
@@ -68,6 +64,25 @@ for delivered messages.
 
 
 Messages channel is always closed, thus it is safe to range over it
-without additional checks.
-`
+without additional checks.`,
+		Args: []*slip.DocArg{
+			{
+				Name: "batch",
+				Type: "fixnum",
+				Text: "The maximum number of bytes in a batch.",
+			},
+			{Name: "&key"},
+			{
+				Name: ":max-wait",
+				Type: "real",
+				Text: "The number of seconds to wait before closing the batch.",
+			},
+			{
+				Name: ":heartbeat",
+				Type: "real",
+				Text: "The number of seconds in a between heartbeats.",
+			},
+		},
+		Return: "jet-message-batch",
+	}
 }

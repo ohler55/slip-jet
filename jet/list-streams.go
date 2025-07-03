@@ -35,13 +35,24 @@ func (caller listStreamsCaller) Call(s *slip.Scope, args slip.List, _ int) slip.
 	return streams
 }
 
-func (caller listStreamsCaller) Docs() string {
-	return `__:list-streams__ &key _timeout_ _subject_ => _list__
-   _:timeout_ [real] the number of seconds to wait before timing out.
-   _:subject_ [string] used to filter results to only streams that have the
-given subject in their configuration.
-
-
-Returns a list of _jet-stream-info_ instances.
-`
+func (caller listStreamsCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":list-streams",
+		Text: `Returns a list of _jet-stream-info_ instances.`,
+		Args: []*slip.DocArg{
+			{Name: "&key"},
+			{
+				Name: ":subject",
+				Type: "string",
+				Text: `Used to filter results to only streams that have the
+given subject in their configuration.`,
+			},
+			{
+				Name: ":timeout",
+				Type: "real",
+				Text: `The number of seconds to wait before timing out.`,
+			},
+		},
+		Return: "list",
+	}
 }

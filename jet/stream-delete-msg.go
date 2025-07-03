@@ -40,16 +40,30 @@ func (caller streamDeleteMsgCaller) Call(s *slip.Scope, args slip.List, _ int) s
 	return nil
 }
 
-func (caller streamDeleteMsgCaller) Docs() string {
-	return `__:delete-msg__ _sequence_ &key _timeout_ _secure_
-   _sequence_ [fixnum] the sequence number of the message to delete.
-   _:timeout_ [real] the number of seconds to wait before timing out.
-   _:secure_ [boolean] deletes a message from a stream. The deleted message
+func (caller streamDeleteMsgCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":delete-msg",
+		Text: `Deletes a message from a stream. On the server, the message is marked as erased,
+but not overwritten unless the _:secure_ option is true.`,
+		Args: []*slip.DocArg{
+			{
+				Name: "sequence",
+				Type: "fixnum",
+				Text: `The sequence number of the message to delete.`,
+			},
+			{Name: "&key"},
+			{
+				Name: ":timeout",
+				Type: "real",
+				Text: `The number of seconds to wait before timing out.`,
+			},
+			{
+				Name: ":secure",
+				Type: "boolean",
+				Text: `deletes a message from a stream. The deleted message
 is overwritten with random data. As a result, this operation is slower
-than when _:secure_ if false.
-
-
-Deletes a message from a stream. On the server, the message is marked as erased,
-but not overwritten unless the _:secure_ option is true.
-`
+than when _:secure_ if false.`,
+			},
+		},
+	}
 }

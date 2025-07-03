@@ -41,12 +41,23 @@ func (caller streamGetLastMsgCaller) Call(s *slip.Scope, args slip.List, _ int) 
 	return MakeMsg(&pm)
 }
 
-func (caller streamGetLastMsgCaller) Docs() string {
-	return `__:get-last-msg__ _subject_ &key _timeout_ => _jet-msg_
-   _subject_ [fixnum] the subject to get the last message of.
-   _:timeout_ [real] the number of seconds to wait before timing out.
-
-
-Retrieves the last stream message stored in JetStream on a given subject subject.
-`
+func (caller streamGetLastMsgCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":get-last-msg",
+		Text: `Retrieves the last stream message stored in JetStream on a given subject subject.`,
+		Args: []*slip.DocArg{
+			{
+				Name: "subject",
+				Type: "string",
+				Text: "The subject to get the last message of.",
+			},
+			{Name: "&key"},
+			{
+				Name: ":timeout",
+				Type: "real",
+				Text: "the number of seconds to wait before timing out.",
+			},
+		},
+		Return: "jet-msg",
+	}
 }

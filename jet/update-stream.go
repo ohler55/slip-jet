@@ -36,8 +36,10 @@ func (caller updateStreamCaller) Call(s *slip.Scope, args slip.List, _ int) slip
 	return MakeStream(stream)
 }
 
-func (caller updateStreamCaller) Docs() string {
-	return makeStreamMethodDoc(":update-stream", "_name_ ", "<jet-stream>",
-		"   _name_ [string] the name of the stream.",
+func (caller updateStreamCaller) FuncDocs() *slip.FuncDoc {
+	return makeStreamMethodFuncDoc(
+		":update-stream",
+		&slip.DocArg{Name: "name", Type: "string", Text: "The name of the stream."},
+		"<jet-stream>",
 		`Updates an existing stream. If stream does not exist, and error is raised.`)
 }

@@ -17,12 +17,12 @@ func (caller publishPendingCaller) Call(s *slip.Scope, args slip.List, _ int) sl
 	return slip.Fixnum(cl.js.PublishAsyncPending())
 }
 
-func (caller publishPendingCaller) Docs() string {
-	return `__:publish-pending__ => _fixnum_
-
-
-Returns the number of async publishes outstanding for this context. An
+func (caller publishPendingCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":publish-pending",
+		Text: `Returns the number of async publishes outstanding for this context. An
 outstanding publish is one that has been sent by the publisher but has not yet
-received an ack.
-`
+received an ack.`,
+		Return: "fixnum",
+	}
 }

@@ -19,7 +19,7 @@ type orderedOpt struct {
 var orderedOptMap = map[string]*orderedOpt{
 	":filter-subjects": {
 		doc: &slip.DocArg{
-			Name: "filter-subjects",
+			Name: ":filter-subjects",
 			Type: "list",
 			Text: `Allows filtering messages from a stream by subject. This field is
 exclusive with FilterSubject. Requires nats-server v2.10.0 or later.`,
@@ -36,7 +36,7 @@ exclusive with FilterSubject. Requires nats-server v2.10.0 or later.`,
 	},
 	":deliver-policy": {
 		doc: &slip.DocArg{
-			Name: "deliver-policy",
+			Name: ":deliver-policy",
 			Type: ":all|:last|:new|:start-sequence|:start-time|:last-per-subject",
 			Text: `Defines from which point to start delivering messages
 from the stream. Defaults to _:all_.`,
@@ -61,7 +61,7 @@ from the stream. Defaults to _:all_.`,
 	},
 	":opt-start-seq": {
 		doc: &slip.DocArg{
-			Name: "opt-start-seq",
+			Name: ":opt-start-seq",
 			Type: "fixnum",
 			Text: `An optional sequence number from which to start
  message delivery. Only applicable when _:deliver-policy_ is set to
@@ -77,7 +77,7 @@ _:start-sequence_.`,
 	},
 	":opt-start-time": {
 		doc: &slip.DocArg{
-			Name: "opt-start-time",
+			Name: ":opt-start-time",
 			Type: "time",
 			Text: `An optional time from which to start message
 delivery. Only applicable when _:deliver-policy_ is set to
@@ -94,7 +94,7 @@ _:start-time_.`,
 	},
 	":replay-policy": {
 		doc: &slip.DocArg{
-			Name: "replay-policy",
+			Name: ":replay-policy",
 			Type: ":instant|:original",
 			Text: `Defines the rate at which messages are sent to the consumer. If
 _:replay-original-policy_ is set, messages are sent in the same intervals in which
@@ -115,7 +115,7 @@ Defaults to _:instant_.`,
 	},
 	":inactive-threshold": {
 		doc: &slip.DocArg{
-			Name: "inactive-threshold",
+			Name: ":inactive-threshold",
 			Type: "real",
 			Text: `The duration which instructs the server to clean up the consumer
 if it has been inactive for the specified duration. Durable consumers will not be
@@ -135,7 +135,7 @@ deliver subject (for push consumers), not if there are no messages to be deliver
 	},
 	":headers-only": {
 		doc: &slip.DocArg{
-			Name: "headers-only",
+			Name: ":headers-only",
 			Type: "boolean",
 			Text: `Indicates whether only headers of messages should be sent
 (with no payload). Defaults to false.`,
@@ -146,7 +146,7 @@ deliver subject (for push consumers), not if there are no messages to be deliver
 	},
 	":max-reset-attempts": {
 		doc: &slip.DocArg{
-			Name: "max-reset-attempts",
+			Name: ":max-reset-attempts",
 			Type: "fixnum",
 			Text: `Defines the number of attempts for the consumer to be recreated in a
 single recreation cycle. Defaults to unlimited.`,
@@ -205,40 +205,25 @@ func OrderedConfigPropList(config *jetstream.OrderedConsumerConfig) slip.List {
 	}
 }
 
-func makeOrderedMethodDoc(method, args, retType, argDocs, description string) string {
-	var b []byte
-	b = append(b, "__"...)
-	b = append(b, method...)
-	b = append(b, "__ "...)
-	b = append(b, args...)
-	b = append(b, "&key _timeout_"...)
-	keys := make([]string, 0, len(streamOptMap))
+func makeOrderedMethodFuncDoc(method string, retType, description string) *slip.FuncDoc {
+	fd := slip.FuncDoc{
+		Name:   method,
+		Return: retType,
+		Text:   description,
+		Kind:   slip.MethodSymbol,
+	}
+	fd.Args = append(fd.Args,
+		&slip.DocArg{Name: "&key"},
+		&slip.DocArg{Name: ":timeout", Type: "real", Text: "The number of seconds to wait before timing out."},
+	)
+	keys := make([]string, 0, len(orderedOptMap))
 	for k := range orderedOptMap {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 	for _, k := range keys {
-		b = append(b, ' ')
-		b = append(b, k[1:]...)
-	}
-	b = append(b, " => "...)
-	b = append(b, retType...)
-	b = append(b, '\n')
-
-	b = append(b, argDocs...)
-	b = append(b, "   _:timeout_ [real] the number of seconds to wait before timing out."...)
-	for _, k := range keys {
-		b = append(b, "\n   _"...)
-		b = append(b, k...)
-		b = append(b, "_ ["...)
 		doc := orderedOptMap[k].doc
-		b = append(b, doc.Type...)
-		b = append(b, "] "...)
-		b = append(b, doc.Text...)
+		fd.Args = append(fd.Args, doc)
 	}
-	b = append(b, '\n', '\n', '\n')
-	b = append(b, description...)
-	b = append(b, '\n')
-
-	return string(b)
+	return &fd
 }

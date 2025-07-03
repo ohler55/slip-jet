@@ -30,14 +30,25 @@ func (caller consumerNextCaller) Call(s *slip.Scope, args slip.List, _ int) slip
 	return MakeMsg(m)
 }
 
-func (caller consumerNextCaller) Docs() string {
-	return `__:next__ batch &key max-wait heartbeat => _jet-msg_
-   _:max-wait_ [real] the number of seconds to wait before returning.
-   _:heartbeat_ [real] the number of seconds in a heartbeat.
-
-
-Used to retrieve the next message from the consumer. This
+func (caller consumerNextCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":next",
+		Text: `Used to retrieve the next message from the consumer. This
 method will block until the message is retrieved or timeout is
-reached.
-`
+reached.`,
+		Args: []*slip.DocArg{
+			{Name: "&key"},
+			{
+				Name: ":max-wait",
+				Type: "real",
+				Text: "The number of seconds to wait before returning.",
+			},
+			{
+				Name: ":heartbeat",
+				Type: "real",
+				Text: "The number of seconds between heartbeats.",
+			},
+		},
+		Return: "jet-msg",
+	}
 }

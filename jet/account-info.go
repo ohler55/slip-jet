@@ -36,11 +36,18 @@ func (caller accountInfoCaller) Call(s *slip.Scope, args slip.List, _ int) slip.
 	return inst
 }
 
-func (caller accountInfoCaller) Docs() string {
-	return `__:account-info__ &key _timeout_ => _bag__
-   _:timeout_ [real] the number of seconds to wait before timing out.
-
-
-Returns a _bag_ with the account information as a tree of data.
-`
+func (caller accountInfoCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":account-info",
+		Text: `Returns a _bag_ with the account information as a tree of data.`,
+		Args: []*slip.DocArg{
+			{Name: "&key"},
+			{
+				Name: ":timeout",
+				Type: "real",
+				Text: "the number of seconds to wait before timing out.",
+			},
+		},
+		Return: "bag",
+	}
 }

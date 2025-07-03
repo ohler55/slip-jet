@@ -36,9 +36,11 @@ func (caller createStreamCaller) Call(s *slip.Scope, args slip.List, _ int) slip
 	return MakeStream(stream)
 }
 
-func (caller createStreamCaller) Docs() string {
-	return makeStreamMethodDoc(":create-stream", "_name_ ", "<jet-stream>",
-		"   _name_ [string] the name of the stream.",
+func (caller createStreamCaller) FuncDocs() *slip.FuncDoc {
+	return makeStreamMethodFuncDoc(
+		":create-stream",
+		&slip.DocArg{Name: "name", Type: "string", Text: "The name of the stream."},
+		"<jet-stream>",
 		`Creates a new stream with the provided options and returns the created stream.
 If a stream with the given name already exists, an error is raised.`)
 }

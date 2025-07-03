@@ -36,13 +36,24 @@ func (caller streamGetConsumerCaller) Call(s *slip.Scope, args slip.List, _ int)
 	return MakeConsumer(consumer)
 }
 
-func (caller streamGetConsumerCaller) Docs() string {
-	return `__:get-consumer__ _name_ &key _timeout_ => _jet-consumer_
-   _name_ [string] the consumer name of the consumer to get.
-   _:timeout_ [real] the number of seconds to wait before timing out.
-
-
-Returns a _jet-consumer_ for an existing consumer, allowing processing
-of messages. If consumer does not exist, _nil_ is returned.
-`
+func (caller streamGetConsumerCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":get-consumer",
+		Text: `Returns a _jet-consumer_ for an existing consumer, allowing processing
+of messages. If consumer does not exist, _nil_ is returned.`,
+		Args: []*slip.DocArg{
+			{
+				Name: "name",
+				Type: "string",
+				Text: `The consumer name of the consumer to get.`,
+			},
+			{Name: "&key"},
+			{
+				Name: ":timeout",
+				Type: "real",
+				Text: `The number of seconds to wait before timing out.`,
+			},
+		},
+		Return: "jet-consumer",
+	}
 }

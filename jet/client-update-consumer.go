@@ -37,9 +37,11 @@ func (caller clientUpdateConsumerCaller) Call(s *slip.Scope, args slip.List, _ i
 	return MakeConsumer(consumer)
 }
 
-func (caller clientUpdateConsumerCaller) Docs() string {
-	return makeConsumerMethodDoc(":update-consumer", "_stream_ ", "<jet-consumer>",
-		"   _stream_ [string] the name of the stream.",
+func (caller clientUpdateConsumerCaller) FuncDocs() *slip.FuncDoc {
+	return makeConsumerMethodFuncDoc(
+		":update-consumer",
+		&slip.DocArg{Name: "stream", Type: "string", Text: "The name of the stream."},
+		"<jet-consumer>",
 		`Updates an existing consumer. If consumer does not
 exist an error is raised otherwise a _jet-consumer_ is
 returned, allowing operations on a consumer (e.g. fetch messages).

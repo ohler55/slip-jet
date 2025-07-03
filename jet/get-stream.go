@@ -34,13 +34,25 @@ func (caller getStreamCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Ob
 	return MakeStream(stream)
 }
 
-func (caller getStreamCaller) Docs() string {
-	return `__:get-stream__ _name_ &key _timeout_ => _jet-stream__
-   _name_ [string] name of the stream to get.
-   _:timeout_ [real] the number of seconds to wait before timing out.
-
-
-Fetches and returns a _jet-stream_ for the given stream name.
+func (caller getStreamCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":get-stream",
+		Text: `Fetches and returns a _jet-stream_ for the given stream name.
 If the stream does not exist _nil_ is returned.
-`
+`,
+		Args: []*slip.DocArg{
+			{
+				Name: "name",
+				Type: "string",
+				Text: "The name of the stream to get.",
+			},
+			{Name: "&key"},
+			{
+				Name: ":timeout",
+				Type: "real",
+				Text: `The number of seconds to wait before timing out.`,
+			},
+		},
+		Return: "jet-stream",
+	}
 }

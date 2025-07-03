@@ -17,11 +17,11 @@ func (caller publishCompleteCaller) Call(s *slip.Scope, args slip.List, _ int) s
 	return TChannel(cl.js.PublishAsyncComplete())
 }
 
-func (caller publishCompleteCaller) Docs() string {
-	return `__:publish-complete__ => _channel_
-
-
-Returns a channel that will be closed when all outstanding asynchronously
-published messages are acknowledged by the server.
-`
+func (caller publishCompleteCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":publish-complete",
+		Text: `Returns a channel that will be closed when all outstanding asynchronously
+published messages are acknowledged by the server.`,
+		Return: "channel",
+	}
 }

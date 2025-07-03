@@ -35,22 +35,22 @@ func defStreamInfo() {
 	streamInfoFlavor.GoMakeOnly = true
 
 	streamInfoFlavor.DefMethod(":state", "", infoStateCaller{})
-	flavors.FlosFun("jet-stream-info-state", ":state", infoStateCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-info-state", ":state", infoStateCaller{}.FuncDocs(), &Pkg)
 
 	streamInfoFlavor.DefMethod(":created", "", infoCreatedCaller{})
-	flavors.FlosFun("jet-stream-info-created", ":created", infoCreatedCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-info-created", ":created", infoCreatedCaller{}.FuncDocs(), &Pkg)
 
 	streamInfoFlavor.DefMethod(":cluster", "", infoClusterCaller{})
-	flavors.FlosFun("jet-stream-info-cluster", ":cluster", infoClusterCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-info-cluster", ":cluster", infoClusterCaller{}.FuncDocs(), &Pkg)
 
 	streamInfoFlavor.DefMethod(":mirror", "", infoMirrorCaller{})
-	flavors.FlosFun("jet-stream-info-mirror", ":mirror", infoMirrorCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-info-mirror", ":mirror", infoMirrorCaller{}.FuncDocs(), &Pkg)
 
 	streamInfoFlavor.DefMethod(":sources", "", infoSourcesCaller{})
-	flavors.FlosFun("jet-stream-info-sources", ":sources", infoSourcesCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-info-sources", ":sources", infoSourcesCaller{}.FuncDocs(), &Pkg)
 
 	streamInfoFlavor.DefMethod(":timestamp", "", infoTimestampCaller{})
-	flavors.FlosFun("jet-stream-info-timestamp", ":timestamp", infoTimestampCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-info-timestamp", ":timestamp", infoTimestampCaller{}.FuncDocs(), &Pkg)
 }
 
 // MakeStream makes a jet-stream-info.
@@ -70,12 +70,12 @@ func (caller infoCreatedCaller) Call(s *slip.Scope, args slip.List, _ int) slip.
 	return slip.Time(si.Created)
 }
 
-func (caller infoCreatedCaller) Docs() string {
-	return `__:created__ => _time_
-
-
-Returns the timestamp when the stream was created.
-`
+func (caller infoCreatedCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name:   ":created",
+		Text:   `Returns the timestamp when the stream was created.`,
+		Return: "time",
+	}
 }
 
 type infoStateCaller struct{}
@@ -87,12 +87,12 @@ func (caller infoStateCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Ob
 	return MakeStreamState(&si.State)
 }
 
-func (caller infoStateCaller) Docs() string {
-	return `__:state__ => _jet-stream-state_
-
-
-Returns the stream information as an instance of the _jet-stream-info_ flavor.
-`
+func (caller infoStateCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name:   ":state",
+		Text:   `Returns the stream information as an instance of the _jet-stream-info_ flavor.`,
+		Return: "jet-stream-state",
+	}
 }
 
 type infoClusterCaller struct{}
@@ -131,15 +131,15 @@ func (caller infoClusterCaller) Call(s *slip.Scope, args slip.List, _ int) (resu
 	return
 }
 
-func (caller infoClusterCaller) Docs() string {
-	return `__:cluster__ => _property list_
-
-
-Returns the information about the cluster to which this stream belongs (if
+func (caller infoClusterCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":cluster",
+		Text: `Returns the information about the cluster to which this stream belongs (if
 applicable). The properties are _:name_, _:leader_, and _:replicas_. The
 _:replicas_ property is a property list of _:name_, _:current_, _:offline_,
-_:active_, and _:lag_.
-`
+_:active_, and _:lag_.`,
+		Return: "property-list",
+	}
 }
 
 type infoMirrorCaller struct{}
@@ -153,14 +153,14 @@ func (caller infoMirrorCaller) Call(s *slip.Scope, args slip.List, _ int) (resul
 	return
 }
 
-func (caller infoMirrorCaller) Docs() string {
-	return `__:mirror__ => _jet-stream-source-info_
-
-
-Returns information about another stream this one is mirroring. Mirroring
+func (caller infoMirrorCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":mirror",
+		Text: `Returns information about another stream this one is mirroring. Mirroring
 is used to create replicas of another stream's  data. This field is omitted
-if the stream is not mirroring another stream.
-`
+if the stream is not mirroring another stream.`,
+		Return: "jet-stream-source-info",
+	}
 }
 
 type infoSourcesCaller struct{}
@@ -175,12 +175,12 @@ func (caller infoSourcesCaller) Call(s *slip.Scope, args slip.List, _ int) slip.
 	return srcs
 }
 
-func (caller infoSourcesCaller) Docs() string {
-	return `__:sources__ => _list_
-
-
-Returns a list of source streams from which this stream collects data.
-`
+func (caller infoSourcesCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name:   ":sources",
+		Text:   `Returns a list of source streams from which this stream collects data.`,
+		Return: "list",
+	}
 }
 
 type infoTimestampCaller struct{}
@@ -192,12 +192,12 @@ func (caller infoTimestampCaller) Call(s *slip.Scope, args slip.List, _ int) sli
 	return slip.Time(si.TimeStamp)
 }
 
-func (caller infoTimestampCaller) Docs() string {
-	return `__:timestamp__ => _time_
-
-
-Returns when the info was gathered by the server.
-`
+func (caller infoTimestampCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name:   ":timestamp",
+		Text:   `Returns when the info was gathered by the server.`,
+		Return: "time",
+	}
 }
 
 ////////////////
@@ -231,13 +231,28 @@ func (caller streamInfoCaller) Call(s *slip.Scope, args slip.List, _ int) slip.O
 	return MakeStreamInfo(si)
 }
 
-func (caller streamInfoCaller) Docs() string {
-	return `__:info__ &key _timeout_ _cached_ _deleted_ => _jet-stream-info_
-   _:timeout_ [real] the number of seconds to wait before timing out.
-   _:cached_ [boolean] return the cached information instead of fetching from the server.
-   _:deleted_ [boolean] if true, include the information about messages deleted from a stream.
-
-
-Returns the stream information as an instance of the _jet-stream-info_ flavor.
-`
+func (caller streamInfoCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name: ":info",
+		Text: `Returns the stream information as an instance of the _jet-stream-info_ flavor.`,
+		Args: []*slip.DocArg{
+			{Name: "&key"},
+			{
+				Name: ":timeout",
+				Type: "real",
+				Text: "The number of seconds to wait before timing out.",
+			},
+			{
+				Name: ":cached",
+				Type: "boolean",
+				Text: `Return the cached information instead of fetching from the server.`,
+			},
+			{
+				Name: ":deleted",
+				Type: "boolean",
+				Text: `If true, include the information about messages deleted from a stream.`,
+			},
+		},
+		Return: "jet-stream-info",
+	}
 }

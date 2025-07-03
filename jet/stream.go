@@ -32,50 +32,50 @@ purging a stream.`),
 	streamFlavor.GoMakeOnly = true
 
 	streamFlavor.DefMethod(":info", "", streamInfoCaller{})
-	flavors.FlosFun("jet-stream-info", ":info", streamInfoCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-info", ":info", streamInfoCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":name", "", streamNameCaller{})
-	flavors.FlosFun("jet-stream-name", ":name", streamNameCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-name", ":name", streamNameCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":subjects", "", streamSubjectsCaller{})
-	flavors.FlosFun("jet-stream-subjects", ":subjects", streamSubjectsCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-subjects", ":subjects", streamSubjectsCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":purge", "", streamPurgeCaller{})
-	flavors.FlosFun("jet-stream-purge", ":purge", streamPurgeCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-purge", ":purge", streamPurgeCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":get-msg", "", streamGetMsgCaller{})
-	flavors.FlosFun("jet-stream-get-msg", ":get-msg", streamGetMsgCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-get-msg", ":get-msg", streamGetMsgCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":get-last-msg", "", streamGetLastMsgCaller{})
-	flavors.FlosFun("jet-stream-get-last-msg", ":get-last-msg", streamGetLastMsgCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-get-last-msg", ":get-last-msg", streamGetLastMsgCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":delete-msg", "", streamDeleteMsgCaller{})
-	flavors.FlosFun("jet-stream-delete-msg", ":delete-msg", streamDeleteMsgCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-delete-msg", ":delete-msg", streamDeleteMsgCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":create-consumer", "", streamCreateConsumerCaller{})
-	flavors.FlosFun("jet-stream-create-consumer", ":create-consumer", streamCreateConsumerCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-create-consumer", ":create-consumer", streamCreateConsumerCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":update-consumer", "", streamUpdateConsumerCaller{})
-	flavors.FlosFun("jet-stream-update-consumer", ":update-consumer", streamUpdateConsumerCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-update-consumer", ":update-consumer", streamUpdateConsumerCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":create-or-update-consumer", "", streamCreateOrUpdateConsumerCaller{})
 	flavors.FlosFun("jet-stream-create-or-update-consumer", ":create-or-update-consumer",
-		streamCreateOrUpdateConsumerCaller{}.Docs(), &Pkg)
+		streamCreateOrUpdateConsumerCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":ordered-consumer", "", streamOrderedConsumerCaller{})
-	flavors.FlosFun("jet-stream-ordered-consumer", ":ordered-consumer", streamOrderedConsumerCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-ordered-consumer", ":ordered-consumer", streamOrderedConsumerCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":get-consumer", "", streamGetConsumerCaller{})
-	flavors.FlosFun("jet-stream-get-consumer", ":get-consumer", streamGetConsumerCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-get-consumer", ":get-consumer", streamGetConsumerCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":list-consumers", "", streamListConsumersCaller{})
-	flavors.FlosFun("jet-stream-list-consumers", ":list-consumers", streamListConsumersCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-list-consumers", ":list-consumers", streamListConsumersCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":consumer-names", "", streamConsumerNamesCaller{})
-	flavors.FlosFun("jet-stream-consumer-names", ":consumer-names", streamConsumerNamesCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-consumer-names", ":consumer-names", streamConsumerNamesCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":delete-consumer", "", streamDeleteConsumerCaller{})
-	flavors.FlosFun("jet-stream-delete-consumer", ":delete-consumer", streamDeleteConsumerCaller{}.Docs(), &Pkg)
+	flavors.FlosFun("jet-stream-delete-consumer", ":delete-consumer", streamDeleteConsumerCaller{}.FuncDocs(), &Pkg)
 }
 
 // MakeStream makes a jet-stream.

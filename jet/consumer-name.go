@@ -21,10 +21,10 @@ func (caller consumerNameCaller) Call(s *slip.Scope, args slip.List, _ int) (res
 	return
 }
 
-func (caller consumerNameCaller) Docs() string {
-	return `__:name__ => _string_
-
-
-Returns the cached consumer name.
-`
+func (caller consumerNameCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name:   ":name",
+		Text:   `Returns the cached consumer name.`,
+		Return: "string",
+	}
 }
