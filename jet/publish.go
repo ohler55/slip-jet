@@ -29,7 +29,7 @@ func (caller publishCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Obje
 	case slip.String:
 		msg.Data = []byte(ta)
 	case *flavors.Instance:
-		if ta.IsA(msgFlavor) {
+		if ta.IsA("jet-msg") {
 			pm := ta.Any.(*PubMsg)
 			msg.Subject = pm.Subj
 			msg.Reply = pm.Repl

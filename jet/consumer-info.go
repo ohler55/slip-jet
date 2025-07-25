@@ -32,7 +32,7 @@ func defConsumerInfo() {
 		&Pkg,
 	)
 	consumerInfoFlavor.Final = true
-	consumerInfoFlavor.GoMakeOnly = true
+	// consumerInfoFlavor.GoMakeOnly = true
 
 	consumerInfoFlavor.DefMethod(":stream", "", consumerInfoStreamCaller{})
 	flavors.FlosFun("jet-consumer-info-stream", ":stream", consumerInfoStreamCaller{}.FuncDocs(), &Pkg)

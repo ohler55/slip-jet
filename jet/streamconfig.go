@@ -302,7 +302,7 @@ v2.10.0 or later.`,
 			Text: `Defines the configuration for mirroring another stream.`,
 		},
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
-			if inst, ok := v.(*flavors.Instance); ok && inst.IsA(streamSourceFlavor) {
+			if inst, ok := v.(*flavors.Instance); ok && inst.IsA("jet-stream-source") {
 				var jss jetstream.StreamSource
 				SetJetstreamStreamSource(&jss, inst)
 				config.Mirror = &jss
@@ -443,7 +443,7 @@ be set on already created streams via the Update API.`,
 					slip.PanicType(":sources", v, "list")
 				}
 				for _, x := range list {
-					if inst, ok := x.(*flavors.Instance); ok && inst.IsA(streamSourceFlavor) {
+					if inst, ok := x.(*flavors.Instance); ok && inst.IsA("jet-stream-source") {
 						var jss jetstream.StreamSource
 						SetJetstreamStreamSource(&jss, inst)
 						config.Sources = append(config.Sources, &jss)

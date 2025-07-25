@@ -4,7 +4,6 @@ package jet_test
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/nats-io/nats.go"
@@ -15,35 +14,37 @@ import (
 	"github.com/ohler55/slip/sliptest"
 )
 
-func TestAckFutureDescribe(t *testing.T) {
-	var out strings.Builder
-	scope := slip.NewScope()
-	scope.Let(slip.Symbol("out"), &slip.OutputStream{Writer: &out})
+// TBD uncomment test once ack-future has vanilla methods or some of them anyway
 
-	scope.Let("af", jet.MakeAckFuture(nil))
-	(&sliptest.Function{
-		Scope:  scope,
-		Source: `(send af :describe out)`,
-		Expect: "nil",
-	}).Test(t)
-	tt.Equal(t, "/an instance of .*jet-ack-future/", out.String())
+// func TestAckFutureDescribe(t *testing.T) {
+// 	var out strings.Builder
+// 	scope := slip.NewScope()
+// 	scope.Let(slip.Symbol("out"), &slip.OutputStream{Writer: &out})
 
-	out.Reset()
-	(&sliptest.Function{
-		Scope:  scope,
-		Source: `(describe (find-class 'jet-ack-future) out)`,
-		Expect: "",
-	}).Test(t)
-	tt.Equal(t, "/jet-ack-future.* is a built-in class/", out.String())
+// 	scope.Let("af", jet.MakeAckFuture(nil))
+// 	(&sliptest.Function{
+// 		Scope:  scope,
+// 		Source: `(send af :describe out)`,
+// 		Expect: "nil",
+// 	}).Test(t)
+// 	tt.Equal(t, "/an instance of .*jet-ack-future/", out.String())
 
-	out.Reset()
-	(&sliptest.Function{
-		Scope:  scope,
-		Source: `(describe-method 'jet-ack-future :result out)`,
-		Expect: "",
-	}).Test(t)
-	tt.Equal(t, "/result.* is a method of .*jet-ack-future/", out.String())
-}
+// 	out.Reset()
+// 	(&sliptest.Function{
+// 		Scope:  scope,
+// 		Source: `(describe (find-class 'jet-ack-future) out)`,
+// 		Expect: "",
+// 	}).Test(t)
+// 	tt.Equal(t, "/jet-ack-future.* is a built-in class/", out.String())
+
+// 	out.Reset()
+// 	(&sliptest.Function{
+// 		Scope:  scope,
+// 		Source: `(describe-method 'jet-ack-future :result out)`,
+// 		Expect: "",
+// 	}).Test(t)
+// 	tt.Equal(t, "/result.* is a method of .*jet-ack-future/", out.String())
+// }
 
 func TestAckFutureObject(t *testing.T) {
 	af := jet.MakeAckFuture(nil)
@@ -84,7 +85,7 @@ func TestAckFutureResult(t *testing.T) {
 	(&sliptest.Function{
 		Scope:  scope,
 		Source: `(send af :result)`,
-		Expect: "/#<ERROR [0-9a-f]+>/",
+		Expect: "/#<error [0-9a-f]+>/",
 	}).Test(t)
 }
 

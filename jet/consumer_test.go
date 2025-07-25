@@ -79,7 +79,7 @@ func TestConsumerFetch(t *testing.T) {
                   (list (when m1 (coerce (send m1 :data) 'string))
                         (when m2 (coerce (send m2 :data) 'string))
                         (when m3 (coerce (send m3 :data) 'string))
-                        (when err (send err :message))))`,
+                        (when err (slot-value err 'message))))`,
 		Expect: `("hello" "goodbye" nil "dummy")`,
 	}).Test(t)
 
@@ -122,7 +122,7 @@ func TestConsumerFetchBytes(t *testing.T) {
                   (list (when m1 (coerce (send m1 :data) 'string))
                         (when m2 (coerce (send m2 :data) 'string))
                         (when m3 (coerce (send m3 :data) 'string))
-                        (when err (send err :message))))`,
+                        (when err (slot-value err 'message))))`,
 		Expect: `("hello" "goodbye" nil "dummy")`,
 	}).Test(t)
 

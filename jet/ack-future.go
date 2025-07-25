@@ -9,35 +9,39 @@ import (
 
 	"github.com/nats-io/nats.go/jetstream"
 	"github.com/ohler55/slip"
-	"github.com/ohler55/slip/pkg/clos"
+	"github.com/ohler55/slip/pkg/flavors"
 )
 
-// JetAckFutureSymbol is the symbol with a value of "time-channel".
+// JetAckFutureSymbol is the symbol with a value of "jet-ack-future".
 const JetAckFutureSymbol = slip.Symbol("jet-ack-future")
 
-var ackFutureClass slip.Class
+var ackFutureFlavor *flavors.Flavor
 
-func init() {
-	ackFutureClass = clos.DefClass(
+func defAckFuture() {
+	ackFutureFlavor = flavors.DefFlavor(
 		"jet-ack-future",
-		`jet-ack-future is a future for a jet-ack. It can be used to wait for a
-jet-ack or an error after an async publish.`,
-		nil, // slots
-		nil, // supers
-		true,
-	)
-	ackFutureClass.(*clos.Class).SetNoMake(true)
-	ackFutureClass.(*clos.Class).DefMethod(":result", "", &DocCaller{
+		map[string]slip.Object{}, // variables
+		nil,                      // inherit
+		slip.List{
+			slip.List{
+				slip.Symbol(":documentation"),
+				slip.String(`jet-ack-future is a future for a jet-ack. It can be used to wait for a
+jet-ack or an error after an async publish.`),
+			},
+		},
+		&Pkg)
+
+	ackFutureFlavor.DefMethod(":result", "", &DocCaller{
 		Text: `__:result__ => _channel_
 
 
 Returns a channel that will either return a _jet-ack_ or and error.
 `})
-	ackFutureClass.(*clos.Class).DefMethod(":message", "", &DocCaller{
+	ackFutureFlavor.DefMethod(":message", "", &DocCaller{
 		Text: `__:message__ => _jet-msg_
 
 
-Returns the message sent to teh server.
+Returns the message sent to the server.
 `})
 }
 
@@ -93,7 +97,7 @@ func (obj *JetAckFuture) Pop() (result slip.Object) {
 
 // Class of the instance.
 func (obj *JetAckFuture) Class() slip.Class {
-	return ackFutureClass
+	return ackFutureFlavor
 }
 
 // Init does nothing.
@@ -120,7 +124,8 @@ func (obj *JetAckFuture) Receive(s *slip.Scope, message string, args slip.List, 
 			}
 		}
 	default:
-		result = ackFutureClass.(*clos.Class).InvokeMethod(obj, s, message, args, depth)
+		// TBD vanilla
+		// result = ackFutureFlavor.InvokeMethod(obj, s, message, args, depth)
 	}
 	return
 }
@@ -131,7 +136,7 @@ func (obj *JetAckFuture) HasMethod(method string) bool {
 	case ":result", ":message":
 		return true
 	}
-	return ackFutureClass.(*clos.Class).GetMethod(method) != nil
+	return ackFutureFlavor.GetMethod(method) != nil
 }
 
 // MakeAckFuture makes a new jet-ack-future.

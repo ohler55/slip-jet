@@ -26,7 +26,7 @@ func defMessagesContext() {
 		&Pkg,
 	)
 	messagesContextFlavor.Final = true
-	messagesContextFlavor.GoMakeOnly = true
+	// messagesContextFlavor.GoMakeOnly = true
 
 	messagesContextFlavor.DefMethod(":next", "", messagesContextNextCaller{})
 	flavors.FlosFun("jet-messages-context-next", ":next", messagesContextNextCaller{}.FuncDocs(), &Pkg)

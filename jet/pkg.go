@@ -38,6 +38,7 @@ func init() {
 	defMessagesContext()
 	defMessagesBatch()
 	defConsumeContext()
+	defAckFuture()
 
 	initConnect()
 
