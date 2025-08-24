@@ -13,7 +13,7 @@ import (
 
 type streamPurgeCaller struct{}
 
-func (caller streamPurgeCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller streamPurgeCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":purge", len(args), 0, 8)
 	stream := self.Any.(jetstream.Stream)
@@ -21,7 +21,7 @@ func (caller streamPurgeCaller) Call(s *slip.Scope, args slip.List, _ int) slip.
 	ctx := context.Background()
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":timeout")); has {
 		var cf context.CancelFunc
-		ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
+		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
 	var opts []jetstream.StreamPurgeOpt
@@ -30,14 +30,14 @@ func (caller streamPurgeCaller) Call(s *slip.Scope, args slip.List, _ int) slip.
 		if num, ok := v.(slip.Fixnum); ok {
 			opts = append(opts, jetstream.WithPurgeKeep(uint64(num)))
 		} else {
-			slip.PanicType(":keep", v, "fixnum")
+			slip.TypePanic(s, depth, ":keep", v, "fixnum")
 		}
 	}
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":sequence")); has {
 		if num, ok := v.(slip.Fixnum); ok {
 			opts = append(opts, jetstream.WithPurgeSequence(uint64(num)))
 		} else {
-			slip.PanicType(":sequence", v, "fixnum")
+			slip.TypePanic(s, depth, ":sequence", v, "fixnum")
 		}
 	}
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":subject")); has {

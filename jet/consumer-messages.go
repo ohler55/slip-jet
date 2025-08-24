@@ -11,7 +11,7 @@ import (
 
 type consumerMessagesCaller struct{}
 
-func (caller consumerMessagesCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller consumerMessagesCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":messages", len(args), 0, 16)
 	consumer := self.Any.(jetstream.Consumer)
@@ -20,7 +20,7 @@ func (caller consumerMessagesCaller) Call(s *slip.Scope, args slip.List, _ int) 
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":error-on-missing-heartbeat")); has {
 		opts = append(opts, jetstream.WithMessagesErrOnMissingHeartbeat(v != nil))
 	}
-	getPullOptArgs(args, func(opt any) { opts = append(opts, opt.(jetstream.PullMessagesOpt)) })
+	getPullOptArgs(s, args, func(opt any) { opts = append(opts, opt.(jetstream.PullMessagesOpt)) }, depth)
 
 	mc, err := consumer.Messages(opts...)
 	if err != nil {

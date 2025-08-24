@@ -73,7 +73,7 @@ from the stream. Defaults to _:all_.`,
 			if pol, has := polMap[strings.ToLower(string(sym))]; has {
 				config.DeliverPolicy = pol
 			} else {
-				slip.PanicType(":deliver-policy", v,
+				slip.TypePanic(slip.NewScope(), 0, ":deliver-policy", v,
 					":all", ":last", ":new", ":start-sequence", ":start-time", ":last-per-subject")
 			}
 		},
@@ -90,7 +90,7 @@ _:start-sequence_.`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.OptStartSeq = uint64(num)
 			} else {
-				slip.PanicType(":opt-start-seq", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":opt-start-seq", v, "fixnum")
 			}
 		},
 	},
@@ -107,7 +107,7 @@ _:start-time_.`,
 				tm := time.Time(stm)
 				config.OptStartTime = &tm
 			} else {
-				slip.PanicType(":opt-start-time", v, "time")
+				slip.TypePanic(slip.NewScope(), 0, ":opt-start-time", v, "time")
 			}
 		},
 	},
@@ -127,7 +127,7 @@ _:start-time_.`,
 			if pol, has := ackMap[strings.ToLower(string(sym))]; has {
 				config.AckPolicy = pol
 			} else {
-				slip.PanicType(":ack-policy", v, ":explicit", ":all", ":none")
+				slip.TypePanic(slip.NewScope(), 0, ":ack-policy", v, ":explicit", ":all", ":none")
 			}
 		},
 	},
@@ -142,7 +142,7 @@ before resending a message. If not set, server default is 30 seconds.`,
 			if num, ok := v.(slip.Real); ok {
 				config.AckWait = time.Duration(float64(time.Second) * num.RealValue())
 			} else {
-				slip.PanicType(":ack-wait", v, "real")
+				slip.TypePanic(slip.NewScope(), 0, ":ack-wait", v, "real")
 			}
 		},
 	},
@@ -158,7 +158,7 @@ default is -1 (unlimited).`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.MaxDeliver = int(num)
 			} else {
-				slip.PanicType(":max-deliver", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":max-deliver", v, "fixnum")
 			}
 		},
 	},
@@ -176,14 +176,14 @@ used for all remaining attempts.`,
 		update: func(config *jetstream.ConsumerConfig, v slip.Object) {
 			list, ok := v.(slip.List)
 			if !ok {
-				slip.PanicType(":back-off", v, "list of real")
+				slip.TypePanic(slip.NewScope(), 0, ":back-off", v, "list of real")
 			}
 			var durs []time.Duration
 			for _, x := range list {
 				if num, ok := x.(slip.Real); ok {
 					durs = append(durs, time.Duration(float64(time.Second)*num.RealValue()))
 				} else {
-					slip.PanicType(":back-off element", x, "real")
+					slip.TypePanic(slip.NewScope(), 0, ":back-off element", x, "real")
 				}
 			}
 			config.BackOff = durs
@@ -217,7 +217,7 @@ Defaults to _:instant_.`,
 			case slip.Symbol(":original"):
 				config.ReplayPolicy = jetstream.ReplayOriginalPolicy
 			default:
-				slip.PanicType(":replay-policy", v, ":instant", ":original")
+				slip.TypePanic(slip.NewScope(), 0, ":replay-policy", v, ":instant", ":original")
 			}
 		},
 	},
@@ -231,7 +231,7 @@ Defaults to _:instant_.`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.RateLimit = uint64(num)
 			} else {
-				slip.PanicType(":rate-limit", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":rate-limit", v, "fixnum")
 			}
 		},
 	},
@@ -259,7 +259,7 @@ account settings. If neither are set, server default is 512.`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.MaxWaiting = int(num)
 			} else {
-				slip.PanicType(":max-waiting", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":max-waiting", v, "fixnum")
 			}
 		},
 	},
@@ -275,7 +275,7 @@ server default is 1000. Set to -1 for unlimited.`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.MaxAckPending = int(num)
 			} else {
-				slip.PanicType(":max-ack-pending", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":max-ack-pending", v, "fixnum")
 			}
 		},
 	},
@@ -302,7 +302,7 @@ limit is hit first.`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.MaxRequestBatch = int(num)
 			} else {
-				slip.PanicType(":max-request-batch", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":max-request-batch", v, "fixnum")
 			}
 		},
 	},
@@ -317,7 +317,7 @@ wait for messages to be available to pull.`,
 			if num, ok := v.(slip.Real); ok {
 				config.MaxRequestExpires = time.Duration(float64(time.Second) * num.RealValue())
 			} else {
-				slip.PanicType(":max-request-expires", v, "real")
+				slip.TypePanic(slip.NewScope(), 0, ":max-request-expires", v, "real")
 			}
 		},
 	},
@@ -333,7 +333,7 @@ limit is hit first.`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.MaxRequestMaxBytes = int(num)
 			} else {
-				slip.PanicType(":max-request-max-bytes", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":max-request-max-bytes", v, "fixnum")
 			}
 		},
 	},
@@ -353,7 +353,7 @@ deliver subject (for push consumers), not if there are no messages to be deliver
 			if num, ok := v.(slip.Real); ok {
 				config.InactiveThreshold = time.Duration(float64(time.Second) * num.RealValue())
 			} else {
-				slip.PanicType(":inactive-threshold", v, "real")
+				slip.TypePanic(slip.NewScope(), 0, ":inactive-threshold", v, "real")
 			}
 		},
 	},
@@ -368,7 +368,7 @@ consumers inherit the number of replicas from the stream.`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.Replicas = int(num)
 			} else {
-				slip.PanicType(":replicas", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":replicas", v, "fixnum")
 			}
 		},
 	},
@@ -393,7 +393,7 @@ exclusive with FilterSubject. Requires nats-server v2.10.0 or later.`,
 		update: func(config *jetstream.ConsumerConfig, v slip.Object) {
 			list, ok := v.(slip.List)
 			if !ok {
-				slip.PanicType(":filter-subjects", v, "list")
+				slip.TypePanic(slip.NewScope(), 0, ":filter-subjects", v, "list")
 			}
 			for _, x := range list {
 				config.FilterSubjects = append(config.FilterSubjects, slip.MustBeString(x, ":filter-subject"))
@@ -410,7 +410,7 @@ on the consumer. This feature requires nats-server v2.10.0 or later.`,
 		update: func(config *jetstream.ConsumerConfig, v slip.Object) {
 			plist, ok := v.(slip.List)
 			if !ok {
-				slip.PanicType(":metadata", v, "property list")
+				slip.TypePanic(slip.NewScope(), 0, ":metadata", v, "property list")
 			}
 			m := map[string]string{}
 			for i := 0; i < len(plist)-1; i += 2 {
@@ -431,7 +431,7 @@ func InitConsumerConfig(config *jetstream.ConsumerConfig, args slip.List) {
 		if so := consumerOptMap[key]; so != nil {
 			so.update(config, args[i+1])
 		} else if key != ":timeout" {
-			slip.NewPanic("%s is not a valid keyword", key)
+			slip.ErrorPanic(slip.NewScope(), 0, "%s is not a valid keyword", key)
 		}
 	}
 }

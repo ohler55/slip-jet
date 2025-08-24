@@ -11,17 +11,17 @@ import (
 
 type consumerNextCaller struct{}
 
-func (caller consumerNextCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller consumerNextCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":next", len(args), 0, 4)
 	consumer := self.Any.(jetstream.Consumer)
 
 	var opts []jetstream.FetchOpt
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":max-wait")); has {
-		opts = append(opts, jetstream.FetchMaxWait(mustBeDuration(v, ":max-wait")))
+		opts = append(opts, jetstream.FetchMaxWait(mustBeDuration(s, v, ":max-wait", depth)))
 	}
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":heartbeat")); has {
-		opts = append(opts, jetstream.FetchHeartbeat(mustBeDuration(v, ":heartbeat")))
+		opts = append(opts, jetstream.FetchHeartbeat(mustBeDuration(s, v, ":heartbeat", depth)))
 	}
 	m, err := consumer.Next(opts...)
 	if err != nil {

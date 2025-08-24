@@ -11,7 +11,7 @@ import (
 
 type deleteStreamCaller struct{}
 
-func (caller deleteStreamCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller deleteStreamCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":delete-stream", len(args), 1, len(streamOptMap)*2+1)
 	js := self.Any.(*Client).js
@@ -19,7 +19,7 @@ func (caller deleteStreamCaller) Call(s *slip.Scope, args slip.List, _ int) slip
 	ctx := context.Background()
 	if v, has := slip.GetArgsKeyValue(args[1:], slip.Symbol(":timeout")); has {
 		var cf context.CancelFunc
-		ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
+		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
 	if err := js.DeleteStream(ctx, slip.MustBeString(args[0], "name")); err != nil {

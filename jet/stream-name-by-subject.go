@@ -13,7 +13,7 @@ import (
 
 type streamNameBySubjectCaller struct{}
 
-func (caller streamNameBySubjectCaller) Call(s *slip.Scope, args slip.List, _ int) (result slip.Object) {
+func (caller streamNameBySubjectCaller) Call(s *slip.Scope, args slip.List, depth int) (result slip.Object) {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":stream-name-by-subject", len(args), 1, 3)
 	js := self.Any.(*Client).js
@@ -21,7 +21,7 @@ func (caller streamNameBySubjectCaller) Call(s *slip.Scope, args slip.List, _ in
 	ctx := context.Background()
 	if v, has := slip.GetArgsKeyValue(args[1:], slip.Symbol(":timeout")); has {
 		var cf context.CancelFunc
-		ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
+		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
 	if name, err := js.StreamNameBySubject(ctx, slip.MustBeString(args[0], "subject")); err == nil {

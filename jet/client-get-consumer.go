@@ -13,7 +13,7 @@ import (
 
 type clientGetConsumerCaller struct{}
 
-func (caller clientGetConsumerCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller clientGetConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":get-consumer", len(args), 2, 4)
 	js := self.Any.(*Client).js
@@ -24,7 +24,7 @@ func (caller clientGetConsumerCaller) Call(s *slip.Scope, args slip.List, _ int)
 	ctx := context.Background()
 	if v, has := slip.GetArgsKeyValue(args[2:], slip.Symbol(":timeout")); has {
 		var cf context.CancelFunc
-		ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
+		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
 	consumer, err := js.Consumer(ctx, stream, name)

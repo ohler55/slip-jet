@@ -204,7 +204,7 @@ func (caller infoTimestampCaller) FuncDocs() *slip.FuncDoc {
 
 type streamInfoCaller struct{}
 
-func (caller streamInfoCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller streamInfoCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":info", len(args), 0, 6)
 	stream := self.Any.(jetstream.Stream)
@@ -216,7 +216,7 @@ func (caller streamInfoCaller) Call(s *slip.Scope, args slip.List, _ int) slip.O
 		ctx := context.Background()
 		if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":timeout")); has {
 			var cf context.CancelFunc
-			ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
+			ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 			defer cf()
 		}
 		var opts []jetstream.StreamInfoOpt

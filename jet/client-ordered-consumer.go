@@ -12,7 +12,7 @@ import (
 
 type clientOrderedConsumerCaller struct{}
 
-func (caller clientOrderedConsumerCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller clientOrderedConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":ordered-consumer", len(args), 1, len(orderedOptMap)*2+3)
 	js := self.Any.(*Client).js
@@ -27,7 +27,7 @@ func (caller clientOrderedConsumerCaller) Call(s *slip.Scope, args slip.List, _ 
 
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":timeout")); has {
 		var cf context.CancelFunc
-		ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
+		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
 	consumer, err := js.OrderedConsumer(ctx, stream, cfg)

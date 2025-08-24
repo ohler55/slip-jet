@@ -12,7 +12,7 @@ import (
 
 type streamUpdateConsumerCaller struct{}
 
-func (caller streamUpdateConsumerCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller streamUpdateConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":update-consumer", len(args), 0, len(consumerOptMap)*2+2)
 	stream := self.Any.(jetstream.Stream)
@@ -23,7 +23,7 @@ func (caller streamUpdateConsumerCaller) Call(s *slip.Scope, args slip.List, _ i
 
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":timeout")); has {
 		var cf context.CancelFunc
-		ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
+		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
 	consumer, err := stream.UpdateConsumer(ctx, cfg)

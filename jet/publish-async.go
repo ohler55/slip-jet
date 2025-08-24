@@ -11,7 +11,7 @@ import (
 
 type publishAsyncCaller struct{}
 
-func (caller publishAsyncCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller publishAsyncCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":publish-async", len(args), 1, 20)
 	js := self.Any.(*Client).js
@@ -32,10 +32,10 @@ func (caller publishAsyncCaller) Call(s *slip.Scope, args slip.List, _ int) slip
 			msg.Header = pm.Head
 			msg.Data = pm.Body
 		} else {
-			slip.PanicType("payload", ta, "octets", "string", "jet-msg instance")
+			slip.TypePanic(s, depth, "payload", ta, "octets", "string", "jet-msg instance")
 		}
 	default:
-		slip.PanicType("payload", ta, "octets", "string", "jet-msg instance")
+		slip.TypePanic(s, depth, "payload", ta, "octets", "string", "jet-msg instance")
 	}
 	args = args[1:]
 	if 0 < len(args) {
@@ -44,7 +44,7 @@ func (caller publishAsyncCaller) Call(s *slip.Scope, args slip.List, _ int) slip
 			args = args[1:]
 		}
 	}
-	opts = pubOptsFromArgs(opts, args)
+	opts = pubOptsFromArgs(s, opts, args, depth)
 	paf, err := js.PublishMsgAsync(&msg, opts...)
 	if err != nil {
 		panic(err)

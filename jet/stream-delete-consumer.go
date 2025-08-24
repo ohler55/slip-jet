@@ -12,7 +12,7 @@ import (
 
 type streamDeleteConsumerCaller struct{}
 
-func (caller streamDeleteConsumerCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller streamDeleteConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":delete-consumer", len(args), 1, 3)
 	stream := self.Any.(jetstream.Stream)
@@ -22,7 +22,7 @@ func (caller streamDeleteConsumerCaller) Call(s *slip.Scope, args slip.List, _ i
 
 	if v, has := slip.GetArgsKeyValue(args[1:], slip.Symbol(":timeout")); has {
 		var cf context.CancelFunc
-		ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
+		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
 	err := stream.DeleteConsumer(ctx, name)

@@ -81,17 +81,17 @@ unacknowledged messages for a consumer.`,
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
 			list, ok := v.(slip.List)
 			if !ok || len(list) != 2 {
-				slip.PanicType(":consumer-limits", v, "list of a real and a fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":consumer-limits", v, "list of a real and a fixnum")
 			}
 			if num, ok2 := list[0].(slip.Real); ok2 {
 				config.ConsumerLimits.InactiveThreshold = time.Duration(float64(time.Second) * num.RealValue())
 			} else {
-				slip.PanicType(":consumer-limits", v, "list of a real and a fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":consumer-limits", v, "list of a real and a fixnum")
 			}
 			if num, ok2 := list[1].(slip.Fixnum); ok2 {
 				config.ConsumerLimits.MaxAckPending = int(num)
 			} else {
-				slip.PanicType(":consumer-limits", v, "list of a real and a fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":consumer-limits", v, "list of a real and a fixnum")
 			}
 		},
 	},
@@ -141,7 +141,7 @@ once the limits are reached.`,
 			case slip.Symbol(":new"):
 				config.Discard = jetstream.DiscardNew
 			default:
-				slip.PanicType(":discard", v, "nil", ":old", ":new")
+				slip.TypePanic(slip.NewScope(), 0, ":discard", v, "nil", ":old", ":new")
 			}
 		},
 	},
@@ -168,7 +168,7 @@ assumed to be seconds.`,
 			if num, ok := v.(slip.Real); ok {
 				config.Duplicates = time.Duration(float64(time.Second) * num.RealValue())
 			} else {
-				slip.PanicType(":duplicates", v, "real")
+				slip.TypePanic(slip.NewScope(), 0, ":duplicates", v, "real")
 			}
 		},
 	},
@@ -182,7 +182,7 @@ assumed to be seconds.`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.FirstSeq = uint64(num)
 			} else {
-				slip.PanicType(":first-seq", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":first-seq", v, "fixnum")
 			}
 		},
 	},
@@ -196,7 +196,7 @@ assumed to be seconds.`,
 			if num, ok := v.(slip.Real); ok {
 				config.MaxAge = time.Duration(float64(time.Second) * num.RealValue())
 			} else {
-				slip.PanicType(":max-age", v, "real")
+				slip.TypePanic(slip.NewScope(), 0, ":max-age", v, "real")
 			}
 		},
 	},
@@ -212,7 +212,7 @@ If not set, server default is -1 (unlimited).`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.MaxBytes = int64(num)
 			} else {
-				slip.PanicType(":max-bytes", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":max-bytes", v, "fixnum")
 			}
 		},
 	},
@@ -226,7 +226,7 @@ If not set, server default is -1 (unlimited).`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.MaxConsumers = int(num)
 			} else {
-				slip.PanicType(":max-consumers", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":max-consumers", v, "fixnum")
 			}
 		},
 	},
@@ -240,7 +240,7 @@ If not set, server default is -1 (unlimited).`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.MaxMsgSize = int32(num)
 			} else {
-				slip.PanicType(":max-msg-size", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":max-msg-size", v, "fixnum")
 			}
 		},
 	},
@@ -256,7 +256,7 @@ If not set, server default is -1 (unlimited).`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.MaxMsgs = int64(num)
 			} else {
-				slip.PanicType(":max-msgs", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":max-msgs", v, "fixnum")
 			}
 		},
 	},
@@ -270,7 +270,7 @@ If not set, server default is -1 (unlimited).`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.MaxMsgsPerSubject = int64(num)
 			} else {
-				slip.PanicType(":max-msgs-per-subject", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":max-msgs-per-subject", v, "fixnum")
 			}
 		},
 	},
@@ -285,7 +285,7 @@ v2.10.0 or later.`,
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
 			plist, ok := v.(slip.List)
 			if !ok {
-				slip.PanicType(":metadata", v, "property list")
+				slip.TypePanic(slip.NewScope(), 0, ":metadata", v, "property list")
 			}
 			m := map[string]string{}
 			for i := 0; i < len(plist)-1; i += 2 {
@@ -307,7 +307,7 @@ v2.10.0 or later.`,
 				SetJetstreamStreamSource(&jss, inst)
 				config.Mirror = &jss
 			} else if v != nil {
-				slip.PanicType(":mirror", v, "jet-stream-source instance")
+				slip.TypePanic(slip.NewScope(), 0, ":mirror", v, "jet-stream-source instance")
 			}
 		},
 	},
@@ -350,7 +350,7 @@ a matching tag.`,
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
 			list, ok := v.(slip.List)
 			if !ok || len(list) < 1 {
-				slip.PanicType(":placement", v, "list")
+				slip.TypePanic(slip.NewScope(), 0, ":placement", v, "list")
 			}
 			p := jetstream.Placement{Cluster: slip.MustBeString(list[0], ":cluster")}
 			for _, x := range list[1:] {
@@ -371,7 +371,7 @@ present is a flag to indicate that only the headers should be republished.`,
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
 			list, ok := v.(slip.List)
 			if !ok || len(list) < 2 {
-				slip.PanicType(":re-publish", v, "list of source, destination, and headers-only")
+				slip.TypePanic(slip.NewScope(), 0, ":re-publish", v, "list of source, destination, and headers-only")
 			}
 			config.RePublish = &jetstream.RePublish{
 				Source:      slip.MustBeString(list[0], ":re-publish source"),
@@ -390,7 +390,7 @@ present is a flag to indicate that only the headers should be republished.`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.Replicas = int(num)
 			} else {
-				slip.PanicType(":replicas", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":replicas", v, "fixnum")
 			}
 		},
 	},
@@ -414,7 +414,7 @@ acknowledges the message it can be removed.`,
 			case slip.Symbol(":queue"):
 				config.Retention = jetstream.WorkQueuePolicy
 			default:
-				slip.PanicType(":retention", v, ":limit", ":interest", ":queue")
+				slip.TypePanic(slip.NewScope(), 0, ":retention", v, ":limit", ":interest", ":queue")
 			}
 		},
 	},
@@ -440,7 +440,7 @@ be set on already created streams via the Update API.`,
 			if v != nil {
 				list, ok := v.(slip.List)
 				if !ok {
-					slip.PanicType(":sources", v, "list")
+					slip.TypePanic(slip.NewScope(), 0, ":sources", v, "list")
 				}
 				for _, x := range list {
 					if inst, ok := x.(*flavors.Instance); ok && inst.IsA("jet-stream-source") {
@@ -448,7 +448,7 @@ be set on already created streams via the Update API.`,
 						SetJetstreamStreamSource(&jss, inst)
 						config.Sources = append(config.Sources, &jss)
 					} else {
-						slip.PanicType(":sources", x, "jet-stream-source instance")
+						slip.TypePanic(slip.NewScope(), 0, ":sources", x, "jet-stream-source instance")
 					}
 				}
 			}
@@ -469,7 +469,7 @@ memory only.`,
 			case slip.Symbol(":memory"):
 				config.Storage = jetstream.MemoryStorage
 			default:
-				slip.PanicType(":storage", v, ":file", ":memory")
+				slip.TypePanic(slip.NewScope(), 0, ":storage", v, ":file", ":memory")
 			}
 		},
 	},
@@ -485,7 +485,7 @@ to match incoming messages against. Destination is the subject pattern to remap 
 			if v != nil {
 				list, ok := v.(slip.List)
 				if !ok || len(list) != 2 {
-					slip.PanicType(":subject-transform", v, "list")
+					slip.TypePanic(slip.NewScope(), 0, ":subject-transform", v, "list")
 				}
 				config.SubjectTransform = &jetstream.SubjectTransformConfig{
 					Source:      slip.MustBeString(list[0], ":source"),
@@ -505,7 +505,7 @@ created as a mirror.`,
 		update: func(config *jetstream.StreamConfig, v slip.Object) {
 			list, ok := v.(slip.List)
 			if !ok {
-				slip.PanicType(":subjects", v, "list")
+				slip.TypePanic(slip.NewScope(), 0, ":subjects", v, "list")
 			}
 			for _, x := range list {
 				config.Subjects = append(config.Subjects, slip.MustBeString(x, ":subject"))
@@ -523,7 +523,7 @@ func InitStreamConfig(config *jetstream.StreamConfig, args slip.List) {
 		if so := streamOptMap[key]; so != nil {
 			so.update(config, args[i+1])
 		} else if key != ":timeout" {
-			slip.NewPanic("%s is not a valid keyword", key)
+			slip.ErrorPanic(slip.NewScope(), 0, "%s is not a valid keyword", key)
 		}
 	}
 }

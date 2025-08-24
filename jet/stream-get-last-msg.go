@@ -13,7 +13,7 @@ import (
 
 type streamGetLastMsgCaller struct{}
 
-func (caller streamGetLastMsgCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller streamGetLastMsgCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":get-last-msg", len(args), 1, 7)
 	stream := self.Any.(jetstream.Stream)
@@ -22,7 +22,7 @@ func (caller streamGetLastMsgCaller) Call(s *slip.Scope, args slip.List, _ int) 
 	ctx := context.Background()
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":timeout")); has {
 		var cf context.CancelFunc
-		ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
+		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
 	raw, err := stream.GetLastMsgForSubject(ctx, subject)

@@ -13,19 +13,19 @@ import (
 
 type streamDeleteMsgCaller struct{}
 
-func (caller streamDeleteMsgCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller streamDeleteMsgCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":delete-msg", len(args), 1, 7)
 	stream := self.Any.(jetstream.Stream)
 	seq, ok := args[0].(slip.Fixnum)
 	if !ok {
-		slip.PanicType(":sequence", args[0], "fixnum")
+		slip.TypePanic(s, depth, ":sequence", args[0], "fixnum")
 	}
 	args = args[1:]
 	ctx := context.Background()
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":timeout")); has {
 		var cf context.CancelFunc
-		ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
+		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
 	var err error

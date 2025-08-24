@@ -14,7 +14,7 @@ import (
 
 type accountInfoCaller struct{}
 
-func (caller accountInfoCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller accountInfoCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":account-info", len(args), 0, 2)
 	js := self.Any.(*Client).js
@@ -22,7 +22,7 @@ func (caller accountInfoCaller) Call(s *slip.Scope, args slip.List, _ int) slip.
 	ctx := context.Background()
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":timeout")); has {
 		var cf context.CancelFunc
-		ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
+		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
 	ai, err := js.AccountInfo(ctx)

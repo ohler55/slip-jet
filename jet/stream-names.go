@@ -12,7 +12,7 @@ import (
 
 type streamNamesCaller struct{}
 
-func (caller streamNamesCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller streamNamesCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":stream-names", len(args), 0, 4)
 	js := self.Any.(*Client).js
@@ -20,7 +20,7 @@ func (caller streamNamesCaller) Call(s *slip.Scope, args slip.List, _ int) slip.
 	ctx := context.Background()
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":timeout")); has {
 		var cf context.CancelFunc
-		ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
+		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
 	var opts []jetstream.StreamListOpt

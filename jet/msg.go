@@ -105,7 +105,7 @@ func MakeMsg(m jetstream.Msg) (inst *flavors.Instance) {
 
 type msgInitCaller bool
 
-func (caller msgInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller msgInitCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	if 0 < len(args) {
 		args = args[0].(slip.List)
@@ -116,11 +116,11 @@ func (caller msgInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Obje
 		k := string(key)
 		switch {
 		case strings.EqualFold(":subject", k):
-			pm.Subj = getStrArg(args[i+1], k)
+			pm.Subj = getStrArg(s, args[i+1], k, depth)
 		case strings.EqualFold(":reply", k):
-			pm.Repl = getStrArg(args[i+1], k)
+			pm.Repl = getStrArg(s, args[i+1], k, depth)
 		case strings.EqualFold(":headers", k):
-			pm.Head = assocToHeader(args[i+1], ":headers")
+			pm.Head = assocToHeader(s, args[i+1], ":headers", depth)
 		case strings.EqualFold(":data", k):
 			switch td := args[i+1].(type) {
 			case slip.Octets:
@@ -131,10 +131,10 @@ func (caller msgInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Obje
 				if td.Class() == bag.Flavor() {
 					pm.Body = []byte(oj.JSON(td.Any))
 				} else {
-					slip.PanicType(":data", td, "octets", "string", "bag instance")
+					slip.TypePanic(s, depth, ":data", td, "octets", "string", "bag instance")
 				}
 			default:
-				slip.PanicType(":data", args[i+1], "octets", "string", "bag instance")
+				slip.TypePanic(s, depth, ":data", args[i+1], "octets", "string", "bag instance")
 			}
 		}
 	}
@@ -407,7 +407,7 @@ func (caller msgReplyCaller) FuncDocs() *slip.FuncDoc {
 
 type msgAckCaller struct{}
 
-func (caller msgAckCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller msgAckCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":ack", len(args), 0, 2)
 	var (
@@ -418,7 +418,7 @@ func (caller msgAckCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Objec
 		if num, ok := v.(slip.Real); ok {
 			timeout = time.Duration(num.RealValue() * float64(time.Second))
 		} else {
-			slip.PanicType(":timeout", v, "real")
+			slip.TypePanic(s, depth, ":timeout", v, "real")
 		}
 	}
 	if 0 < timeout {
@@ -453,7 +453,7 @@ waits for an ack reply from the server.`,
 
 type msgNakCaller struct{}
 
-func (caller msgNakCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller msgNakCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":nak", len(args), 0, 2)
 	var (
@@ -464,7 +464,7 @@ func (caller msgNakCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Objec
 		if num, ok := v.(slip.Real); ok {
 			delay = time.Duration(num.RealValue() * float64(time.Second))
 		} else {
-			slip.PanicType(":delay", v, "real")
+			slip.TypePanic(s, depth, ":delay", v, "real")
 		}
 	}
 	if 0 < delay {
@@ -514,12 +514,12 @@ redelivery timer on the server.`,
 
 type msgTermCaller struct{}
 
-func (caller msgTermCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller msgTermCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":term", len(args), 0, 1)
 	var err error
 	if 0 < len(args) {
-		reason := getStrArg(args[0], "reason")
+		reason := getStrArg(s, args[0], "reason", depth)
 		err = self.Any.(jetstream.Msg).TermWithReason(reason)
 	} else {
 		err = self.Any.(jetstream.Msg).Term()
@@ -546,36 +546,36 @@ it is added to the server logs.`,
 	}
 }
 
-func getStrArg(arg slip.Object, use string) string {
+func getStrArg(s *slip.Scope, arg slip.Object, use string, depth int) string {
 	ss, ok := arg.(slip.String)
 	if !ok {
-		slip.PanicType(use, arg, "string")
+		slip.TypePanic(s, depth, use, arg, "string")
 	}
 	return string(ss)
 }
 
-func assocToHeader(value slip.Object, field string) nats.Header {
+func assocToHeader(s *slip.Scope, value slip.Object, field string, depth int) nats.Header {
 	alist, ok := value.(slip.List)
 	if !ok {
-		slip.PanicType(field, value, "assoc")
+		slip.TypePanic(s, depth, field, value, "assoc")
 	}
 	header := nats.Header{}
 	for _, element := range alist {
 		elist, ok2 := element.(slip.List)
 		if !ok2 || len(elist) < 2 {
-			slip.PanicType("assoc element", element, "list")
+			slip.TypePanic(s, depth, "assoc element", element, "list")
 		}
 		var (
 			key    slip.String
 			values []string
 		)
 		if key, ok = elist[0].(slip.String); !ok {
-			slip.PanicType("header key", elist[0], "string")
+			slip.TypePanic(s, depth, "header key", elist[0], "string")
 		}
 		for _, v := range elist[1:] {
 			var ss slip.String
 			if ss, ok = v.(slip.String); !ok {
-				slip.PanicType("header value", v, "string")
+				slip.TypePanic(s, depth, "header value", v, "string")
 			}
 			values = append(values, string(ss))
 		}

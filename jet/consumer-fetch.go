@@ -13,7 +13,7 @@ import (
 
 type consumerFetchCaller struct{}
 
-func (caller consumerFetchCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller consumerFetchCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":fetch", len(args), 1, 5)
 	consumer := self.Any.(jetstream.Consumer)
@@ -25,15 +25,15 @@ func (caller consumerFetchCaller) Call(s *slip.Scope, args slip.List, _ int) sli
 	)
 	batch, ok := args[0].(slip.Fixnum)
 	if !ok {
-		slip.PanicType(":batch", args[0], "fixnum")
+		slip.TypePanic(s, depth, ":batch", args[0], "fixnum")
 	}
 	args = args[1:]
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":max-wait")); has {
-		maxWait = mustBeDuration(v, ":max-wait")
+		maxWait = mustBeDuration(s, v, ":max-wait", depth)
 		opts = append(opts, jetstream.FetchMaxWait(maxWait))
 	}
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":heartbeat")); has {
-		opts = append(opts, jetstream.FetchHeartbeat(mustBeDuration(v, ":heartbeat")))
+		opts = append(opts, jetstream.FetchHeartbeat(mustBeDuration(s, v, ":heartbeat", depth)))
 	}
 	if maxWait <= 0 {
 		mb, err = consumer.FetchNoWait(int(batch))

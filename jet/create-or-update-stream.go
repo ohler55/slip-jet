@@ -12,7 +12,7 @@ import (
 
 type createOrUpdateStreamCaller struct{}
 
-func (caller createOrUpdateStreamCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller createOrUpdateStreamCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":create-or-update-stream", len(args), 1, len(streamOptMap)*2+1)
 	js := self.Any.(*Client).js
@@ -26,7 +26,7 @@ func (caller createOrUpdateStreamCaller) Call(s *slip.Scope, args slip.List, _ i
 
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":timeout")); has {
 		var cf context.CancelFunc
-		ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
+		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
 	stream, err := js.CreateOrUpdateStream(ctx, cfg)

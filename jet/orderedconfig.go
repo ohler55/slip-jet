@@ -27,7 +27,7 @@ exclusive with FilterSubject. Requires nats-server v2.10.0 or later.`,
 		update: func(config *jetstream.OrderedConsumerConfig, v slip.Object) {
 			list, ok := v.(slip.List)
 			if !ok {
-				slip.PanicType(":filter-subjects", v, "list")
+				slip.TypePanic(slip.NewScope(), 0, ":filter-subjects", v, "list")
 			}
 			for _, x := range list {
 				config.FilterSubjects = append(config.FilterSubjects, slip.MustBeString(x, ":filter-subject"))
@@ -54,7 +54,7 @@ from the stream. Defaults to _:all_.`,
 			if pol, has := polMap[strings.ToLower(string(sym))]; has {
 				config.DeliverPolicy = pol
 			} else {
-				slip.PanicType(":deliver-policy", v,
+				slip.TypePanic(slip.NewScope(), 0, ":deliver-policy", v,
 					":all", ":last", ":new", ":start-sequence", ":start-time", ":last-per-subject")
 			}
 		},
@@ -71,7 +71,7 @@ _:start-sequence_.`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.OptStartSeq = uint64(num)
 			} else {
-				slip.PanicType(":opt-start-seq", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":opt-start-seq", v, "fixnum")
 			}
 		},
 	},
@@ -88,7 +88,7 @@ _:start-time_.`,
 				tm := time.Time(stm)
 				config.OptStartTime = &tm
 			} else {
-				slip.PanicType(":opt-start-time", v, "time")
+				slip.TypePanic(slip.NewScope(), 0, ":opt-start-time", v, "time")
 			}
 		},
 	},
@@ -109,7 +109,7 @@ Defaults to _:instant_.`,
 			case slip.Symbol(":original"):
 				config.ReplayPolicy = jetstream.ReplayOriginalPolicy
 			default:
-				slip.PanicType(":replay-policy", v, ":instant", ":original")
+				slip.TypePanic(slip.NewScope(), 0, ":replay-policy", v, ":instant", ":original")
 			}
 		},
 	},
@@ -129,7 +129,7 @@ deliver subject (for push consumers), not if there are no messages to be deliver
 			if num, ok := v.(slip.Real); ok {
 				config.InactiveThreshold = time.Duration(float64(time.Second) * num.RealValue())
 			} else {
-				slip.PanicType(":inactive-threshold", v, "real")
+				slip.TypePanic(slip.NewScope(), 0, ":inactive-threshold", v, "real")
 			}
 		},
 	},
@@ -155,7 +155,7 @@ single recreation cycle. Defaults to unlimited.`,
 			if num, ok := v.(slip.Fixnum); ok {
 				config.MaxResetAttempts = int(num)
 			} else {
-				slip.PanicType(":max-reset-attempts", v, "fixnum")
+				slip.TypePanic(slip.NewScope(), 0, ":max-reset-attempts", v, "fixnum")
 			}
 		},
 	},
@@ -170,7 +170,7 @@ func InitOrderedConfig(config *jetstream.OrderedConsumerConfig, args slip.List) 
 		if so := orderedOptMap[key]; so != nil {
 			so.update(config, args[i+1])
 		} else if key != ":timeout" {
-			slip.NewPanic("%s is not a valid keyword", key)
+			slip.ErrorPanic(slip.NewScope(), 0, "%s is not a valid keyword", key)
 		}
 	}
 }

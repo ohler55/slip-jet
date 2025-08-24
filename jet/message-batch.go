@@ -62,12 +62,12 @@ func (caller messageBatchMessagesCaller) FuncDocs() *slip.FuncDoc {
 
 type messageBatchErrorCaller struct{}
 
-func (caller messageBatchErrorCaller) Call(s *slip.Scope, args slip.List, _ int) (result slip.Object) {
+func (caller messageBatchErrorCaller) Call(s *slip.Scope, args slip.List, depth int) (result slip.Object) {
 	self := s.Get("self").(*flavors.Instance)
 	mc := self.Any.(jetstream.MessageBatch)
 
 	if err := mc.Error(); err != nil {
-		result = slip.NewError("%s", err)
+		result = slip.ErrorNew(s, depth, "%s", err)
 	}
 	return
 }

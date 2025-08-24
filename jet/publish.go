@@ -14,7 +14,7 @@ import (
 
 type publishCaller struct{}
 
-func (caller publishCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller publishCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":publish", len(args), 1, 20)
 	js := self.Any.(*Client).js
@@ -36,10 +36,10 @@ func (caller publishCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Obje
 			msg.Header = pm.Head
 			msg.Data = pm.Body
 		} else {
-			slip.PanicType("payload", ta, "octets", "string", "jet-msg instance")
+			slip.TypePanic(s, depth, "payload", ta, "octets", "string", "jet-msg instance")
 		}
 	default:
-		slip.PanicType("payload", ta, "octets", "string", "jet-msg instance")
+		slip.TypePanic(s, depth, "payload", ta, "octets", "string", "jet-msg instance")
 	}
 	args = args[1:]
 	if 0 < len(args) {
@@ -50,10 +50,10 @@ func (caller publishCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Obje
 	}
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":timeout")); has {
 		var cf context.CancelFunc
-		ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
+		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
-	opts = pubOptsFromArgs(opts, args)
+	opts = pubOptsFromArgs(s, opts, args, depth)
 	pa, err := js.PublishMsg(ctx, &msg, opts...)
 	if err != nil {
 		panic(err)
@@ -139,25 +139,25 @@ fail.`,
 	}
 }
 
-func mustBeInt(arg slip.Object, name string) (i int) {
+func mustBeInt(s *slip.Scope, arg slip.Object, name string, depth int) (i int) {
 	if num, ok := arg.(slip.Fixnum); ok {
 		i = int(num)
 	} else {
-		slip.PanicType(name, arg, "fixnum")
+		slip.TypePanic(s, depth, name, arg, "fixnum")
 	}
 	return
 }
 
-func mustBeDuration(arg slip.Object, name string) (dur time.Duration) {
+func mustBeDuration(s *slip.Scope, arg slip.Object, name string, depth int) (dur time.Duration) {
 	if num, ok := arg.(slip.Real); ok {
 		dur = time.Duration(num.RealValue() * float64(time.Second))
 	} else {
-		slip.PanicType(name, arg, "real")
+		slip.TypePanic(s, depth, name, arg, "real")
 	}
 	return
 }
 
-func pubOptsFromArgs(opts []jetstream.PublishOpt, args slip.List) []jetstream.PublishOpt {
+func pubOptsFromArgs(s *slip.Scope, opts []jetstream.PublishOpt, args slip.List, depth int) []jetstream.PublishOpt {
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":expect-last-msg-id")); has {
 		opts = append(opts, jetstream.WithExpectLastMsgID(slip.MustBeString(v, ":expect-last-msg-id")))
 	}
@@ -168,20 +168,20 @@ func pubOptsFromArgs(opts []jetstream.PublishOpt, args slip.List) []jetstream.Pu
 		opts = append(opts, jetstream.WithMsgID(slip.MustBeString(v, ":msg-id")))
 	}
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":expect-last-sequence")); has {
-		opts = append(opts, jetstream.WithExpectLastSequence(uint64(mustBeInt(v, ":expect-last-sequence"))))
+		opts = append(opts, jetstream.WithExpectLastSequence(uint64(mustBeInt(s, v, ":expect-last-sequence", depth))))
 	}
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":expect-last-subject-sequence")); has {
 		opts = append(opts,
-			jetstream.WithExpectLastSequencePerSubject(uint64(mustBeInt(v, ":expect-last-subject-sequence"))))
+			jetstream.WithExpectLastSequencePerSubject(uint64(mustBeInt(s, v, ":expect-last-subject-sequence", depth))))
 	}
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":retry-attempts")); has {
-		opts = append(opts, jetstream.WithRetryAttempts(mustBeInt(v, ":retry-attempts")))
+		opts = append(opts, jetstream.WithRetryAttempts(mustBeInt(s, v, ":retry-attempts", depth)))
 	}
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":retry-wait")); has {
-		opts = append(opts, jetstream.WithRetryWait(mustBeDuration(v, ":retry-wait")))
+		opts = append(opts, jetstream.WithRetryWait(mustBeDuration(s, v, ":retry-wait", depth)))
 	}
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":stall-wait")); has {
-		opts = append(opts, jetstream.WithStallWait(mustBeDuration(v, ":stall-wait")))
+		opts = append(opts, jetstream.WithStallWait(mustBeDuration(s, v, ":stall-wait", depth)))
 	}
 	return opts
 }

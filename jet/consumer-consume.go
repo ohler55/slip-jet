@@ -12,7 +12,7 @@ import (
 
 type consumerConsumeCaller struct{}
 
-func (caller consumerConsumeCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller consumerConsumeCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":consume", len(args), 1, 17)
 	consumer := self.Any.(jetstream.Consumer)
@@ -25,10 +25,10 @@ func (caller consumerConsumeCaller) Call(s *slip.Scope, args slip.List, _ int) s
 		errCaller := cl.ResolveToCaller(s, v, 0)
 		opts = append(opts, jetstream.ConsumeErrHandler(
 			func(cc jetstream.ConsumeContext, err error) {
-				_ = errCaller.Call(s, slip.List{MakeConsumeContext(cc), slip.NewError("%s", err)}, 0)
+				_ = errCaller.Call(s, slip.List{MakeConsumeContext(cc), slip.ErrorNew(s, depth, "%s", err)}, 0)
 			}))
 	}
-	getPullOptArgs(args, func(opt any) { opts = append(opts, opt.(jetstream.PullConsumeOpt)) })
+	getPullOptArgs(s, args, func(opt any) { opts = append(opts, opt.(jetstream.PullConsumeOpt)) }, depth)
 
 	cc, err := consumer.Consume(func(msg jetstream.Msg) {
 		_ = msgCaller.Call(s, slip.List{MakeMsg(msg)}, 0)
@@ -119,26 +119,26 @@ trigger new pull request to the server. Defaults to 50% of _:max-messages_.`,
 	}
 }
 
-func getPullOptArgs(args slip.List, appendOpt func(opt any)) {
+func getPullOptArgs(s *slip.Scope, args slip.List, appendOpt func(opt any), depth int) {
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":stop-after")); has {
-		appendOpt(jetstream.StopAfter(mustBeInt(v, ":stop-after")))
+		appendOpt(jetstream.StopAfter(mustBeInt(s, v, ":stop-after", depth)))
 	}
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":pull-expiry")); has {
-		appendOpt(jetstream.PullExpiry(mustBeDuration(v, ":pull-expiry")))
+		appendOpt(jetstream.PullExpiry(mustBeDuration(s, v, ":pull-expiry", depth)))
 	}
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":pull-max-bytes")); has {
-		appendOpt(jetstream.PullMaxBytes(mustBeInt(v, ":pull-max-bytes")))
+		appendOpt(jetstream.PullMaxBytes(mustBeInt(s, v, ":pull-max-bytes", depth)))
 	}
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":pull-heartbeat")); has {
-		appendOpt(jetstream.PullHeartbeat(mustBeDuration(v, ":pull-heartbeat")))
+		appendOpt(jetstream.PullHeartbeat(mustBeDuration(s, v, ":pull-heartbeat", depth)))
 	}
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":pull-max-messages")); has {
-		appendOpt(jetstream.PullMaxMessages(mustBeInt(v, ":pull-max-messages")))
+		appendOpt(jetstream.PullMaxMessages(mustBeInt(s, v, ":pull-max-messages", depth)))
 	}
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":pull-threshold-bytes")); has {
-		appendOpt(jetstream.PullThresholdBytes(mustBeInt(v, ":pull-threshold-bytes")))
+		appendOpt(jetstream.PullThresholdBytes(mustBeInt(s, v, ":pull-threshold-bytes", depth)))
 	}
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":pull-threshold-messages")); has {
-		appendOpt(jetstream.PullThresholdMessages(mustBeInt(v, ":pull-threshold-messages")))
+		appendOpt(jetstream.PullThresholdMessages(mustBeInt(s, v, ":pull-threshold-messages", depth)))
 	}
 }

@@ -354,7 +354,7 @@ func (caller consumerInfoTimestampCaller) FuncDocs() *slip.FuncDoc {
 
 type consumerInfoCaller struct{}
 
-func (caller consumerInfoCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller consumerInfoCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	slip.CheckMethodArgCount(self, ":info", len(args), 0, 6)
 	consumer := self.Any.(jetstream.Consumer)
@@ -366,7 +366,7 @@ func (caller consumerInfoCaller) Call(s *slip.Scope, args slip.List, _ int) slip
 		ctx := context.Background()
 		if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":timeout")); has {
 			var cf context.CancelFunc
-			ctx, cf = context.WithTimeout(ctx, mustBeDuration(v, ":timeout"))
+			ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 			defer cf()
 		}
 		var err error

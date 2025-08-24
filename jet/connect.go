@@ -45,7 +45,7 @@ var conOptMap = map[string]*conOpt{
 				// Subscriptions are a nats only type and are kind of like
 				// consumers. In any case a Subscription has a subject so that
 				// is passed in the callback.
-				caller.Call(s, slip.List{self, slip.String(sub.Subject), slip.NewError("%s", err)}, 0)
+				caller.Call(s, slip.List{self, slip.String(sub.Subject), slip.ErrorNew(s, 0, "%s", err)}, 0)
 			}
 		},
 	},
@@ -107,7 +107,7 @@ jitter to prevent all connections to attempt reconnecting at the same time.`,
 				if num, ok := result.(slip.Real); ok {
 					delay = time.Duration(float64(time.Second) * num.RealValue())
 				} else {
-					slip.PanicType("custom-reconnect-delay", result, "real")
+					slip.TypePanic(s, 0, "custom-reconnect-delay", result, "real")
 				}
 				return
 			}
@@ -144,8 +144,7 @@ DisconnectedCB will not be called if DisconnectedErrCB is set.`,
 		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
 			caller := cl.ResolveToCaller(s, v, 0)
 			options.DisconnectedErrCB = func(c *nats.Conn, err error) {
-				self := s.Get("self").(*flavors.Instance)
-				caller.Call(s, slip.List{self, slip.NewError("%s", err)}, 0)
+				caller.Call(s, slip.List{s.Get("self"), slip.ErrorNew(s, 0, "%s", err)}, 0)
 			}
 		},
 	},
@@ -173,7 +172,7 @@ DisconnectedCB will not be called if DisconnectedErrCB is set.`,
 			if num, ok := v.(slip.Real); ok {
 				options.DrainTimeout = time.Duration(float64(time.Second) * num.RealValue())
 			} else {
-				slip.PanicType(":drain-timeout", v, "real")
+				slip.TypePanic(s, 0, ":drain-timeout", v, "real")
 			}
 		},
 	},
@@ -189,7 +188,7 @@ Defaults to 1m.`,
 			if num, ok := v.(slip.Real); ok {
 				options.FlusherTimeout = time.Duration(float64(time.Second) * num.RealValue())
 			} else {
-				slip.PanicType(":flusher-timeout", v, "real")
+				slip.TypePanic(s, 0, ":flusher-timeout", v, "real")
 			}
 		},
 	},
@@ -215,7 +214,7 @@ subsequent reconnect attempts if server returns the same auth error twice (regar
 			if ss, ok := v.(slip.String); ok {
 				options.InboxPrefix = string(ss)
 			} else {
-				slip.PanicType(":inbox-prefix", v, "string")
+				slip.TypePanic(s, 0, ":inbox-prefix", v, "string")
 			}
 		},
 	},
@@ -248,7 +247,7 @@ Defaults to 2.`,
 			if num, ok := v.(slip.Fixnum); ok {
 				options.MaxPingsOut = int(num)
 			} else {
-				slip.PanicType(":max-pings-out", v, "fixnum")
+				slip.TypePanic(s, 0, ":max-pings-out", v, "fixnum")
 			}
 		},
 	},
@@ -265,7 +264,7 @@ Defaults to 60.`,
 			if num, ok := v.(slip.Fixnum); ok {
 				options.MaxReconnect = int(num)
 			} else {
-				slip.PanicType(":max-reconnect", v, "fixnum")
+				slip.TypePanic(s, 0, ":max-reconnect", v, "fixnum")
 			}
 		},
 	},
@@ -280,7 +279,7 @@ on CONNECT to identify the client.`,
 			if ss, ok := v.(slip.String); ok {
 				options.Name = string(ss)
 			} else {
-				slip.PanicType(":name", v, "string")
+				slip.TypePanic(s, 0, ":name", v, "string")
 			}
 		},
 	},
@@ -296,7 +295,7 @@ and if defined, UserJWT will take precedence.`,
 			if ss, ok := v.(slip.String); ok {
 				options.Nkey = string(ss)
 			} else {
-				slip.PanicType(":nkey", v, "string")
+				slip.TypePanic(s, 0, ":nkey", v, "string")
 			}
 		},
 	},
@@ -344,7 +343,7 @@ Note this is supported on servers >= version 1.2. Proto 1 or greater.`,
 			if ss, ok := v.(slip.String); ok {
 				options.Password = string(ss)
 			} else {
-				slip.PanicType(":password", v, "string")
+				slip.TypePanic(s, 0, ":password", v, "string")
 			}
 		},
 	},
@@ -370,7 +369,7 @@ Defaults to 2m.`,
 			if num, ok := v.(slip.Real); ok {
 				options.PingInterval = time.Duration(float64(time.Second) * num.RealValue())
 			} else {
-				slip.PanicType(":ping-interval", v, "real")
+				slip.TypePanic(s, 0, ":ping-interval", v, "real")
 			}
 		},
 	},
@@ -385,7 +384,7 @@ This is useful when connecting to NATS behind a proxy.`,
 			if ss, ok := v.(slip.String); ok {
 				options.ProxyPath = string(ss)
 			} else {
-				slip.PanicType(":proxy-path", v, "string")
+				slip.TypePanic(s, 0, ":proxy-path", v, "string")
 			}
 		},
 	},
@@ -401,7 +400,7 @@ Defaults to 8388608 bytes (8MB).`,
 			if num, ok := v.(slip.Fixnum); ok {
 				options.ReconnectBufSize = int(num)
 			} else {
-				slip.PanicType(":reconnect-buf-size", v, "fixnum")
+				slip.TypePanic(s, 0, ":reconnect-buf-size", v, "fixnum")
 			}
 		},
 	},
@@ -417,7 +416,7 @@ Defaults to 100ms.`,
 			if num, ok := v.(slip.Real); ok {
 				options.ReconnectJitter = time.Duration(float64(time.Second) * num.RealValue())
 			} else {
-				slip.PanicType(":reconnect-jitter", v, "real")
+				slip.TypePanic(s, 0, ":reconnect-jitter", v, "real")
 			}
 		},
 	},
@@ -433,7 +432,7 @@ Defaults to 1s.`,
 			if num, ok := v.(slip.Real); ok {
 				options.ReconnectJitterTLS = time.Duration(float64(time.Second) * num.RealValue())
 			} else {
-				slip.PanicType(":reconnect-jitter-tls", v, "real")
+				slip.TypePanic(s, 0, ":reconnect-jitter-tls", v, "real")
 			}
 		},
 	},
@@ -449,7 +448,7 @@ Defaults to 2s.`,
 			if num, ok := v.(slip.Real); ok {
 				options.ReconnectWait = time.Duration(float64(time.Second) * num.RealValue())
 			} else {
-				slip.PanicType(":reconnect-wait", v, "real")
+				slip.TypePanic(s, 0, ":reconnect-wait", v, "real")
 			}
 		},
 	},
@@ -510,11 +509,11 @@ verification by default. NOT RECOMMENDED.`,
 					if ss, ok := val.(slip.String); ok {
 						options.Servers[i] = string(ss)
 					} else {
-						slip.PanicType(":servers", v, "list of strings")
+						slip.TypePanic(s, 0, ":servers", v, "list of strings")
 					}
 				}
 			} else {
-				slip.PanicType(":servers", v, "list of strings")
+				slip.TypePanic(s, 0, ":servers", v, "list of strings")
 			}
 		},
 	},
@@ -562,7 +561,7 @@ Defaults to 65536.`,
 			if num, ok := v.(slip.Fixnum); ok {
 				options.SubChanLen = int(num)
 			} else {
-				slip.PanicType(":sub-chan-len", v, "fixnum")
+				slip.TypePanic(s, 0, ":sub-chan-len", v, "fixnum")
 			}
 		},
 	},
@@ -576,7 +575,7 @@ Defaults to 65536.`,
 			if num, ok := v.(slip.Real); ok {
 				options.Timeout = time.Duration(float64(time.Second) * num.RealValue())
 			} else {
-				slip.PanicType(":timeout", v, "real")
+				slip.TypePanic(s, 0, ":timeout", v, "real")
 			}
 		},
 	},
@@ -606,7 +605,7 @@ first, the connection will fail.`,
 			if ss, ok := v.(slip.String); ok {
 				options.Token = string(ss)
 			} else {
-				slip.PanicType(":token", v, "string")
+				slip.TypePanic(s, 0, ":token", v, "string")
 			}
 		},
 	},
@@ -633,7 +632,7 @@ first, the connection will fail.`,
 			if ss, ok := v.(slip.String); ok {
 				options.Url = string(ss)
 			} else {
-				slip.PanicType(":url", v, "string")
+				slip.TypePanic(s, 0, ":url", v, "string")
 			}
 		},
 	},
@@ -658,7 +657,7 @@ a new Inbox and a new Subscription for each request.`,
 			if ss, ok := v.(slip.String); ok {
 				options.User = string(ss)
 			} else {
-				slip.PanicType(":user", v, "string")
+				slip.TypePanic(s, 0, ":user", v, "string")
 			}
 		},
 	},
@@ -705,7 +704,7 @@ payload as octets, and a header as an association list.`,
 		jopt: func(s *slip.Scope, v slip.Object) jetstream.JetStreamOpt {
 			list, ok := v.(slip.List)
 			if !ok {
-				slip.PanicType(":trace", v, "list of two functions")
+				slip.TypePanic(s, 0, ":trace", v, "list of two functions")
 			}
 			sentCaller := cl.ResolveToCaller(s, list[0], 0)
 			recvCaller := cl.ResolveToCaller(s, list[1], 0)
@@ -747,7 +746,7 @@ payload as octets, and a header as an association list.`,
 						Body: nm.Data,
 						Head: nm.Header,
 					}
-					caller.Call(s, slip.List{self, MakeMsg(&pm), slip.NewError("%s", err)}, 0)
+					caller.Call(s, slip.List{self, MakeMsg(&pm), slip.ErrorNew(s, 0, "%s", err)}, 0)
 				})
 		},
 	},
@@ -760,7 +759,7 @@ payload as octets, and a header as an association list.`,
 		jopt: func(s *slip.Scope, v slip.Object) jetstream.JetStreamOpt {
 			num, ok := v.(slip.Fixnum)
 			if !ok {
-				slip.PanicType(":publish-async-max-pending", v, "fixnum")
+				slip.TypePanic(s, 0, ":publish-async-max-pending", v, "fixnum")
 			}
 			return jetstream.WithPublishAsyncMaxPending(int(num))
 		},
@@ -810,7 +809,7 @@ func (f *Connect) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 
 type clientInitCaller struct{}
 
-func (caller clientInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller clientInitCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
 	if 0 < len(args) {
 		args = args[0].(slip.List)
@@ -829,7 +828,7 @@ func (caller clientInitCaller) Call(s *slip.Scope, args slip.List, _ int) slip.O
 			if ss, ok := args[i+1].(slip.String); ok {
 				prefix = string(ss)
 			} else {
-				slip.PanicType(":prefix", args[i+1], "string")
+				slip.TypePanic(s, depth, ":prefix", args[i+1], "string")
 			}
 		case co.update != nil:
 			co.update(&options, s, args[i+1])
