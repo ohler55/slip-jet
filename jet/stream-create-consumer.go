@@ -14,7 +14,7 @@ type streamCreateConsumerCaller struct{}
 
 func (caller streamCreateConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":create-consumer", len(args), 0, len(consumerOptMap)*2+2)
+	slip.MethodArgCountCheck(s, depth, self, ":create-consumer", len(args), 0, len(consumerOptMap)*2+2)
 	stream := self.Any.(jetstream.Stream)
 
 	var cfg jetstream.ConsumerConfig

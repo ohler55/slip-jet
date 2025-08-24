@@ -15,7 +15,7 @@ type streamGetMsgCaller struct{}
 
 func (caller streamGetMsgCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":get-msg", len(args), 1, 7)
+	slip.MethodArgCountCheck(s, depth, self, ":get-msg", len(args), 1, 7)
 	stream := self.Any.(jetstream.Stream)
 	seq, ok := args[0].(slip.Fixnum)
 	if !ok {

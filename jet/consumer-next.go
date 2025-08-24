@@ -13,7 +13,7 @@ type consumerNextCaller struct{}
 
 func (caller consumerNextCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":next", len(args), 0, 4)
+	slip.MethodArgCountCheck(s, depth, self, ":next", len(args), 0, 4)
 	consumer := self.Any.(jetstream.Consumer)
 
 	var opts []jetstream.FetchOpt

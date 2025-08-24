@@ -9,9 +9,9 @@ import (
 
 type cleanupPublisherCaller struct{}
 
-func (caller cleanupPublisherCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller cleanupPublisherCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":cleanup-publisher", len(args), 0, 0)
+	slip.MethodArgCountCheck(s, depth, self, ":cleanup-publisher", len(args), 0, 0)
 	cl := self.Any.(*Client)
 	cl.js.CleanupPublisher()
 

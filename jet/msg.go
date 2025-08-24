@@ -409,7 +409,7 @@ type msgAckCaller struct{}
 
 func (caller msgAckCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":ack", len(args), 0, 2)
+	slip.MethodArgCountCheck(s, depth, self, ":ack", len(args), 0, 2)
 	var (
 		timeout time.Duration
 		err     error
@@ -455,7 +455,7 @@ type msgNakCaller struct{}
 
 func (caller msgNakCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":nak", len(args), 0, 2)
+	slip.MethodArgCountCheck(s, depth, self, ":nak", len(args), 0, 2)
 	var (
 		delay time.Duration
 		err   error
@@ -516,7 +516,7 @@ type msgTermCaller struct{}
 
 func (caller msgTermCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":term", len(args), 0, 1)
+	slip.MethodArgCountCheck(s, depth, self, ":term", len(args), 0, 1)
 	var err error
 	if 0 < len(args) {
 		reason := getStrArg(s, args[0], "reason", depth)

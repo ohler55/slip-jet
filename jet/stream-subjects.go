@@ -11,9 +11,9 @@ import (
 
 type streamSubjectsCaller struct{}
 
-func (caller streamSubjectsCaller) Call(s *slip.Scope, args slip.List, _ int) (result slip.Object) {
+func (caller streamSubjectsCaller) Call(s *slip.Scope, args slip.List, depth int) (result slip.Object) {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":subjects", len(args), 0, 0)
+	slip.MethodArgCountCheck(s, depth, self, ":subjects", len(args), 0, 0)
 	stream := self.Any.(jetstream.Stream)
 	if si := stream.CachedInfo(); si != nil {
 		subjects := make(slip.List, len(si.Config.Subjects))

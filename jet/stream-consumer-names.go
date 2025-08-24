@@ -14,7 +14,7 @@ type streamConsumerNamesCaller struct{}
 
 func (caller streamConsumerNamesCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":consumer-names", len(args), 0, 2)
+	slip.MethodArgCountCheck(s, depth, self, ":consumer-names", len(args), 0, 2)
 	stream := self.Any.(jetstream.Stream)
 
 	ctx := context.Background()

@@ -13,7 +13,7 @@ type deleteStreamCaller struct{}
 
 func (caller deleteStreamCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":delete-stream", len(args), 1, len(streamOptMap)*2+1)
+	slip.MethodArgCountCheck(s, depth, self, ":delete-stream", len(args), 1, len(streamOptMap)*2+1)
 	js := self.Any.(*Client).js
 
 	ctx := context.Background()

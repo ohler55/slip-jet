@@ -15,7 +15,7 @@ type streamGetLastMsgCaller struct{}
 
 func (caller streamGetLastMsgCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":get-last-msg", len(args), 1, 7)
+	slip.MethodArgCountCheck(s, depth, self, ":get-last-msg", len(args), 1, 7)
 	stream := self.Any.(jetstream.Stream)
 	subject := slip.MustBeString(args[0], "subject")
 	args = args[1:]

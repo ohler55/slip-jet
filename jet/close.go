@@ -9,9 +9,9 @@ import (
 
 type clientCloseCaller struct{}
 
-func (caller clientCloseCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller clientCloseCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":close", len(args), 0, 0)
+	slip.MethodArgCountCheck(s, depth, self, ":close", len(args), 0, 0)
 	if cl, ok := self.Any.(*Client); ok {
 		if cl.nc != nil {
 			cl.nc.Close()

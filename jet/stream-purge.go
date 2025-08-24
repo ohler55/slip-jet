@@ -15,7 +15,7 @@ type streamPurgeCaller struct{}
 
 func (caller streamPurgeCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":purge", len(args), 0, 8)
+	slip.MethodArgCountCheck(s, depth, self, ":purge", len(args), 0, 8)
 	stream := self.Any.(jetstream.Stream)
 
 	ctx := context.Background()

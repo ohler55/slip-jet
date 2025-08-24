@@ -356,7 +356,7 @@ type consumerInfoCaller struct{}
 
 func (caller consumerInfoCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":info", len(args), 0, 6)
+	slip.MethodArgCountCheck(s, depth, self, ":info", len(args), 0, 6)
 	consumer := self.Any.(jetstream.Consumer)
 	var ci *jetstream.ConsumerInfo
 

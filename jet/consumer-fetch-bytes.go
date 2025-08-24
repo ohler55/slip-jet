@@ -15,7 +15,7 @@ type consumerFetchBytesCaller struct{}
 
 func (caller consumerFetchBytesCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":fetch", len(args), 1, 5)
+	slip.MethodArgCountCheck(s, depth, self, ":fetch", len(args), 1, 5)
 	consumer := self.Any.(jetstream.Consumer)
 	var (
 		opts    []jetstream.FetchOpt

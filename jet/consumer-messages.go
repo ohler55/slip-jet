@@ -13,7 +13,7 @@ type consumerMessagesCaller struct{}
 
 func (caller consumerMessagesCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":messages", len(args), 0, 16)
+	slip.MethodArgCountCheck(s, depth, self, ":messages", len(args), 0, 16)
 	consumer := self.Any.(jetstream.Consumer)
 	var opts []jetstream.PullMessagesOpt
 

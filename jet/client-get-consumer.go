@@ -15,7 +15,7 @@ type clientGetConsumerCaller struct{}
 
 func (caller clientGetConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":get-consumer", len(args), 2, 4)
+	slip.MethodArgCountCheck(s, depth, self, ":get-consumer", len(args), 2, 4)
 	js := self.Any.(*Client).js
 
 	stream := slip.MustBeString(args[0], "stream")

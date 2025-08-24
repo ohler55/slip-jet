@@ -14,7 +14,7 @@ type listStreamsCaller struct{}
 
 func (caller listStreamsCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":list-streams", len(args), 0, 4)
+	slip.MethodArgCountCheck(s, depth, self, ":list-streams", len(args), 0, 4)
 	js := self.Any.(*Client).js
 
 	ctx := context.Background()

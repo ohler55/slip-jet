@@ -11,9 +11,9 @@ import (
 
 type streamNameCaller struct{}
 
-func (caller streamNameCaller) Call(s *slip.Scope, args slip.List, _ int) (result slip.Object) {
+func (caller streamNameCaller) Call(s *slip.Scope, args slip.List, depth int) (result slip.Object) {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":name", len(args), 0, 0)
+	slip.MethodArgCountCheck(s, depth, self, ":name", len(args), 0, 0)
 	stream := self.Any.(jetstream.Stream)
 	if si := stream.CachedInfo(); si != nil {
 		result = slip.String(si.Config.Name)

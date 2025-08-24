@@ -15,7 +15,7 @@ type streamGetConsumerCaller struct{}
 
 func (caller streamGetConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":get-consumer", len(args), 1, 3)
+	slip.MethodArgCountCheck(s, depth, self, ":get-consumer", len(args), 1, 3)
 	stream := self.Any.(jetstream.Stream)
 
 	name := slip.MustBeString(args[0], "name")

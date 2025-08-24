@@ -9,9 +9,9 @@ import (
 
 type optionsCaller struct{}
 
-func (caller optionsCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller optionsCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":options", len(args), 0, 0)
+	slip.MethodArgCountCheck(s, depth, self, ":options", len(args), 0, 0)
 	cl := self.Any.(*Client)
 	// Use both the nats.Conn options as well as the saved options to
 	// lookup functions.

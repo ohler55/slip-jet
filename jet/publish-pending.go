@@ -9,9 +9,9 @@ import (
 
 type publishPendingCaller struct{}
 
-func (caller publishPendingCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+func (caller publishPendingCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":publish-pending", len(args), 0, 0)
+	slip.MethodArgCountCheck(s, depth, self, ":publish-pending", len(args), 0, 0)
 	cl := self.Any.(*Client)
 
 	return slip.Fixnum(cl.js.PublishAsyncPending())

@@ -16,7 +16,7 @@ type publishCaller struct{}
 
 func (caller publishCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":publish", len(args), 1, 20)
+	slip.MethodArgCountCheck(s, depth, self, ":publish", len(args), 1, 20)
 	js := self.Any.(*Client).js
 	ctx := context.Background()
 	var (

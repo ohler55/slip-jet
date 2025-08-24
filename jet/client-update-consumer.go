@@ -14,7 +14,7 @@ type clientUpdateConsumerCaller struct{}
 
 func (caller clientUpdateConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.CheckMethodArgCount(self, ":update-consumer", len(args), 1, len(consumerOptMap)*2+3)
+	slip.MethodArgCountCheck(s, depth, self, ":update-consumer", len(args), 1, len(consumerOptMap)*2+3)
 	js := self.Any.(*Client).js
 
 	stream := slip.MustBeString(args[0], "stream")
