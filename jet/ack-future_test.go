@@ -4,6 +4,7 @@ package jet_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/nats-io/nats.go"
@@ -14,37 +15,238 @@ import (
 	"github.com/ohler55/slip/sliptest"
 )
 
-// TBD uncomment test once ack-future has vanilla methods or some of them anyway
+type badWriter int
 
-// func TestAckFutureDescribe(t *testing.T) {
-// 	var out strings.Builder
-// 	scope := slip.NewScope()
-// 	scope.Let(slip.Symbol("out"), &slip.OutputStream{Writer: &out})
+func (w badWriter) Write([]byte) (int, error) {
+	return 0, fmt.Errorf("oops")
+}
 
-// 	scope.Let("af", jet.MakeAckFuture(nil))
-// 	(&sliptest.Function{
-// 		Scope:  scope,
-// 		Source: `(send af :describe out)`,
-// 		Expect: "nil",
-// 	}).Test(t)
-// 	tt.Equal(t, "/an instance of .*jet-ack-future/", out.String())
+func TestAckFutureDescribe(t *testing.T) {
+	var out strings.Builder
+	scope := slip.NewScope()
+	scope.Let(slip.Symbol("out"), &slip.OutputStream{Writer: &out})
 
-// 	out.Reset()
-// 	(&sliptest.Function{
-// 		Scope:  scope,
-// 		Source: `(describe (find-class 'jet-ack-future) out)`,
-// 		Expect: "",
-// 	}).Test(t)
-// 	tt.Equal(t, "/jet-ack-future.* is a built-in class/", out.String())
+	scope.Let("af", jet.MakeAckFuture(nil))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(let ((*print-ansi* t)) (send af :describe out))`,
+		Expect: "nil",
+	}).Test(t)
+	tt.Equal(t, "/an instance of .*jet-ack-future/", out.String())
 
-// 	out.Reset()
-// 	(&sliptest.Function{
-// 		Scope:  scope,
-// 		Source: `(describe-method 'jet-ack-future :result out)`,
-// 		Expect: "",
-// 	}).Test(t)
-// 	tt.Equal(t, "/result.* is a method of .*jet-ack-future/", out.String())
-// }
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(let ((*print-ansi* nil)) (send af :describe))`,
+		Expect: "nil",
+	}).Test(t)
+	tt.Equal(t, "/an instance of .*jet-ack-future/", out.String())
+
+	out.Reset()
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(describe (find-class 'jet-ack-future) out)`,
+		Expect: "",
+	}).Test(t)
+	tt.Equal(t, "/jet-ack-future.* is a flavor/", out.String())
+
+	out.Reset()
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(describe-method 'jet-ack-future :result out)`,
+		Expect: "",
+	}).Test(t)
+	tt.Equal(t, "/result.* is a method of .*jet-ack-future/", out.String())
+
+	(&sliptest.Function{
+		Scope:     scope,
+		Source:    `(send af :describe out t)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+
+	(&sliptest.Function{
+		Scope:     scope,
+		Source:    `(send af :describe 7)`,
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestAckFuturePrintSelf(t *testing.T) {
+	var out strings.Builder
+	scope := slip.NewScope()
+	scope.Let(slip.Symbol("out"), &slip.OutputStream{Writer: &out})
+
+	scope.Let("af", jet.MakeAckFuture(nil))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(let ((*standard-output* out)) (send af :print-self))`,
+		Expect: "nil",
+	}).Test(t)
+	tt.Equal(t, "/#<jet-ack-future [0-9a-f]+>/", out.String())
+
+	out.Reset()
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send af :print-self out)`,
+		Expect: "nil",
+	}).Test(t)
+	tt.Equal(t, "/#<jet-ack-future [0-9a-f]+>/", out.String())
+
+	(&sliptest.Function{
+		Scope:     scope,
+		Source:    `(send af :print-self 7)`,
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+
+	scope.Let(slip.Symbol("bad"), &slip.OutputStream{Writer: badWriter(0)})
+	(&sliptest.Function{
+		Scope:     scope,
+		Source:    `(send af :print-self bad)`,
+		PanicType: slip.StreamErrorSymbol,
+	}).Test(t)
+}
+
+func TestAckFutureID(t *testing.T) {
+	scope := slip.NewScope()
+	scope.Let("af", jet.MakeAckFuture(nil))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send af :id)`,
+		Expect: "/[0-9]+/",
+	}).Test(t)
+}
+
+func TestAckFutureWhichOperations(t *testing.T) {
+	scope := slip.NewScope()
+	scope.Let("af", jet.MakeAckFuture(nil))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send af :which-operations)`,
+		Expect: `(:change-class :change-flavor :describe :equal :eval-inside-yourself :flavor :id
+               :inspect :message :operation-handled-p :print-self :result
+               :send-if-handles :shared-initialize
+               :update-instance-for-different-class :which-operations)`,
+	}).Test(t)
+}
+
+func TestAckFutureClass(t *testing.T) {
+	scope := slip.NewScope()
+	scope.Let("af", jet.MakeAckFuture(nil))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send af :class)`,
+		Expect: "#<flavor jet-ack-future>",
+	}).Test(t)
+}
+
+func TestAckFutureOperationHandledP(t *testing.T) {
+	scope := slip.NewScope()
+	scope.Let("af", jet.MakeAckFuture(nil))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send af :operation-handled-p :flavor)`,
+		Expect: "t",
+	}).Test(t)
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send af :operation-handled-p :quux)`,
+		Expect: "nil",
+	}).Test(t)
+}
+
+func TestAckFutureEqual(t *testing.T) {
+	scope := slip.NewScope()
+	scope.Let("af", jet.MakeAckFuture(nil))
+	scope.Let("af2", jet.MakeAckFuture(nil))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send af :equal af)`,
+		Expect: "t",
+	}).Test(t)
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send af :equal af2)`,
+		Expect: "nil",
+	}).Test(t)
+}
+
+func TestAckFutureChangeClass(t *testing.T) {
+	scope := slip.NewScope()
+	scope.Let("af", jet.MakeAckFuture(nil))
+	(&sliptest.Function{
+		Scope:     scope,
+		Source:    `(send af :change-class)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestAckFutureEvalInsideSelf(t *testing.T) {
+	scope := slip.NewScope()
+	scope.Let("af", jet.MakeAckFuture(nil))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send af :eval-inside-yourself '(+ 1 2))`,
+		Expect: "3",
+	}).Test(t)
+	(&sliptest.Function{
+		Scope:     scope,
+		Source:    `(send af :eval-inside-yourself '(+ 1 2) t)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestAckFutureInspect(t *testing.T) {
+	scope := slip.NewScope()
+	scope.Let("af", jet.MakeAckFuture(nil))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send af :inspect) `,
+		Expect: "/#<bag-flavor [0-9a-f]+>/",
+	}).Test(t)
+}
+
+func TestAckFutureSendIfHandles(t *testing.T) {
+	scope := slip.NewScope()
+	scope.Let("af", jet.MakeAckFuture(nil))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send af :send-if-handles :flavor) `,
+		Expect: "#<flavor jet-ack-future>",
+	}).Test(t)
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send af :send-if-handles :quux) `,
+		Expect: "nil",
+	}).Test(t)
+	(&sliptest.Function{
+		Scope:     scope,
+		Source:    `(send af :send-if-handles) `,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestAckFutureMisc(t *testing.T) {
+	af := jet.MakeAckFuture(nil)
+	tt.Equal(t, true, af.IsA("jet-ack-future"))
+	tt.Equal(t, false, af.IsA("jet-ack"))
+	af.SetSynchronized(false)
+	tt.Equal(t, false, af.Synchronized())
+	tt.Equal(t, []string{}, af.SlotNames())
+	_, has := af.SlotValue("quux")
+	tt.Equal(t, false, has)
+	tt.Equal(t, false, af.SetSlotValue(slip.Symbol("quux"), nil))
+	tt.Nil(t, af.GetMethod(":quux"))
+	tt.Nil(t, af.Dup())
+}
+
+func TestAckFutureChangeNoMethod(t *testing.T) {
+	scope := slip.NewScope()
+	scope.Let("af", jet.MakeAckFuture(nil))
+	(&sliptest.Function{
+		Scope:     scope,
+		Source:    `(send af :quux)`,
+		PanicType: slip.NoApplicableMethodErrorSymbol,
+	}).Test(t)
+}
 
 func TestAckFutureObject(t *testing.T) {
 	af := jet.MakeAckFuture(nil)

@@ -136,6 +136,6 @@ fail.`,
 If a publish call is blocked for this long, ErrTooManyStalledMsgs is returned.`,
 			},
 		},
-		Return: "jet-ack",
+		Return: "jet-ack-future",
 	}
 }
