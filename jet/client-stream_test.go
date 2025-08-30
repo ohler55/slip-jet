@@ -16,8 +16,8 @@ func TestGetStreamOk(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))
                                     (jss (send js :create-stream "get-test" :subjects '("test.get.>")))
-                                    (found (send js :get-stream "get-test" :timeout 0.1))
-                                    (not-found (send js :get-stream "not-a-stream")))
+                                    (found (send js :stream "get-test" :timeout 0.1))
+                                    (not-found (send js :stream "not-a-stream")))
                               (send js :close)
                               (list (send found :name) not-found))`, natsURL),
 		Expect: `("get-test" nil)`,
@@ -27,7 +27,7 @@ func TestGetStreamOk(t *testing.T) {
 func TestGetStreamError(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password")))
-                              (send js :get-stream "not a stream"))`, natsURL),
+                              (send js :stream "not a stream"))`, natsURL),
 		PanicType: slip.ErrorSymbol,
 	}).Test(t)
 }

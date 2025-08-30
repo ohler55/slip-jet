@@ -11,11 +11,11 @@ import (
 	"github.com/ohler55/slip/pkg/flavors"
 )
 
-type clientGetConsumerCaller struct{}
+type clientConsumerCaller struct{}
 
-func (caller clientGetConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
+func (caller clientConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.MethodArgCountCheck(s, depth, self, ":get-consumer", len(args), 2, 4)
+	slip.MethodArgCountCheck(s, depth, self, ":-consumer", len(args), 2, 4)
 	js := self.Any.(*Client).js
 
 	stream := slip.MustBeString(args[0], "stream")
@@ -37,9 +37,9 @@ func (caller clientGetConsumerCaller) Call(s *slip.Scope, args slip.List, depth 
 	return MakeConsumer(consumer)
 }
 
-func (caller clientGetConsumerCaller) FuncDocs() *slip.FuncDoc {
+func (caller clientConsumerCaller) FuncDocs() *slip.FuncDoc {
 	return &slip.FuncDoc{
-		Name: ":get-consumer",
+		Name: ":consumer",
 		Text: `Returns a _jet-consumer_ for an existing consumer, allowing processing
 of messages. If consumer does not exist, _nil_ is returned.`,
 		Args: []*slip.DocArg{

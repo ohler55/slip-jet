@@ -10,15 +10,15 @@ import (
 	"github.com/ohler55/slip/sliptest"
 )
 
-func TestClientGetConsumerOk(t *testing.T) {
+func TestClientConsumerOk(t *testing.T) {
 	defer cleanupTestStream("get-test")
 
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))
                                     (jss (send js :create-stream "get-test" :subjects '("test.get.>")))
                                     (consumer (send jss :create-consumer :timeout 0.1 :name "eater"))
-                                    (found (send js :get-consumer "get-test" "eater" :timeout 0.1))
-                                    (not-found (send js :get-consumer "get-test" "no-one")))
+                                    (found (send js :consumer "get-test" "eater" :timeout 0.1))
+                                    (not-found (send js :consumer "get-test" "no-one")))
                               (send js :close)
                               (list not-found
                                     (send consumer :equal found)
@@ -27,13 +27,13 @@ func TestClientGetConsumerOk(t *testing.T) {
 	}).Test(t)
 }
 
-func TestClientGetConsumerError(t *testing.T) {
+func TestClientConsumerError(t *testing.T) {
 	defer cleanupTestStream("get-test")
 
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))
                                     (jss (send js :create-stream "get-test" :subjects '("test.get.>"))))
-                              (send js :get-consumer "get-test" "get bad"))`, natsURL),
+                              (send js :consumer "get-test" "get bad"))`, natsURL),
 		PanicType: slip.ErrorSymbol,
 	}).Test(t)
 }

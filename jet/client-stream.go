@@ -11,11 +11,11 @@ import (
 	"github.com/ohler55/slip/pkg/flavors"
 )
 
-type getStreamCaller struct{}
+type clientStreamCaller struct{}
 
-func (caller getStreamCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
+func (caller clientStreamCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.MethodArgCountCheck(s, depth, self, ":get-stream", len(args), 1, 3)
+	slip.MethodArgCountCheck(s, depth, self, ":stream", len(args), 1, 3)
 	js := self.Any.(*Client).js
 
 	ctx := context.Background()
@@ -34,9 +34,9 @@ func (caller getStreamCaller) Call(s *slip.Scope, args slip.List, depth int) sli
 	return MakeStream(stream)
 }
 
-func (caller getStreamCaller) FuncDocs() *slip.FuncDoc {
+func (caller clientStreamCaller) FuncDocs() *slip.FuncDoc {
 	return &slip.FuncDoc{
-		Name: ":get-stream",
+		Name: ":stream",
 		Text: `Fetches and returns a _jet-stream_ for the given stream name.
 If the stream does not exist _nil_ is returned.
 `,

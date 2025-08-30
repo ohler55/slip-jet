@@ -64,8 +64,8 @@ func defClient() {
 	flavors.FlosFun("jet-create-or-update-stream", ":create-or-update-stream",
 		createOrUpdateStreamCaller{}.FuncDocs(), &Pkg)
 
-	clientFlavor.DefMethod(":get-stream", "", getStreamCaller{})
-	flavors.FlosFun("jet-get-stream", ":get-stream", getStreamCaller{}.FuncDocs(), &Pkg)
+	clientFlavor.DefMethod(":stream", "", clientStreamCaller{})
+	flavors.FlosFun("jet-stream", ":stream", clientStreamCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":stream-name-by-subject", "", streamNameBySubjectCaller{})
 	flavors.FlosFun("jet-stream-name-by-subject", ":stream-name-by-subject",
@@ -93,8 +93,8 @@ func defClient() {
 	clientFlavor.DefMethod(":ordered-consumer", "", clientOrderedConsumerCaller{})
 	flavors.FlosFun("jet-client-ordered-consumer", ":ordered-consumer", clientOrderedConsumerCaller{}.FuncDocs(), &Pkg)
 
-	clientFlavor.DefMethod(":get-consumer", "", clientGetConsumerCaller{})
-	flavors.FlosFun("jet-client-get-consumer", ":get-consumer", clientGetConsumerCaller{}.FuncDocs(), &Pkg)
+	clientFlavor.DefMethod(":consumer", "", clientConsumerCaller{})
+	flavors.FlosFun("jet-client-consumer", ":consumer", clientConsumerCaller{}.FuncDocs(), &Pkg)
 
 	clientFlavor.DefMethod(":delete-consumer", "", clientDeleteConsumerCaller{})
 	flavors.FlosFun("jet-client-delete-consumer", ":delete-consumer", clientDeleteConsumerCaller{}.FuncDocs(), &Pkg)
