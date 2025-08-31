@@ -181,6 +181,48 @@ func TestConsumerInfoTimestamp(t *testing.T) {
 	}).Test(t)
 }
 
+func TestConsumerInfoPaused(t *testing.T) {
+	tm := time.Date(2024, time.December, 9, 19, 00, 2, 123, time.UTC)
+	var info jetstream.ConsumerInfo
+	sampleConsumerInfo(&info, tm)
+
+	scope := slip.NewScope()
+	scope.Let(slip.Symbol("info"), jet.MakeConsumerInfo(&info))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send info :paused)`,
+		Expect: "t",
+	}).Test(t)
+}
+
+func TestConsumerInfoPauseRemaining(t *testing.T) {
+	tm := time.Date(2024, time.December, 9, 19, 00, 2, 123, time.UTC)
+	var info jetstream.ConsumerInfo
+	sampleConsumerInfo(&info, tm)
+
+	scope := slip.NewScope()
+	scope.Let(slip.Symbol("info"), jet.MakeConsumerInfo(&info))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send info :pause-remaining)`,
+		Expect: "1.2",
+	}).Test(t)
+}
+
+func TestConsumerInfoPriorityGroups(t *testing.T) {
+	tm := time.Date(2024, time.December, 9, 19, 00, 2, 123, time.UTC)
+	var info jetstream.ConsumerInfo
+	sampleConsumerInfo(&info, tm)
+
+	scope := slip.NewScope()
+	scope.Let(slip.Symbol("info"), jet.MakeConsumerInfo(&info))
+	(&sliptest.Function{
+		Scope:  scope,
+		Source: `(send info :priority-groups)`,
+		Expect: `/\(\(:group "grouper" :pinned-client-id "clide" :pinned-timestamp/`,
+	}).Test(t)
+}
+
 func sampleConsumerInfo(info *jetstream.ConsumerInfo, tm time.Time) {
 	info.Stream = "river"
 	info.Name = "eater"
@@ -214,5 +256,11 @@ func sampleConsumerInfo(info *jetstream.ConsumerInfo, tm time.Time) {
 	}
 	info.PushBound = true
 	info.TimeStamp = tm
+	info.Paused = true
+	info.PauseRemaining = time.Second + time.Millisecond*200
+	info.PriorityGroups = []jetstream.PriorityGroupState{
+		{Group: "grouper", PinnedClientID: "clide", PinnedTS: tm},
+	}
+
 	sampleConsumerConfig(&info.Config)
 }

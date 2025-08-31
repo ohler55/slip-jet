@@ -99,6 +99,12 @@ func defClient() {
 	clientFlavor.DefMethod(":delete-consumer", "", clientDeleteConsumerCaller{})
 	flavors.FlosFun("jet-client-delete-consumer", ":delete-consumer", clientDeleteConsumerCaller{}.FuncDocs(), &Pkg)
 
+	clientFlavor.DefMethod(":pause-consumer", "", clientPauseConsumerCaller{})
+	flavors.FlosFun("jet-client-pause-consumer", ":pause-consumer", clientPauseConsumerCaller{}.FuncDocs(), &Pkg)
+
+	clientFlavor.DefMethod(":resume-consumer", "", clientResumeConsumerCaller{})
+	flavors.FlosFun("jet-client-resume-consumer", ":resume-consumer", clientResumeConsumerCaller{}.FuncDocs(), &Pkg)
+
 	clientFlavor.DefMethod(":account-info", "", accountInfoCaller{})
 	flavors.FlosFun("jet-account-info", ":account-info", accountInfoCaller{}.FuncDocs(), &Pkg)
 }
