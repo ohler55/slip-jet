@@ -39,6 +39,7 @@ func init() {
 	defMessagesBatch()
 	defConsumeContext()
 	defAckFuture()
+	defPushConsumer()
 
 	initConnect()
 

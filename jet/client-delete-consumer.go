@@ -25,8 +25,7 @@ func (caller clientDeleteConsumerCaller) Call(s *slip.Scope, args slip.List, dep
 		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
-	err := js.DeleteConsumer(ctx, stream, name)
-	if err != nil {
+	if err := js.DeleteConsumer(ctx, stream, name); err != nil {
 		panic(err)
 	}
 	return nil

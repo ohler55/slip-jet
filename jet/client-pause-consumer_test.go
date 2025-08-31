@@ -23,7 +23,7 @@ func TestClientPauseConsumerOk(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))
                                     (jss (send js :create-stream "pause-test" :subjects '("test.pause.>")))
-                                    (consumer (send jss :create-consumer :timeout 0.1 :name "eater"))
+                                    (consumer (send js :create-push-consumer "pause-test" :timeout 0.1 :name "eater"))
                                     result)
 (format t "*** before pause\n")
                               (send js :pause-consumer "pause-test" "eater" %s :timeout 1.1)

@@ -115,7 +115,7 @@ new pull request to the server. Defaults to 50% of _:max-bytes_ (if set).`,
 trigger new pull request to the server. Defaults to 50% of _:max-messages_.`,
 			},
 		},
-		Return: "jet-message-context",
+		Return: "jet-consume-context",
 	}
 }
 
