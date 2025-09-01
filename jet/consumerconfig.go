@@ -420,12 +420,76 @@ on the consumer. This feature requires nats-server v2.10.0 or later.`,
 			config.Metadata = m
 		},
 	},
-	// TBD
-	// PauseUntil
-	// PriorityPolicy
-	// Pinned TTL
-	// PriorityGroups
-	// DeliverSubject
+	":pause-until": {
+		doc: &slip.DocArg{
+			Name: ":pause-until",
+			Type: "time",
+			Text: `For suspending the consumer until the deadline.`,
+		},
+		update: func(config *jetstream.ConsumerConfig, v slip.Object) {
+			if stm, ok := v.(slip.Time); ok {
+				tm := time.Time(stm)
+				config.PauseUntil = &tm
+			} else {
+				slip.TypePanic(slip.NewScope(), 0, ":pause-until", v, "time")
+			}
+		},
+	},
+	":priority-policy": {
+		doc: &slip.DocArg{
+			Name: ":priority-policy",
+			Type: "nil|:none|:pinned|:overflow",
+			Text: `Represents he priority policy the consumer is set to.
+If _:none_ or _nil_ is the default priority policy.
+If _:pinned_ is the priority policy that pins a consumer to a specific client.
+If _:overflow_ is the priority policy that allows for restricting when a
+consumer will receive messages based on the number of pending messages or acks.
+`,
+		},
+		update: func(config *jetstream.ConsumerConfig, v slip.Object) {
+			switch v {
+			case slip.Symbol(":nonde"), nil:
+				config.PriorityPolicy = jetstream.PriorityPolicyNone
+			case slip.Symbol(":pinned"):
+				config.PriorityPolicy = jetstream.PriorityPolicyPinned
+			case slip.Symbol(":overflow"):
+				config.PriorityPolicy = jetstream.PriorityPolicyOverflow
+			default:
+				slip.TypePanic(slip.NewScope(), 0, ":priority-policy", v, "nil", ":none", ":pinned", ":overflow")
+			}
+		},
+	},
+	":pinned-ttl": {
+		doc: &slip.DocArg{
+			Name: ":pinned-ttl",
+			Type: "real",
+			Text: `Represents the time after which the client will be unpinned
+if no new pull requests are sent.Used with PriorityPolicyPinned.`,
+		},
+		update: func(config *jetstream.ConsumerConfig, v slip.Object) {
+			if num, ok := v.(slip.Real); ok {
+				config.PinnedTTL = time.Duration(float64(time.Second) * num.RealValue())
+			} else {
+				slip.TypePanic(slip.NewScope(), 0, ":pinned-ttl", v, "real")
+			}
+		},
+	},
+	":priority-groups": {
+		doc: &slip.DocArg{
+			Name: ":priority-groups",
+			Type: "list",
+			Text: `A list of priority groups this consumer supports.`,
+		},
+		update: func(config *jetstream.ConsumerConfig, v slip.Object) {
+			list, ok := v.(slip.List)
+			if !ok {
+				slip.TypePanic(slip.NewScope(), 0, ":priority-groups", v, "list")
+			}
+			for _, x := range list {
+				config.PriorityGroups = append(config.PriorityGroups, slip.MustBeString(x, ":priority-groups"))
+			}
+		},
+	},
 	":deliver-subject": {
 		doc: &slip.DocArg{
 			Name: ":deliver-subject",
@@ -436,10 +500,46 @@ on the consumer. This feature requires nats-server v2.10.0 or later.`,
 			config.DeliverSubject = slip.MustBeString(v, ":deliver-subject")
 		},
 	},
-
-	// DeliverGroup
-	// FlowControl
-	// IdleHeartbeat
+	":deliver-group": {
+		doc: &slip.DocArg{
+			Name: ":deliver-group",
+			Type: "string",
+			Text: `The group name for push consumers.`,
+		},
+		update: func(config *jetstream.ConsumerConfig, v slip.Object) {
+			config.DeliverGroup = slip.MustBeString(v, ":deliver-group")
+		},
+	},
+	":flow-control": {
+		doc: &slip.DocArg{
+			Name: ":flow-control",
+			Type: "boolean",
+			Text: `A flag to enable flow control for the consumer.
+When set, server will regularly send an empty message with Status
+header 100 and a reply subject, consumers must reply to these
+messages to control the rate of message delivery.`,
+		},
+		update: func(config *jetstream.ConsumerConfig, v slip.Object) {
+			config.FlowControl = v != nil
+		},
+	},
+	":idle-heartbeat": {
+		doc: &slip.DocArg{
+			Name: ":idle-heartbeat",
+			Type: "real",
+			Text: `Enables push consumer idle heartbeat messages.
+If the Consumer is idle for more than the set value, an empty message
+with Status header 100 will be sent indicating the consumer is still
+alive.`,
+		},
+		update: func(config *jetstream.ConsumerConfig, v slip.Object) {
+			if num, ok := v.(slip.Real); ok {
+				config.IdleHeartbeat = time.Duration(float64(time.Second) * num.RealValue())
+			} else {
+				slip.TypePanic(slip.NewScope(), 0, ":idle-heartbeat", v, "real")
+			}
+		},
+	},
 }
 
 // InitConsumerConfig sets or updates the fields in a jetstream.ConsumerConfig
@@ -474,6 +574,11 @@ var (
 		jetstream.ReplayInstantPolicy:  ":instant",
 		jetstream.ReplayOriginalPolicy: ":original",
 	}
+	priorityPolMap = map[jetstream.PriorityPolicy]string{
+		jetstream.PriorityPolicyNone:     ":none",
+		jetstream.PriorityPolicyPinned:   ":pinned",
+		jetstream.PriorityPolicyOverflow: ":overflow",
+	}
 )
 
 // ConsumerConfigPropList returns a property list built from a
@@ -481,12 +586,15 @@ var (
 // consumer creation.
 func ConsumerConfigPropList(config *jetstream.ConsumerConfig) slip.List {
 	var (
-		startTime   slip.Object
-		backoff     slip.List
-		headersOnly slip.Object
-		memStore    slip.Object
-		filters     slip.List
-		meta        slip.List
+		startTime      slip.Object
+		backoff        slip.List
+		headersOnly    slip.Object
+		memStore       slip.Object
+		filters        slip.List
+		meta           slip.List
+		pauseUntil     slip.Object
+		priorityGroups slip.List
+		flowControl    slip.Object
 	)
 	if config.OptStartTime != nil {
 		startTime = slip.Time(*config.OptStartTime)
@@ -505,6 +613,15 @@ func ConsumerConfigPropList(config *jetstream.ConsumerConfig) slip.List {
 	}
 	for k, v := range config.Metadata {
 		meta = append(meta, slip.String(k), slip.String(v))
+	}
+	if config.PauseUntil != nil {
+		pauseUntil = slip.Time(*config.PauseUntil)
+	}
+	for _, pg := range config.PriorityGroups {
+		priorityGroups = append(priorityGroups, slip.String(pg))
+	}
+	if config.FlowControl {
+		flowControl = slip.True
 	}
 	return slip.List{
 		slip.Symbol(":name"), slip.String(config.Name),
@@ -532,7 +649,14 @@ func ConsumerConfigPropList(config *jetstream.ConsumerConfig) slip.List {
 		slip.Symbol(":memory-storage"), memStore,
 		slip.Symbol(":filter-subjects"), filters,
 		slip.Symbol(":metadata"), meta,
+		slip.Symbol(":pause-until"), pauseUntil,
+		slip.Symbol(":priority-policy"), slip.Symbol(priorityPolMap[config.PriorityPolicy]),
+		slip.Symbol(":pinned-ttl"), slip.DoubleFloat(float64(config.PinnedTTL) / float64(time.Second)),
+		slip.Symbol(":priority-groups"), priorityGroups,
 		slip.Symbol(":deliver-subject"), slip.String(config.DeliverSubject),
+		slip.Symbol(":deliver-group"), slip.String(config.DeliverGroup),
+		slip.Symbol(":flow-control"), flowControl,
+		slip.Symbol(":idle-heartbeat"), slip.DoubleFloat(float64(config.IdleHeartbeat) / float64(time.Second)),
 	}
 }
 
