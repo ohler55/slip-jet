@@ -420,6 +420,26 @@ on the consumer. This feature requires nats-server v2.10.0 or later.`,
 			config.Metadata = m
 		},
 	},
+	// TBD
+	// PauseUntil
+	// PriorityPolicy
+	// Pinned TTL
+	// PriorityGroups
+	// DeliverSubject
+	":deliver-subject": {
+		doc: &slip.DocArg{
+			Name: ":deliver-subject",
+			Type: "string",
+			Text: `The subject to deliver messages to for push consumers.`,
+		},
+		update: func(config *jetstream.ConsumerConfig, v slip.Object) {
+			config.DeliverSubject = slip.MustBeString(v, ":deliver-subject")
+		},
+	},
+
+	// DeliverGroup
+	// FlowControl
+	// IdleHeartbeat
 }
 
 // InitConsumerConfig sets or updates the fields in a jetstream.ConsumerConfig
@@ -512,6 +532,7 @@ func ConsumerConfigPropList(config *jetstream.ConsumerConfig) slip.List {
 		slip.Symbol(":memory-storage"), memStore,
 		slip.Symbol(":filter-subjects"), filters,
 		slip.Symbol(":metadata"), meta,
+		slip.Symbol(":deliver-subject"), slip.String(config.DeliverSubject),
 	}
 }
 

@@ -14,23 +14,25 @@ import (
 func TestClientPauseConsumerOk(t *testing.T) {
 	defer cleanupTestStream("pause-test")
 
-	t.Skip()
+	// t.Skip()
 	// TBD pause causes a hang. Try with a push consumer
 	//  if non-push consumers always then detect and raise an error
 
-	// tm := time.Date(2024, time.December, 9, 19, 00, 2, 123, time.UTC)
-	tm := time.Now().Add(time.Second)
+	tm := time.Now().Add(time.Minute)
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))
                                     (jss (send js :create-stream "pause-test" :subjects '("test.pause.>")))
-                                    (consumer (send js :create-push-consumer "pause-test" :timeout 0.1 :name "eater"))
+                                    (consumer (send js :create-consumer "pause-test"
+                                                                        :ack-policy :all
+                                                                        :description "is this needed?"
+                                                                        :durable "paws"
+                                                                        :timeout 0.1))
                                     result)
-(format t "*** before pause\n")
-                              (send js :pause-consumer "pause-test" "eater" %s :timeout 1.1)
-                              (setq result (send consumer :info))
+                              (send js :pause-consumer "pause-test" "paws" %s :timeout 1.0)
+                              (setq result (send (send consumer :info) :paused))
                               (send js :close)
                               result)`, natsURL, slip.Time(tm)),
-		Expect: "nil",
+		Expect: "t",
 	}).Test(t)
 }
 
