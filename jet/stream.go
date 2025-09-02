@@ -65,8 +65,8 @@ purging a stream.`),
 	streamFlavor.DefMethod(":ordered-consumer", "", streamOrderedConsumerCaller{})
 	flavors.FlosFun("jet-stream-ordered-consumer", ":ordered-consumer", streamOrderedConsumerCaller{}.FuncDocs(), &Pkg)
 
-	streamFlavor.DefMethod(":get-consumer", "", streamGetConsumerCaller{})
-	flavors.FlosFun("jet-stream-get-consumer", ":get-consumer", streamGetConsumerCaller{}.FuncDocs(), &Pkg)
+	streamFlavor.DefMethod(":consumer", "", streamConsumerCaller{})
+	flavors.FlosFun("jet-stream-consumer", ":consumer", streamConsumerCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":list-consumers", "", streamListConsumersCaller{})
 	flavors.FlosFun("jet-stream-list-consumers", ":list-consumers", streamListConsumersCaller{}.FuncDocs(), &Pkg)
@@ -76,6 +76,22 @@ purging a stream.`),
 
 	streamFlavor.DefMethod(":delete-consumer", "", streamDeleteConsumerCaller{})
 	flavors.FlosFun("jet-stream-delete-consumer", ":delete-consumer", streamDeleteConsumerCaller{}.FuncDocs(), &Pkg)
+
+	streamFlavor.DefMethod(":create-push-consumer", "", streamCreatePushConsumerCaller{})
+	flavors.FlosFun("jet-stream-create-push-consumer", ":create-push-consumer", streamCreatePushConsumerCaller{}.FuncDocs(), &Pkg)
+
+	streamFlavor.DefMethod(":push-consumer", "", streamPushConsumerCaller{})
+	flavors.FlosFun("jet-stream-push-consumer", ":push-consumer", streamPushConsumerCaller{}.FuncDocs(), &Pkg)
+
+	streamFlavor.DefMethod(":pause-consumer", "", streamPauseConsumerCaller{})
+	flavors.FlosFun("jet-stream-pause-consumer", ":pause-consumer", streamPauseConsumerCaller{}.FuncDocs(), &Pkg)
+
+	streamFlavor.DefMethod(":resume-consumer", "", streamResumeConsumerCaller{})
+	flavors.FlosFun("jet-stream-resume-consumer", ":resume-consumer", streamResumeConsumerCaller{}.FuncDocs(), &Pkg)
+
+	streamFlavor.DefMethod(":create-push-consumer", "", streamCreatePushConsumerCaller{})
+	flavors.FlosFun("jet-stream-create-push-consumer", ":create-push-consumer",
+		streamCreatePushConsumerCaller{}.FuncDocs(), &Pkg)
 }
 
 // MakeStream makes a jet-stream.

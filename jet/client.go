@@ -103,6 +103,9 @@ func defClient() {
 	flavors.FlosFun("jet-client-create-push-consumer", ":create-push-consumer",
 		clientCreatePushConsumerCaller{}.FuncDocs(), &Pkg)
 
+	clientFlavor.DefMethod(":push-consumer", "", clientPushConsumerCaller{})
+	flavors.FlosFun("jet-client-push-consumer", ":push-consumer", clientPushConsumerCaller{}.FuncDocs(), &Pkg)
+
 	clientFlavor.DefMethod(":pause-consumer", "", clientPauseConsumerCaller{})
 	flavors.FlosFun("jet-client-pause-consumer", ":pause-consumer", clientPauseConsumerCaller{}.FuncDocs(), &Pkg)
 
