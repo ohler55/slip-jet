@@ -448,7 +448,7 @@ consumer will receive messages based on the number of pending messages or acks.
 		},
 		update: func(config *jetstream.ConsumerConfig, v slip.Object) {
 			switch v {
-			case slip.Symbol(":nonde"), nil:
+			case slip.Symbol(":none"), nil:
 				config.PriorityPolicy = jetstream.PriorityPolicyNone
 			case slip.Symbol(":pinned"):
 				config.PriorityPolicy = jetstream.PriorityPolicyPinned
