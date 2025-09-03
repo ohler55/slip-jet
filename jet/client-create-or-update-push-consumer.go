@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Peter Ohler, All rights reserved.
+// Copyright (c) 2025, Peter Ohler, All rights reserved.
 
 package jet
 
@@ -10,11 +10,11 @@ import (
 	"github.com/ohler55/slip/pkg/flavors"
 )
 
-type clientCreateOrUpdateConsumerCaller struct{}
+type clientCreateOrUpdatePushConsumerCaller struct{}
 
-func (caller clientCreateOrUpdateConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
+func (caller clientCreateOrUpdatePushConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.MethodArgCountCheck(s, depth, self, ":create-or-update-consumer", len(args), 1, len(consumerOptMap)*2+3)
+	slip.MethodArgCountCheck(s, depth, self, ":create-or-update-push-consumer", len(args), 1, len(consumerOptMap)*2+3)
 	js := self.Any.(*Client).js
 
 	stream := slip.MustBeString(args[0], "stream")
@@ -30,21 +30,21 @@ func (caller clientCreateOrUpdateConsumerCaller) Call(s *slip.Scope, args slip.L
 		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
-	consumer, err := js.CreateOrUpdateConsumer(ctx, stream, cfg)
+	consumer, err := js.CreateOrUpdatePushConsumer(ctx, stream, cfg)
 	if err != nil {
 		panic(err)
 	}
-	return MakeConsumer(consumer)
+	return MakePushConsumer(consumer)
 }
 
-func (caller clientCreateOrUpdateConsumerCaller) FuncDocs() *slip.FuncDoc {
+func (caller clientCreateOrUpdatePushConsumerCaller) FuncDocs() *slip.FuncDoc {
 	return makeConsumerMethodFuncDoc(
-		":create-or-update-consumer",
+		":create-or-update-push-consumer",
 		&slip.DocArg{Name: "stream", Type: "string", Text: "The name of the stream."},
-		"<jet-consumer>",
-		`Creates a consumer on a given stream with given
+		"<jet-push-consumer>",
+		`Creates a push consumer on a given stream with given
 config. If consumer already exists, it will be updated (if possible) otherwise
-a _jet-consumer_ is returned, allowing operations on a
+a _jet-push-consumer_ is returned, allowing operations on a
 consumer (e.g. fetch messages).
 `)
 }

@@ -103,6 +103,14 @@ func defClient() {
 	flavors.FlosFun("jet-client-create-push-consumer", ":create-push-consumer",
 		clientCreatePushConsumerCaller{}.FuncDocs(), &Pkg)
 
+	clientFlavor.DefMethod(":update-push-consumer", "", clientUpdatePushConsumerCaller{})
+	flavors.FlosFun("jet-client-update-push-consumer", ":update-push-consumer",
+		clientUpdatePushConsumerCaller{}.FuncDocs(), &Pkg)
+
+	clientFlavor.DefMethod(":create-or-update-push-consumer", "", clientCreateOrUpdatePushConsumerCaller{})
+	flavors.FlosFun("jet-client-create-or-update-push-consumer", ":create-or-update-push-consumer",
+		clientCreateOrUpdatePushConsumerCaller{}.FuncDocs(), &Pkg)
+
 	clientFlavor.DefMethod(":push-consumer", "", clientPushConsumerCaller{})
 	flavors.FlosFun("jet-client-push-consumer", ":push-consumer", clientPushConsumerCaller{}.FuncDocs(), &Pkg)
 

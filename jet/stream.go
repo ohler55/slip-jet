@@ -78,7 +78,16 @@ purging a stream.`),
 	flavors.FlosFun("jet-stream-delete-consumer", ":delete-consumer", streamDeleteConsumerCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":create-push-consumer", "", streamCreatePushConsumerCaller{})
-	flavors.FlosFun("jet-stream-create-push-consumer", ":create-push-consumer", streamCreatePushConsumerCaller{}.FuncDocs(), &Pkg)
+	flavors.FlosFun("jet-stream-create-push-consumer", ":create-push-consumer",
+		streamCreatePushConsumerCaller{}.FuncDocs(), &Pkg)
+
+	streamFlavor.DefMethod(":update-push-consumer", "", streamUpdatePushConsumerCaller{})
+	flavors.FlosFun("jet-stream-update-push-consumer", ":update-push-consumer",
+		streamUpdatePushConsumerCaller{}.FuncDocs(), &Pkg)
+
+	streamFlavor.DefMethod(":create-or-update-push-consumer", "", streamCreateOrUpdatePushConsumerCaller{})
+	flavors.FlosFun("jet-stream-create-or-update-push-consumer", ":create-or-update-push-consumer",
+		streamCreateOrUpdatePushConsumerCaller{}.FuncDocs(), &Pkg)
 
 	streamFlavor.DefMethod(":push-consumer", "", streamPushConsumerCaller{})
 	flavors.FlosFun("jet-stream-push-consumer", ":push-consumer", streamPushConsumerCaller{}.FuncDocs(), &Pkg)
@@ -89,9 +98,8 @@ purging a stream.`),
 	streamFlavor.DefMethod(":resume-consumer", "", streamResumeConsumerCaller{})
 	flavors.FlosFun("jet-stream-resume-consumer", ":resume-consumer", streamResumeConsumerCaller{}.FuncDocs(), &Pkg)
 
-	streamFlavor.DefMethod(":create-push-consumer", "", streamCreatePushConsumerCaller{})
-	flavors.FlosFun("jet-stream-create-push-consumer", ":create-push-consumer",
-		streamCreatePushConsumerCaller{}.FuncDocs(), &Pkg)
+	streamFlavor.DefMethod(":unpin-consumer", "", streamUnpinConsumerCaller{})
+	flavors.FlosFun("jet-stream-unpin-consumer", ":unpin-consumer", streamUnpinConsumerCaller{}.FuncDocs(), &Pkg)
 }
 
 // MakeStream makes a jet-stream.

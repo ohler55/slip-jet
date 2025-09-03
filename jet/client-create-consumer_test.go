@@ -30,7 +30,8 @@ func TestClientCreateConsumerError(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))
                                     (jss (send js :create-stream "create-test" :subjects '("test.create.>"))))
-                              (send js :create-consumer "create bad"))`, natsURL),
+                               (recover r (progn (send js :close) (panic r))
+                                 (send js :create-consumer "create bad")))`, natsURL),
 		PanicType: slip.ErrorSymbol,
 	}).Test(t)
 }

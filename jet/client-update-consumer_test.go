@@ -31,7 +31,8 @@ func TestClientUpdateConsumerError(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))
                                     (jss (send js :create-stream "update-test" :subjects '("test.update.>"))))
-                              (send js :update-consumer "update bad"))`, natsURL),
+                               (recover r (progn (send js :close) (panic r))
+                                 (send js :update-consumer "update bad")))`, natsURL),
 		PanicType: slip.ErrorSymbol,
 	}).Test(t)
 }

@@ -151,7 +151,7 @@ func TestConsumerMessages(t *testing.T) {
 	scope.Let(slip.Symbol("mc"), jet.MakeConsumer(&mc))
 	(&sliptest.Function{
 		Scope: scope,
-		Source: `(let* ((mmc (send mc :messages :error-on-missing-heartbeat t)))
+		Source: `(let* ((mmc (send mc :messages :error-on-missing-heartbeat t :pull-max-messages 100)))
                   (coerce (send (send mmc :next) :data) 'string))`,
 		Expect: `"hello"`,
 	}).Test(t)
