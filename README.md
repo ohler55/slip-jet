@@ -11,21 +11,3 @@ or https://pkg.go.dev/github.com/nats-io/nats.go/jetstream. The
 JetStream API is object based and this package uses Flavors to
 implement an object based API for SLIP that closely follows the
 JetStream API.
-
-
---------
-Notes
-
-- connect
- - test use cases (start with connection)
-  - with token ??
-  - nkeys
-  - start server with multiple accounts
-
-
-- should managers be included in the objects so the api is more friendly?
- - need a struct for each and not just the current assignment to Any
-  - methods
-   - :update
-   - :client
-   - :delete
