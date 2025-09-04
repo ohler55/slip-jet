@@ -417,7 +417,7 @@ func (caller consumerInfoPriorityGroupsCaller) FuncDocs() *slip.FuncDoc {
 	return &slip.FuncDoc{
 		Name:   ":priority-groups",
 		Text:   `Returns the priority groups of the consumer-info.`,
-		Return: "boolean",
+		Return: "list",
 	}
 }
 

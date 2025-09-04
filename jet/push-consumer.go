@@ -125,7 +125,7 @@ func (caller pushConsumerConsumeCaller) FuncDocs() *slip.FuncDoc {
 		Name: ":consume",
 		Text: `Will continuously receive messages and handle them
 with the provided callback function. _:consume_ can be configured
-using then _:error-handler_ options.
+using the _:error-handler_ options.
 
 
 Error handling and monitoring can be configured using _:error-handler_ option,
@@ -133,7 +133,7 @@ which provides information about errors encountered during consumption
 (both transient and terminal)
 
 
-Returns a _jet-consume-context_, which can be used to stop or drain the consumer.
+Returns a _jet-consume-context_.
 `,
 		Args: []*slip.DocArg{
 			{

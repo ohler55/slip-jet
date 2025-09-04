@@ -39,7 +39,7 @@ func (caller clientPushConsumerCaller) Call(s *slip.Scope, args slip.List, depth
 
 func (caller clientPushConsumerCaller) FuncDocs() *slip.FuncDoc {
 	return &slip.FuncDoc{
-		Name: ":consumer",
+		Name: ":push-consumer",
 		Text: `Returns a _jet-push-consumer_ for an existing consumer, allowing processing
 of messages. If consumer does not exist, _nil_ is returned.`,
 		Args: []*slip.DocArg{
