@@ -32,7 +32,8 @@ func TestClientCreateOrUpdateConsumerError(t *testing.T) {
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))
                                     (jss (send js :create-stream "create-or-update-test"
                                                   :subjects '("test.update.>"))))
-                              (send js :create-or-update-consumer "update bad"))`, natsURL),
+                               (recover r (progn (send js :close) (panic r))
+                                 (send js :create-or-update-consumer "update bad")))`, natsURL),
 		PanicType: slip.ErrorSymbol,
 	}).Test(t)
 }

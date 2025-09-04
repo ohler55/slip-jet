@@ -76,6 +76,17 @@ func defConsumerInfo() {
 
 	consumerInfoFlavor.DefMethod(":timestamp", "", consumerInfoTimestampCaller{})
 	flavors.FlosFun("jet-consumer-info-timestamp", ":timestamp", consumerInfoTimestampCaller{}.FuncDocs(), &Pkg)
+
+	consumerInfoFlavor.DefMethod(":paused", "", consumerInfoPausedCaller{})
+	flavors.FlosFun("jet-consumer-info-paused", ":paused", consumerInfoPausedCaller{}.FuncDocs(), &Pkg)
+
+	consumerInfoFlavor.DefMethod(":pause-remaining", "", consumerInfoPauseRemainingCaller{})
+	flavors.FlosFun("jet-consumer-info-pause-remaining", ":pause-remaining",
+		consumerInfoPauseRemainingCaller{}.FuncDocs(), &Pkg)
+
+	consumerInfoFlavor.DefMethod(":priority-groups", "", consumerInfoPriorityGroupsCaller{})
+	flavors.FlosFun("jet-consumer-info-priority-groups", ":priorityGroups",
+		consumerInfoPriorityGroupsCaller{}.FuncDocs(), &Pkg)
 }
 
 // MakeConsumerInfo makes a jet-consumer-info.
@@ -347,6 +358,66 @@ func (caller consumerInfoTimestampCaller) FuncDocs() *slip.FuncDoc {
 		Name:   ":timestamp",
 		Text:   `Returns the timestamp in the consumer-info.`,
 		Return: "time",
+	}
+}
+
+type consumerInfoPausedCaller struct{}
+
+func (caller consumerInfoPausedCaller) Call(s *slip.Scope, args slip.List, _ int) (result slip.Object) {
+	self := s.Get("self").(*flavors.Instance)
+	ci := self.Any.(*jetstream.ConsumerInfo)
+	if ci.Paused {
+		result = slip.True
+	}
+	return
+}
+
+func (caller consumerInfoPausedCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name:   ":paused",
+		Text:   `Returns the paused indicator of the consumer-info.`,
+		Return: "boolean",
+	}
+}
+
+type consumerInfoPauseRemainingCaller struct{}
+
+func (caller consumerInfoPauseRemainingCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+	self := s.Get("self").(*flavors.Instance)
+	ci := self.Any.(*jetstream.ConsumerInfo)
+
+	return slip.DoubleFloat(float64(ci.PauseRemaining) / float64(time.Second))
+}
+
+func (caller consumerInfoPauseRemainingCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name:   ":pause-remaining",
+		Text:   `Returns the pause remaining in the consumer-info in seconds.`,
+		Return: "real",
+	}
+}
+
+type consumerInfoPriorityGroupsCaller struct{}
+
+func (caller consumerInfoPriorityGroupsCaller) Call(s *slip.Scope, args slip.List, _ int) slip.Object {
+	self := s.Get("self").(*flavors.Instance)
+	ci := self.Any.(*jetstream.ConsumerInfo)
+	var groups slip.List
+	for _, pg := range ci.PriorityGroups {
+		groups = append(groups, slip.List{
+			slip.Symbol(":group"), slip.String(pg.Group),
+			slip.Symbol(":pinned-client-id"), slip.String(pg.PinnedClientID),
+			slip.Symbol(":pinned-timestamp"), slip.Time(pg.PinnedTS),
+		})
+	}
+	return groups
+}
+
+func (caller consumerInfoPriorityGroupsCaller) FuncDocs() *slip.FuncDoc {
+	return &slip.FuncDoc{
+		Name:   ":priority-groups",
+		Text:   `Returns the priority groups of the consumer-info.`,
+		Return: "boolean",
 	}
 }
 

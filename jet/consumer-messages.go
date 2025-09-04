@@ -20,7 +20,9 @@ func (caller consumerMessagesCaller) Call(s *slip.Scope, args slip.List, depth i
 	if v, has := slip.GetArgsKeyValue(args, slip.Symbol(":error-on-missing-heartbeat")); has {
 		opts = append(opts, jetstream.WithMessagesErrOnMissingHeartbeat(v != nil))
 	}
-	getPullOptArgs(s, args, func(opt any) { opts = append(opts, opt.(jetstream.PullMessagesOpt)) }, depth)
+	getPullOptArgs(s, args, func(opt any) {
+		opts = append(opts, opt.(jetstream.PullMessagesOpt))
+	}, depth)
 
 	mc, err := consumer.Messages(opts...)
 	if err != nil {

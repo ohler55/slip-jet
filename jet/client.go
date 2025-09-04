@@ -99,6 +99,27 @@ func defClient() {
 	clientFlavor.DefMethod(":delete-consumer", "", clientDeleteConsumerCaller{})
 	flavors.FlosFun("jet-client-delete-consumer", ":delete-consumer", clientDeleteConsumerCaller{}.FuncDocs(), &Pkg)
 
+	clientFlavor.DefMethod(":create-push-consumer", "", clientCreatePushConsumerCaller{})
+	flavors.FlosFun("jet-client-create-push-consumer", ":create-push-consumer",
+		clientCreatePushConsumerCaller{}.FuncDocs(), &Pkg)
+
+	clientFlavor.DefMethod(":update-push-consumer", "", clientUpdatePushConsumerCaller{})
+	flavors.FlosFun("jet-client-update-push-consumer", ":update-push-consumer",
+		clientUpdatePushConsumerCaller{}.FuncDocs(), &Pkg)
+
+	clientFlavor.DefMethod(":create-or-update-push-consumer", "", clientCreateOrUpdatePushConsumerCaller{})
+	flavors.FlosFun("jet-client-create-or-update-push-consumer", ":create-or-update-push-consumer",
+		clientCreateOrUpdatePushConsumerCaller{}.FuncDocs(), &Pkg)
+
+	clientFlavor.DefMethod(":push-consumer", "", clientPushConsumerCaller{})
+	flavors.FlosFun("jet-client-push-consumer", ":push-consumer", clientPushConsumerCaller{}.FuncDocs(), &Pkg)
+
+	clientFlavor.DefMethod(":pause-consumer", "", clientPauseConsumerCaller{})
+	flavors.FlosFun("jet-client-pause-consumer", ":pause-consumer", clientPauseConsumerCaller{}.FuncDocs(), &Pkg)
+
+	clientFlavor.DefMethod(":resume-consumer", "", clientResumeConsumerCaller{})
+	flavors.FlosFun("jet-client-resume-consumer", ":resume-consumer", clientResumeConsumerCaller{}.FuncDocs(), &Pkg)
+
 	clientFlavor.DefMethod(":account-info", "", accountInfoCaller{})
 	flavors.FlosFun("jet-account-info", ":account-info", accountInfoCaller{}.FuncDocs(), &Pkg)
 }

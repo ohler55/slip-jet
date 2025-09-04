@@ -9,15 +9,15 @@ import (
 	"github.com/ohler55/slip/pkg/flavors"
 )
 
-type clientDeleteConsumerCaller struct{}
+type clientResumeConsumerCaller struct{}
 
-func (caller clientDeleteConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
+func (caller clientResumeConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.MethodArgCountCheck(s, depth, self, ":delete-consumer", len(args), 2, 4)
+	slip.MethodArgCountCheck(s, depth, self, ":resume-consumer", len(args), 2, 4)
 	js := self.Any.(*Client).js
 
 	stream := slip.MustBeString(args[0], "stream")
-	name := slip.MustBeString(args[1], "name")
+	consumer := slip.MustBeString(args[1], "consumer")
 
 	ctx := context.Background()
 	if v, has := slip.GetArgsKeyValue(args[2:], slip.Symbol(":timeout")); has {
@@ -25,17 +25,16 @@ func (caller clientDeleteConsumerCaller) Call(s *slip.Scope, args slip.List, dep
 		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
-	if err := js.DeleteConsumer(ctx, stream, name); err != nil {
+	if _, err := js.ResumeConsumer(ctx, stream, consumer); err != nil {
 		panic(err)
 	}
 	return nil
 }
 
-func (caller clientDeleteConsumerCaller) FuncDocs() *slip.FuncDoc {
+func (caller clientResumeConsumerCaller) FuncDocs() *slip.FuncDoc {
 	return &slip.FuncDoc{
-		Name: ":delete-consumer",
-		Text: `Removes a consumer with given name from a stream. If consumer does not
-exist an error is raised.`,
+		Name: ":resume-consumer",
+		Text: `Resumes a consumer until the designated time. The time remaining in seconds is returned.`,
 		Args: []*slip.DocArg{
 			{
 				Name: "stream",
@@ -43,9 +42,9 @@ exist an error is raised.`,
 				Text: "The stream to remove the consumer from.",
 			},
 			{
-				Name: "name",
+				Name: "consumer",
 				Type: "string",
-				Text: "The consumer name of the consumer to delete.",
+				Text: "The name of the consumer to resume.",
 			},
 			{Name: "&key"},
 			{
@@ -54,5 +53,6 @@ exist an error is raised.`,
 				Text: `The number of seconds to wait before timing out.`,
 			},
 		},
+		Return: "nil",
 	}
 }

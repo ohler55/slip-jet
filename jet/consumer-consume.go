@@ -28,7 +28,9 @@ func (caller consumerConsumeCaller) Call(s *slip.Scope, args slip.List, depth in
 				_ = errCaller.Call(s, slip.List{MakeConsumeContext(cc), slip.ErrorNew(s, depth, "%s", err)}, 0)
 			}))
 	}
-	getPullOptArgs(s, args, func(opt any) { opts = append(opts, opt.(jetstream.PullConsumeOpt)) }, depth)
+	getPullOptArgs(s, args, func(opt any) {
+		opts = append(opts, opt.(jetstream.PullConsumeOpt))
+	}, depth)
 
 	cc, err := consumer.Consume(func(msg jetstream.Msg) {
 		_ = msgCaller.Call(s, slip.List{MakeMsg(msg)}, 0)
@@ -115,7 +117,7 @@ new pull request to the server. Defaults to 50% of _:max-bytes_ (if set).`,
 trigger new pull request to the server. Defaults to 50% of _:max-messages_.`,
 			},
 		},
-		Return: "jet-message-context",
+		Return: "jet-consume-context",
 	}
 }
 

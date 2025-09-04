@@ -11,23 +11,22 @@ import (
 	"github.com/ohler55/slip/pkg/flavors"
 )
 
-type clientConsumerCaller struct{}
+type streamConsumerCaller struct{}
 
-func (caller clientConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
+func (caller streamConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.MethodArgCountCheck(s, depth, self, ":consumer", len(args), 2, 4)
-	js := self.Any.(*Client).js
+	slip.MethodArgCountCheck(s, depth, self, ":consumer", len(args), 1, 3)
+	stream := self.Any.(jetstream.Stream)
 
-	stream := slip.MustBeString(args[0], "stream")
-	name := slip.MustBeString(args[1], "name")
-
+	name := slip.MustBeString(args[0], "name")
 	ctx := context.Background()
-	if v, has := slip.GetArgsKeyValue(args[2:], slip.Symbol(":timeout")); has {
+
+	if v, has := slip.GetArgsKeyValue(args[1:], slip.Symbol(":timeout")); has {
 		var cf context.CancelFunc
 		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
-	consumer, err := js.Consumer(ctx, stream, name)
+	consumer, err := stream.Consumer(ctx, name)
 	if err != nil {
 		if errors.Is(err, jetstream.ErrConsumerNotFound) {
 			return nil
@@ -37,21 +36,16 @@ func (caller clientConsumerCaller) Call(s *slip.Scope, args slip.List, depth int
 	return MakeConsumer(consumer)
 }
 
-func (caller clientConsumerCaller) FuncDocs() *slip.FuncDoc {
+func (caller streamConsumerCaller) FuncDocs() *slip.FuncDoc {
 	return &slip.FuncDoc{
 		Name: ":consumer",
 		Text: `Returns a _jet-consumer_ for an existing consumer, allowing processing
 of messages. If consumer does not exist, _nil_ is returned.`,
 		Args: []*slip.DocArg{
 			{
-				Name: "stream",
-				Type: "string",
-				Text: "The stream to search for the consumer in.",
-			},
-			{
 				Name: "name",
 				Type: "string",
-				Text: "The consumer name of the consumer to get.",
+				Text: `The consumer name of the consumer to get.`,
 			},
 			{Name: "&key"},
 			{

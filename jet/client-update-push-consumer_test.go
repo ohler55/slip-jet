@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Peter Ohler, All rights reserved.
+// Copyright (c) 2025, Peter Ohler, All rights reserved.
 
 package jet_test
 
@@ -10,29 +10,34 @@ import (
 	"github.com/ohler55/slip/sliptest"
 )
 
-func TestClientUpdateConsumerOk(t *testing.T) {
+func TestClientUpdatePushConsumerOk(t *testing.T) {
 	defer cleanupTestStream("update-test")
 
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))
                                     (jss (send js :create-stream "update-test" :subjects '("test.update.>")))
-                                    (consumer (send js :create-consumer "update-test" :name "eater"))
-                                    (updated (send js :update-consumer "update-test" :timeout 0.1 :name "eater"))
-                                    (name (send updated :name)))
+                                    (consumer (send js :create-push-consumer "update-test"
+                                                       :name "puss"
+                                                       :deliver-subject "test.quux"))
+                                    (updated (send js :update-push-consumer "update-test"
+                                                      :name "puss"
+                                                      :deliver-subject "test.puss"
+                                                      :timeout 0.1))
+                                    (name (send (send updated :info) :name)))
                               (send js :close)
                               (send consumer :equal updated))`, natsURL),
 		Expect: "t",
 	}).Test(t)
 }
 
-func TestClientUpdateConsumerError(t *testing.T) {
+func TestClientUpdatePushConsumerError(t *testing.T) {
 	defer cleanupTestStream("update-test")
 
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"))
                                     (jss (send js :create-stream "update-test" :subjects '("test.update.>"))))
                                (recover r (progn (send js :close) (panic r))
-                                 (send js :update-consumer "update-test")))`, natsURL),
+                                 (send js :update-push-consumer "update bad")))`, natsURL),
 		PanicType: slip.ErrorSymbol,
 	}).Test(t)
 }

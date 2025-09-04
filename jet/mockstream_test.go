@@ -136,3 +136,42 @@ func (ms *mockStream) ListConsumers(context.Context) jetstream.ConsumerInfoListe
 func (ms *mockStream) ConsumerNames(context.Context) jetstream.ConsumerNameLister {
 	return nil
 }
+
+// CreatePushConsumer does nothing.
+func (ms *mockStream) CreatePushConsumer(
+	ctx context.Context, cfg jetstream.ConsumerConfig) (jetstream.PushConsumer, error) {
+	return nil, ms.err
+}
+
+// CreateOrUpdatePushConsumer does nothing.
+func (ms *mockStream) CreateOrUpdatePushConsumer(
+	ctx context.Context, cfg jetstream.ConsumerConfig) (jetstream.PushConsumer, error) {
+	return nil, ms.err
+}
+
+// PauseConsumer does nothing
+func (ms *mockStream) PauseConsumer(
+	ctx context.Context, consumer string, pauseUntil time.Time) (*jetstream.ConsumerPauseResponse, error) {
+	return nil, ms.err
+}
+
+// ResumeConsumer does nothing
+func (ms *mockStream) ResumeConsumer(
+	ctx context.Context, consumer string) (*jetstream.ConsumerPauseResponse, error) {
+	return nil, ms.err
+}
+
+// PushConsumer does nothing.
+func (ms *mockStream) PushConsumer(ctx context.Context, consumer string) (jetstream.PushConsumer, error) {
+	return nil, ms.err
+}
+
+// UnpinConsumer does nothing.
+func (ms *mockStream) UnpinConsumer(ctx context.Context, consumer string, group string) error {
+	return ms.err
+}
+
+// UpdatePushConsumer does nothing.
+func (ms *mockStream) UpdatePushConsumer(ctx context.Context, cfg jetstream.ConsumerConfig) (jetstream.PushConsumer, error) {
+	return nil, ms.err
+}

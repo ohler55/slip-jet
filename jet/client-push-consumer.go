@@ -1,4 +1,4 @@
-// Copyright (c) 2024, Peter Ohler, All rights reserved.
+// Copyright (c) 2025, Peter Ohler, All rights reserved.
 
 package jet
 
@@ -11,11 +11,11 @@ import (
 	"github.com/ohler55/slip/pkg/flavors"
 )
 
-type clientConsumerCaller struct{}
+type clientPushConsumerCaller struct{}
 
-func (caller clientConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
+func (caller clientPushConsumerCaller) Call(s *slip.Scope, args slip.List, depth int) slip.Object {
 	self := s.Get("self").(*flavors.Instance)
-	slip.MethodArgCountCheck(s, depth, self, ":consumer", len(args), 2, 4)
+	slip.MethodArgCountCheck(s, depth, self, ":push-consumer", len(args), 2, 4)
 	js := self.Any.(*Client).js
 
 	stream := slip.MustBeString(args[0], "stream")
@@ -27,20 +27,20 @@ func (caller clientConsumerCaller) Call(s *slip.Scope, args slip.List, depth int
 		ctx, cf = context.WithTimeout(ctx, mustBeDuration(s, v, ":timeout", depth))
 		defer cf()
 	}
-	consumer, err := js.Consumer(ctx, stream, name)
+	consumer, err := js.PushConsumer(ctx, stream, name)
 	if err != nil {
 		if errors.Is(err, jetstream.ErrConsumerNotFound) {
 			return nil
 		}
 		panic(err)
 	}
-	return MakeConsumer(consumer)
+	return MakePushConsumer(consumer)
 }
 
-func (caller clientConsumerCaller) FuncDocs() *slip.FuncDoc {
+func (caller clientPushConsumerCaller) FuncDocs() *slip.FuncDoc {
 	return &slip.FuncDoc{
 		Name: ":consumer",
-		Text: `Returns a _jet-consumer_ for an existing consumer, allowing processing
+		Text: `Returns a _jet-push-consumer_ for an existing consumer, allowing processing
 of messages. If consumer does not exist, _nil_ is returned.`,
 		Args: []*slip.DocArg{
 			{
@@ -60,6 +60,6 @@ of messages. If consumer does not exist, _nil_ is returned.`,
 				Text: `The number of seconds to wait before timing out.`,
 			},
 		},
-		Return: "jet-consumer",
+		Return: "jet-push-consumer",
 	}
 }

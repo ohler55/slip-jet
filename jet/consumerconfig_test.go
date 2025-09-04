@@ -45,6 +45,14 @@ func TestConsumerConfigOk(t *testing.T) {
 	checkPlistValue(t, ":memory-storage", plist, slip.True)
 	checkPlistValue(t, ":filter-subjects", plist, slip.List{slip.String("test.one"), slip.String("test.two")})
 	checkPlistValue(t, ":metadata", plist, slip.List{slip.String("meta"), slip.String("data")})
+	checkPlistValue(t, ":pause-until", plist, slip.Time(time.Date(2024, time.December, 9, 19, 18, 17, 16, time.UTC)))
+	checkPlistValue(t, ":priority-policy", plist, slip.Symbol(":pinned"))
+	checkPlistValue(t, ":pinned-ttl", plist, slip.DoubleFloat(2.5))
+	checkPlistValue(t, ":priority-groups", plist, slip.List{slip.String("quux")})
+	checkPlistValue(t, ":deliver-subject", plist, slip.String("test.deliver"))
+	checkPlistValue(t, ":deliver-group", plist, slip.String("quux"))
+	checkPlistValue(t, ":flow-control", plist, slip.True)
+	checkPlistValue(t, ":idle-heartbeat", plist, slip.DoubleFloat(7.5))
 }
 
 func sampleConsumerConfig(cfg *jetstream.ConsumerConfig) {
@@ -74,6 +82,14 @@ func sampleConsumerConfig(cfg *jetstream.ConsumerConfig) {
 		slip.Symbol(":memory-storage"), slip.True,
 		slip.Symbol(":filter-subjects"), slip.List{slip.String("test.one"), slip.String("test.two")},
 		slip.Symbol(":metadata"), slip.List{slip.String("meta"), slip.String("data")},
+		slip.Symbol(":pause-until"), slip.Time(time.Date(2024, time.December, 9, 19, 18, 17, 16, time.UTC)),
+		slip.Symbol(":priority-policy"), slip.Symbol(":pinned"),
+		slip.Symbol(":pinned-ttl"), slip.DoubleFloat(2.5),
+		slip.Symbol(":priority-groups"), slip.List{slip.String("quux")},
+		slip.Symbol(":deliver-subject"), slip.String("test.deliver"),
+		slip.Symbol(":deliver-group"), slip.String("quux"),
+		slip.Symbol(":flow-control"), slip.True,
+		slip.Symbol(":idle-heartbeat"), slip.DoubleFloat(7.5),
 	})
 }
 
@@ -216,5 +232,52 @@ func TestConsumerConfigNotKeyword(t *testing.T) {
 	var cfg jetstream.ConsumerConfig
 	tt.Panic(t, func() {
 		jet.InitConsumerConfig(&cfg, slip.List{slip.Symbol(":not-an-option"), slip.True})
+	})
+}
+
+func TestConsumerConfigPauseUntil(t *testing.T) {
+	var cfg jetstream.ConsumerConfig
+	tt.Panic(t, func() {
+		jet.InitConsumerConfig(&cfg, slip.List{slip.Symbol(":pause-until"), slip.True})
+	})
+}
+
+func TestConsumerConfigPriorityPolicy(t *testing.T) {
+	var cfg jetstream.ConsumerConfig
+	jet.InitConsumerConfig(&cfg, slip.List{
+		slip.Symbol(":priority-policy"), slip.Symbol(":none"),
+	})
+	plist := jet.ConsumerConfigPropList(&cfg)
+	checkPlistValue(t, ":priority-policy", plist, slip.Symbol(":none"))
+
+	jet.InitConsumerConfig(&cfg, slip.List{
+		slip.Symbol(":priority-policy"), slip.Symbol(":overflow"),
+	})
+	plist = jet.ConsumerConfigPropList(&cfg)
+	checkPlistValue(t, ":priority-policy", plist, slip.Symbol(":overflow"))
+
+	tt.Panic(t, func() {
+		jet.InitConsumerConfig(&cfg, slip.List{slip.Symbol(":priority-policy"), slip.True})
+	})
+}
+
+func TestConsumerConfigPinnedTTL(t *testing.T) {
+	var cfg jetstream.ConsumerConfig
+	tt.Panic(t, func() {
+		jet.InitConsumerConfig(&cfg, slip.List{slip.Symbol(":pinned-ttl"), slip.True})
+	})
+}
+
+func TestConsumerConfigIdleHeartbeat(t *testing.T) {
+	var cfg jetstream.ConsumerConfig
+	tt.Panic(t, func() {
+		jet.InitConsumerConfig(&cfg, slip.List{slip.Symbol(":idle-heartbeat"), slip.True})
+	})
+}
+
+func TestConsumerConfigPriorityGroups(t *testing.T) {
+	var cfg jetstream.ConsumerConfig
+	tt.Panic(t, func() {
+		jet.InitConsumerConfig(&cfg, slip.List{slip.Symbol(":priority-groups"), slip.True})
 	})
 }
