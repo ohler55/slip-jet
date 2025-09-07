@@ -38,7 +38,7 @@ func (caller streamCreatePushConsumerCaller) FuncDocs() *slip.FuncDoc {
 		":create-push-consumer",
 		nil,
 		"<jet-push-consumer>",
-		`creates a push consumer on a given stream with given
+		`Creates a push consumer on a given stream with given
 config. If consumer already exists and the provided configuration
 differs from its configuration, ErrConsumerExists is returned. If the
 provided configuration is the same as the existing consumer, the

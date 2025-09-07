@@ -37,8 +37,8 @@ func (caller streamUpdatePushConsumerCaller) FuncDocs() *slip.FuncDoc {
 	return makeConsumerMethodFuncDoc(
 		":update-push-consumer",
 		nil,
-		"<jet-consumer>",
+		"<jet-push-consumer>",
 		`Updates an existing consumer. If consumer does not
-exist, an error is raised. A _jet-consumer_ is returned.
+exist, an error is raised. A _jet-push-consumer_ is returned.
 `)
 }
