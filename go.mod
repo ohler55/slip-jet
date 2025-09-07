@@ -6,7 +6,7 @@ require (
 	github.com/nats-io/nats-server/v2 v2.11.8
 	github.com/nats-io/nats.go v1.45.0
 	github.com/ohler55/ojg v1.26.10
-	github.com/ohler55/slip v1.1.0
+	github.com/ohler55/slip v1.2.0
 )
 
 require (
