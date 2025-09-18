@@ -261,6 +261,12 @@ func sampleConsumerInfo(info *jetstream.ConsumerInfo, tm time.Time) {
 	info.PriorityGroups = []jetstream.PriorityGroupState{
 		{Group: "grouper", PinnedClientID: "clide", PinnedTS: tm},
 	}
-
 	sampleConsumerConfig(&info.Config)
+}
+
+func TestConsumerInfoGoMakeOnly(t *testing.T) {
+	(&sliptest.Function{
+		Source:    `(make-instance 'jet-consumer-info)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
 }

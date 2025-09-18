@@ -228,3 +228,10 @@ func TestConsumerConsume(t *testing.T) {
 		PanicType: slip.ErrorSymbol,
 	}).Test(t)
 }
+
+func TestConsumerGoMakeOnly(t *testing.T) {
+	(&sliptest.Function{
+		Source:    `(make-instance 'jet-consumer)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}

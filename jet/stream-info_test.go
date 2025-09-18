@@ -149,3 +149,10 @@ func TestStreamInfoTimestamp(t *testing.T) {
 		Expect: "@2024-12-07T19:00:02.000000123Z",
 	}).Test(t)
 }
+
+func TestStreamInfoGoMakeOnly(t *testing.T) {
+	(&sliptest.Function{
+		Source:    `(make-instance 'jet-stream-info)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}

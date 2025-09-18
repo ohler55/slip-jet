@@ -35,3 +35,10 @@ Stop()
 		PanicType: slip.ErrorSymbol,
 	}).Test(t)
 }
+
+func TestMessagesConttextGoMakeOnly(t *testing.T) {
+	(&sliptest.Function{
+		Source:    `(make-instance 'jet-messages-context)`,
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}

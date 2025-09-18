@@ -29,7 +29,7 @@ purging a stream.`),
 		&Pkg,
 	)
 	streamFlavor.Final = true
-	// streamFlavor.GoMakeOnly = true
+	streamFlavor.GoMakeOnly = true
 
 	streamFlavor.DefMethod(":info", "", streamInfoCaller{})
 	flavors.FlosFun("jet-stream-info", ":info", streamInfoCaller{}.FuncDocs(), &Pkg)
