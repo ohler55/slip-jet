@@ -19,6 +19,7 @@ func TestStreamUnpinConsumerOk(t *testing.T) {
                                     (consumer (send jss :create-consumer
                                                         :ack-policy :all
                                                         :durable "pin"
+                                                        :priority-policy :pinned
                                                         :priority-groups '("pg")
                                                         :timeout 0.1)))
                               (send jss :unpin-consumer "pin" "pg" :timeout 1.0)
@@ -36,6 +37,7 @@ func TestStreamUnpinConsumerError(t *testing.T) {
                                     (consumer (send jss :create-consumer
                                                         :ack-policy :all
                                                         :durable "pin"
+                                                        :priority-policy :pinned
                                                         :priority-groups '("pg")
                                                         :timeout 0.1)))
                               (send js :close)

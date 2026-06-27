@@ -172,6 +172,18 @@ func (ms *mockStream) UnpinConsumer(ctx context.Context, consumer string, group 
 }
 
 // UpdatePushConsumer does nothing.
-func (ms *mockStream) UpdatePushConsumer(ctx context.Context, cfg jetstream.ConsumerConfig) (jetstream.PushConsumer, error) {
+func (ms *mockStream) UpdatePushConsumer(
+	ctx context.Context, cfg jetstream.ConsumerConfig) (jetstream.PushConsumer, error) {
+	return nil, ms.err
+}
+
+// ResetConsumer does nothing.
+func (ms *mockStream) ResetConsumer(ctx context.Context, consumer string) (*jetstream.ConsumerResetResponse, error) {
+	return nil, ms.err
+}
+
+// ResetConsumerToSequence does nothing
+func (ms *mockStream) ResetConsumerToSequence(
+	ctx context.Context, consumer string, seq uint64) (*jetstream.ConsumerResetResponse, error) {
 	return nil, ms.err
 }

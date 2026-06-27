@@ -32,7 +32,6 @@ func defStreamInfo() {
 		&Pkg,
 	)
 	streamInfoFlavor.Final = true
-	streamInfoFlavor.GoMakeOnly = true
 
 	streamInfoFlavor.DefMethod(":state", "", infoStateCaller{})
 	flavors.FlosFun("jet-stream-info-state", ":state", infoStateCaller{}.FuncDocs(), &Pkg)

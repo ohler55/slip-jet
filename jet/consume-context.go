@@ -26,7 +26,6 @@ func defConsumeContext() {
 		&Pkg,
 	)
 	consumeContextFlavor.Final = true
-	consumeContextFlavor.GoMakeOnly = true
 
 	consumeContextFlavor.DefMethod(":stop", "", consumeContextStopCaller{})
 	flavors.FlosFun("jet-consume-context-stop", ":stop", consumeContextStopCaller{}.FuncDocs(), &Pkg)

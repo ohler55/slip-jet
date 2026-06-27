@@ -12,7 +12,7 @@ type mockMessageContext struct {
 	err error
 }
 
-func (mc *mockMessageContext) Next() (jetstream.Msg, error) {
+func (mc *mockMessageContext) Next(opts ...jetstream.NextOpt) (jetstream.Msg, error) {
 	return mc.msg, mc.err
 }
 

@@ -662,7 +662,7 @@ func TestClientConnectTokenHandler(t *testing.T) {
 		Source: fmt.Sprintf(`(setq js
                                    (jet-connect :url %q
                                                 :user "u1" :password "password"
-                                                :token-handler (lambda (c) "toker")))`,
+                                                :token-handler (lambda () "toker")))`,
 			natsURL),
 		Expect: "/#<jet-client [0-9a-f]+>/",
 	}).Test(t)

@@ -28,7 +28,6 @@ a stream, as well as fetching consumer info.
 		&Pkg,
 	)
 	consumerFlavor.Final = true
-	consumerFlavor.GoMakeOnly = true
 
 	consumerFlavor.DefMethod(":info", "", consumerInfoCaller{})
 	flavors.FlosFun("jet-consumer-info", ":info", consumerInfoCaller{}.FuncDocs(), &Pkg)

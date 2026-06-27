@@ -263,10 +263,3 @@ func sampleConsumerInfo(info *jetstream.ConsumerInfo, tm time.Time) {
 	}
 	sampleConsumerConfig(&info.Config)
 }
-
-func TestConsumerInfoGoMakeOnly(t *testing.T) {
-	(&sliptest.Function{
-		Source:    `(make-instance 'jet-consumer-info)`,
-		PanicType: slip.ErrorSymbol,
-	}).Test(t)
-}

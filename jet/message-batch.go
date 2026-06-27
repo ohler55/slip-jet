@@ -26,7 +26,6 @@ func defMessagesBatch() {
 		&Pkg,
 	)
 	messageBatchFlavor.Final = true
-	messageBatchFlavor.GoMakeOnly = true
 
 	messageBatchFlavor.DefMethod(":messages", "", messageBatchMessagesCaller{})
 	flavors.FlosFun("jet-messages-batch-messages", ":messages", messageBatchMessagesCaller{}.FuncDocs(), &Pkg)
