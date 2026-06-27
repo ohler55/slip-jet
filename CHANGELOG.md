@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.0] - 2025-09-06
 ### Added
-- Added methods ro support push-consumers.
+- Added methods to support push-consumers.
 ### Changed
 - Updated to v1.2.0 of slip.
 
