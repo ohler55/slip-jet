@@ -88,6 +88,25 @@ supports compression. If the server does too, then data will be compressed.`,
 			}
 		},
 	},
+	":user-credentials": {
+		doc: &slip.DocArg{
+			Name: ":user-credentials",
+			Type: "string",
+			Text: `Path to a NATS credentials file (.creds). Sets up both the
+JWT callback and the NKey signing callback via nats.UserCredentials, so NSC
+JWT (decentralized) auth works without any other options. Equivalent to
+passing the file to nats.UserCredentials() when connecting via Go.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			if ss, ok := v.(slip.String); ok {
+				if err := nats.UserCredentials(string(ss))(options); err != nil {
+					panic(fmt.Errorf(":user-credentials: %w", err))
+				}
+			} else {
+				slip.TypePanic(s, 0, ":user-credentials", v, "string")
+			}
+		},
+	},
 	// CustomDialer, a CustomDialer not supporter yet
 	":custom-reconnect-delay-callback": {
 		doc: &slip.DocArg{
