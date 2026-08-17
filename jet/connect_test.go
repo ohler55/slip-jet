@@ -25,9 +25,9 @@ func TestClientConnectPassword(t *testing.T) {
 }
 
 func TestClientConnectCredsBadType(t *testing.T) {
-	// A non-string :creds is a type error, raised while parsing options
+	// A non-string :user-credentials is a type error, raised while parsing options
 	(&sliptest.Function{
-		Source:    fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password" :creds t)`, natsURL),
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password" :user-credentials t)`, natsURL),
 		PanicType: slip.TypeErrorSymbol,
 	}).Test(t)
 }

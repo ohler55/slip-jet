@@ -88,9 +88,9 @@ supports compression. If the server does too, then data will be compressed.`,
 			}
 		},
 	},
-	":creds": {
+	":user-credentials": {
 		doc: &slip.DocArg{
-			Name: ":creds",
+			Name: ":user-credentials",
 			Type: "string",
 			Text: `Path to a NATS credentials file (.creds). Sets up both the
 JWT callback and the NKey signing callback via nats.UserCredentials, so NSC
@@ -100,10 +100,10 @@ passing the file to nats.UserCredentials() when connecting via Go.`,
 		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
 			if ss, ok := v.(slip.String); ok {
 				if err := nats.UserCredentials(string(ss))(options); err != nil {
-					panic(fmt.Errorf(":creds: %w", err))
+					panic(fmt.Errorf(":user-credentials: %w", err))
 				}
 			} else {
-				slip.TypePanic(s, 0, ":creds", v, "string")
+				slip.TypePanic(s, 0, ":user-credentials", v, "string")
 			}
 		},
 	},

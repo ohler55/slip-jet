@@ -69,7 +69,7 @@ func (caller optionsCaller) Call(s *slip.Scope, args slip.List, depth int) slip.
 	options = caller.appendFunc(options, ":user-jwt", cl.nc.Opts.UserJWT, cl.options)
 	options = caller.appendBool(options, ":verbose", cl.nc.Opts.Verbose)
 
-	options = caller.appendFromArgs(options, ":creds", cl.options)
+	options = caller.appendFromArgs(options, ":user-credentials", cl.options)
 	options = caller.appendFromArgs(options, ":prefix", cl.options)
 	options = caller.appendFromArgs(options, ":publish-async-error-handler", cl.options)
 	options = caller.appendFromArgs(options, ":publish-async-max-pending", cl.options)

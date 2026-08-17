@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Added `:creds` option to `jet-connect` for NSC/decentralized JWT auth via a
+- Added `:user-credentials` option to `jet-connect` for NSC/decentralized JWT auth via a
   NATS credentials file (wraps `nats.UserCredentials`).
 
 ## [1.5.0] - 2026-06-26

@@ -80,7 +80,7 @@ func startJWTServer(t *testing.T) (url, credsPath string) {
 	return s.ClientURL(), credsPath
 }
 
-// E2E test: jet-connect :creds authenticates against a JWT server,
+// E2E test: jet-connect :user-credentials authenticates against a JWT server,
 // and the same server rejects a connection that presents no credentials
 func TestConnectCredsAuthenticates(t *testing.T) {
 	url, credsPath := startJWTServer(t)
@@ -97,10 +97,10 @@ func TestConnectCredsAuthenticates(t *testing.T) {
 	tt.Nil(t, err)
 	nc.Close()
 
-	// The real assertion: slip-jet's :creds option authenticates end-to-end,
+	// The real assertion: slip-jet's :user-credentials option authenticates end-to-end,
 	// and the authenticated client can drive JetStream (create a stream).
 	(&sliptest.Function{
-		Source: fmt.Sprintf(`(let ((js (jet-connect :url %q :creds %q)))
+		Source: fmt.Sprintf(`(let ((js (jet-connect :url %q :user-credentials %q)))
                               (send js :create-or-update-stream "TEST" :subjects '("test.>") :storage :memory)
                               (send js :close)
                               js)`, url, credsPath),
