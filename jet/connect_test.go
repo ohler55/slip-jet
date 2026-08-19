@@ -24,14 +24,6 @@ func TestClientConnectPassword(t *testing.T) {
 	}).Test(t)
 }
 
-func TestClientConnectCredsBadType(t *testing.T) {
-	// A non-string :user-credentials is a type error, raised while parsing options
-	(&sliptest.Function{
-		Source:    fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password" :user-credentials t)`, natsURL),
-		PanicType: slip.TypeErrorSymbol,
-	}).Test(t)
-}
-
 func TestClientConnectAllowReconnect(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q
@@ -731,6 +723,39 @@ func TestClientConnectBadUser(t *testing.T) {
 // 	tt.Nil(t, err)
 // 	tt.Equal(t, "jit", jwt)
 // }
+
+func TestClientConnectUserCredentialsBadType(t *testing.T) {
+	// A non-string :user-credentials is a type error, raised while parsing options
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password" :user-credentials t)`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectUserCredentialsError(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credentials "quux")`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credentials '("quux" "quack"))`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectUserCredentialsListNotString(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credentials '("quux" t))`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectUserCredentialsListEmpty(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credentials '())`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
 
 func TestClientConnectUserJWTError(t *testing.T) {
 	scope := slip.NewScope()

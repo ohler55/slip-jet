@@ -88,25 +88,6 @@ supports compression. If the server does too, then data will be compressed.`,
 			}
 		},
 	},
-	":user-credentials": {
-		doc: &slip.DocArg{
-			Name: ":user-credentials",
-			Type: "string",
-			Text: `Path to a NATS credentials file (.creds). Sets up both the
-JWT callback and the NKey signing callback via nats.UserCredentials, so NSC
-JWT (decentralized) auth works without any other options. Equivalent to
-passing the file to nats.UserCredentials() when connecting via Go.`,
-		},
-		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
-			if ss, ok := v.(slip.String); ok {
-				if err := nats.UserCredentials(string(ss))(options); err != nil {
-					panic(fmt.Errorf(":user-credentials: %w", err))
-				}
-			} else {
-				slip.TypePanic(s, 0, ":user-credentials", v, "string")
-			}
-		},
-	},
 	// CustomDialer, a CustomDialer not supporter yet
 	":custom-reconnect-delay-callback": {
 		doc: &slip.DocArg{
@@ -677,6 +658,43 @@ a new Inbox and a new Subscription for each request.`,
 				options.User = string(ss)
 			} else {
 				slip.TypePanic(s, 0, ":user", v, "string")
+			}
+		},
+	},
+	":user-credentials": {
+		doc: &slip.DocArg{
+			Name: ":user-credentials",
+			Type: "string|list",
+			Text: `Path to a NATS credentials file (.creds). Sets up both the
+JWT callback and the NKey signing callback via nats.UserCredentials, so NSC
+JWT (decentralized) auth works without any other options. Equivalent to
+passing the file to nats.UserCredentials() when connecting via Go. If the
+value for the option is a list of strings all are passed to the
+nats.UserCredentials() according to the optional arguments to that function.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			switch tv := v.(type) {
+			case slip.String:
+				if err := nats.UserCredentials(string(tv))(options); err != nil {
+					slip.ErrorPanic(s, 0, ":user-credentials: %s", err)
+				}
+			case slip.List:
+				files := make([]string, len(tv))
+				for i, ev := range tv {
+					if ss, ok := ev.(slip.String); ok {
+						files[i] = string(ss)
+					} else {
+						slip.TypePanic(s, 0, ":user-credentials", v, "string", "list of strings")
+					}
+				}
+				if len(files) == 0 {
+					slip.TypePanic(s, 0, ":user-credentials", v, "string", "list of strings")
+				}
+				if err := nats.UserCredentials(files[0], files[1:]...)(options); err != nil {
+					slip.ErrorPanic(s, 0, ":user-credentials: %s", err)
+				}
+			default:
+				slip.TypePanic(s, 0, ":user-credentials", v, "string", "list of strings")
 			}
 		},
 	},
