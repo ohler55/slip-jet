@@ -60,6 +60,20 @@ func TestClientConnectAsyncErrorCallback(t *testing.T) {
 	tt.Equal(t, slip.Symbol("error"), scope.Get("out"))
 }
 
+func TestClientConnectClientCertError(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :client-cert '("quux" "quack"))`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectClientCertBadType(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :client-cert "quux")`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
 func TestClientConnectClosedHandler(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((cc (make-channel 2))

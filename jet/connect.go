@@ -49,6 +49,26 @@ var conOptMap = map[string]*conOpt{
 			}
 		},
 	},
+	":client-cert": {
+		doc: &slip.DocArg{
+			Name: ":client-cert",
+			Type: "list",
+			Text: `The :client-cert option is a helper to provide the client certificate from a file. If
+Secure is not already set this will set it as well. The value must be a list of two filepath strings.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			if pair, _ := v.(slip.List); len(pair) == 2 {
+				if err := nats.ClientCert(
+					slip.MustBeString(pair[0], ":client-cert cert-file"),
+					slip.MustBeString(pair[1], ":client-cert key-file"),
+				)(options); err != nil {
+					slip.ErrorPanic(s, 0, ":client-cert: %s", err)
+				}
+			} else {
+				slip.TypePanic(s, 0, ":client-cert", v, "list of two strings")
+			}
+		},
+	},
 	":closed-callback": {
 		doc: &slip.DocArg{
 			Name: ":closed-callback",
@@ -579,7 +599,6 @@ Defaults to 65536.`,
 			}
 		},
 	},
-	// TLSCertCB, a TLSCertHandler not supported yet
 	// TLSConfig, a *tls.Config not supported yet
 	":tls-handshake-first": {
 		doc: &slip.DocArg{
