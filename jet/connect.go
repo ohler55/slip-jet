@@ -223,6 +223,16 @@ subsequent reconnect attempts if server returns the same auth error twice (regar
 			options.IgnoreAuthErrorAbort = (v != nil)
 		},
 	},
+	":ignore-discovered-servers": {
+		doc: &slip.DocArg{
+			Name: ":ignore-discovered-servers",
+			Type: "boolean",
+			Text: `If set will disable adding advertised server URLs from INFO messages to the server pool.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			options.IgnoreDiscoveredServers = (v != nil)
+		},
+	},
 	// InProcessServer, a InProcessConnProvider not supporter yet
 	":inbox-prefix": {
 		doc: &slip.DocArg{

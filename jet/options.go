@@ -31,6 +31,7 @@ func (caller optionsCaller) Call(s *slip.Scope, args slip.List, depth int) slip.
 	options = append(options, slip.Symbol(":drain-timeout"), slip.DoubleFloat(cl.nc.Opts.DrainTimeout))
 	options = append(options, slip.Symbol(":flusher-timeout"), slip.DoubleFloat(cl.nc.Opts.FlusherTimeout))
 	options = caller.appendBool(options, ":ignore-auth-error-abort", cl.nc.Opts.IgnoreAuthErrorAbort)
+	options = caller.appendBool(options, ":ignore-discovered-servers", cl.nc.Opts.IgnoreDiscoveredServers)
 	// InProcessServer, a InProcessConnProvider not supported yet
 	options = caller.appendString(options, ":inbox-prefix", cl.nc.Opts.InboxPrefix)
 	options = caller.appendFunc(options, ":lame-duck-mode-handler", cl.nc.Opts.LameDuckModeHandler, cl.options)
@@ -68,6 +69,7 @@ func (caller optionsCaller) Call(s *slip.Scope, args slip.List, depth int) slip.
 	options = caller.appendString(options, ":user", cl.nc.Opts.User)
 	options = caller.appendFunc(options, ":user-jwt", cl.nc.Opts.UserJWT, cl.options)
 	options = caller.appendBool(options, ":verbose", cl.nc.Opts.Verbose)
+	options = append(options, slip.Symbol(":write-buffer-size"), slip.Fixnum(cl.nc.Opts.WriteBufferSize))
 
 	options = caller.appendFromArgs(options, ":user-credentials", cl.options)
 	options = caller.appendFromArgs(options, ":prefix", cl.options)

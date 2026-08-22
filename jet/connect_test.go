@@ -257,6 +257,16 @@ func TestClientConnectIgnoreAuthErrorAbort(t *testing.T) {
 	}).Test(t)
 }
 
+func TestClientConnectIgnoreDiscoveredServers(t *testing.T) {
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password" :ignore-discovered-servers 7))
+                                    (val (get (send js :options) :ignore-discovered-servers)))
+                              (send js :close)
+                              val)`, natsURL),
+		Expect: "t",
+	}).Test(t)
+}
+
 func TestClientConnectInboxPrefix(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password" :inbox-prefix "pre"))
