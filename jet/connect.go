@@ -526,6 +526,44 @@ the connection is successfully reconnected.`,
 			}
 		},
 	},
+	":reconnect-on-flusher-error": {
+		doc: &slip.DocArg{
+			Name: ":reconnect-on-flusher-error",
+			Type: "boolean",
+			Text: `When set to true, causes the client to trigger a reconnect if the background
+flusher fails to write to the underlying connection for any reason
+(timeout, broken pipe, connection reset, EOF etc.).
+
+
+This is an advanced option. Most applications do not need to enable
+it: the server-side stale connection detection (via PingInterval /
+MaxPingsOut) and the read loop's own error handling will eventually
+notice a dead connection and the client will reconnect. Enable this
+only if you need faster recovery from a stalled or broken TCP write
+— for example, in latency-sensitive setups where waiting for a ping
+timeout is unacceptable.
+
+
+Messages buffered at the time of the error are lost, as they are
+with any flusher write error. The purpose of this option is to
+limit the blast radius by preventing further messages from being
+buffered into a potentially corrupted connection, not to recover
+the in-flight data.
+
+
+When triggered, the standard DisconnectErrHandler and
+ReconnectHandler callbacks are invoked as with any other reconnect.
+The first reconnect attempt bypasses the configured ReconnectWait
+so that recovery is as fast as possible; if that attempt fails,
+subsequent attempts obey the normal backoff.
+
+
+Defaults to false.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			options.ReconnectOnFlusherError = (v != nil)
+		},
+	},
 	":retry-on-failed-connect": {
 		doc: &slip.DocArg{
 			Name: ":retry-on-failed-connect",

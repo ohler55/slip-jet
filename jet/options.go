@@ -52,6 +52,7 @@ func (caller optionsCaller) Call(s *slip.Scope, args slip.List, depth int) slip.
 	options = append(options, slip.Symbol(":reconnect-jitter-tls"), slip.DoubleFloat(cl.nc.Opts.ReconnectJitterTLS))
 	options = append(options, slip.Symbol(":reconnect-wait"), slip.DoubleFloat(cl.nc.Opts.ReconnectWait))
 	options = caller.appendFunc(options, ":reconnected-callback", cl.nc.Opts.ReconnectedCB, cl.options)
+	options = caller.appendBool(options, ":reconnect-on-flusher-error", cl.nc.Opts.ReconnectOnFlusherError)
 	options = caller.appendBool(options, ":retry-on-failed-connect", cl.nc.Opts.RetryOnFailedConnect)
 	// RootCAsCB, a RootCAsHandler not supported yet
 	options = caller.appendBool(options, ":secure", cl.nc.Opts.Secure)

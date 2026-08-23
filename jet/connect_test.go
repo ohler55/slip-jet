@@ -507,6 +507,17 @@ func TestClientConnectReconnectJitterTLS(t *testing.T) {
 	}).Test(t)
 }
 
+func TestClientConnectReconnectOnFlushError(t *testing.T) {
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"
+                                                     :reconnect-on-flusher-error t))
+                                    (val (get (send js :options) :reconnect-on-flusher-error)))
+                              (send js :close)
+                              val)`, natsURL),
+		Expect: "t",
+	}).Test(t)
+}
+
 func TestClientConnectReconnectWait(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password" :reconnect-wait 2))
