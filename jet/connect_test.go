@@ -859,6 +859,47 @@ func TestClientConnectUserCredentialsListEmpty(t *testing.T) {
 	}).Test(t)
 }
 
+///////////////////
+func TestClientConnectUserCredentialBytesBadType(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password" :user-credential-bytes t)`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectUserCredentialBytesError(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credential-bytes "quux")`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credential-bytes '("quux" "quack"))`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credential-bytes (coerce "quux" 'octets))`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credential-bytes (list (coerce "quux" 'octets)))`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectUserCredentialBytesListNotString(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credential-bytes '("quux" t))`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectUserCredentialBytesListEmpty(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credential-bytes '())`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
 func TestClientConnectUserJWTError(t *testing.T) {
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("js"), nil)

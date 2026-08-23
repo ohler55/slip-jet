@@ -839,6 +839,44 @@ nats.UserCredentials() according to the optional arguments to that function.`,
 			}
 		},
 	},
+	":user-credential-bytes": {
+		doc: &slip.DocArg{
+			Name: ":user-credential-bytes",
+			Type: "string|octets|list",
+			Text: `A convenience function that takes the JWT and seed values as byte slices. This allows
+passing credentials directly from memory or environment variables without needing to write them to disk.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			var err error
+			switch tv := v.(type) {
+			case slip.String:
+				err = nats.UserCredentialBytes([]byte(tv))(options)
+			case slip.Octets:
+				err = nats.UserCredentialBytes([]byte(tv))(options)
+			case slip.List:
+				data := make([][]byte, len(tv))
+				for i, ev := range tv {
+					switch tev := ev.(type) {
+					case slip.String:
+						data[i] = []byte(tev)
+					case slip.Octets:
+						data[i] = []byte(tev)
+					default:
+						slip.TypePanic(s, 0, ":user-credential-bytes", v, "string", "octets", "list of strings")
+					}
+				}
+				if len(data) == 0 {
+					slip.TypePanic(s, 0, ":user-credential-bytes", v, "string", "octets", "list of strings")
+				}
+				err = nats.UserCredentialBytes(data[0], data[1:]...)(options)
+			default:
+				slip.TypePanic(s, 0, ":user-credential-bytes", v, "string", "octets", "list of strings")
+			}
+			if err != nil {
+				slip.ErrorPanic(s, 0, ":user-credential-bytes: %s", err)
+			}
+		},
+	},
 	":user-jwt": {
 		doc: &slip.DocArg{
 			Name: ":user-jwt",
