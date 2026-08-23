@@ -582,6 +582,40 @@ it fails to connect (after exhausting the MaxReconnect attempts).`,
 		},
 	},
 	// RootCAsCB, a RootCAsHandler not supported yet
+	":root-cas": {
+		doc: &slip.DocArg{
+			Name: ":root-cas",
+			Type: "string|list",
+			Text: `Is a helper option to provide the RootCAs pool from a list of filenames.
+If Secure is not already set this will set it as well.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			switch tv := v.(type) {
+			case slip.String:
+				if err := nats.RootCAs(string(tv))(options); err != nil {
+					slip.ErrorPanic(s, 0, ":root-cas: %s", err)
+				}
+			case slip.List:
+				files := make([]string, len(tv))
+				for i, ev := range tv {
+					if ss, ok := ev.(slip.String); ok {
+						files[i] = string(ss)
+					} else {
+						slip.TypePanic(s, 0, ":root-cas", v, "string", "list of strings")
+					}
+				}
+				if len(files) == 0 {
+					slip.TypePanic(s, 0, ":root-cas", v, "string", "list of strings")
+				}
+				if err := nats.RootCAs(files...)(options); err != nil {
+					slip.ErrorPanic(s, 0, ":root-cas: %s", err)
+				}
+			default:
+				slip.TypePanic(s, 0, ":root-cas", v, "string", "list of strings")
+			}
+		},
+	},
+
 	":secure": {
 		doc: &slip.DocArg{
 			Name: ":secure",

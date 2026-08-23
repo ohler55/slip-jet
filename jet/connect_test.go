@@ -567,6 +567,38 @@ func TestClientConnectRetryOnFailedConnect(t *testing.T) {
 	}).Test(t)
 }
 
+func TestClientConnectRootCAsBadType(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password" :root-cas t)`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectRootCAsError(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :root-cas "quux")`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :root-cas '("quux" "quack"))`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectRootCAsListNotString(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :root-cas '("quux" t))`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectRootCAsListEmpty(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :root-cas '())`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
 // TBD secure connection not available so change server config
 // func TestClientConnectSecure(t *testing.T) {
 // 	(&sliptest.Function{
