@@ -329,6 +329,23 @@ and if defined, UserJWT will take precedence.`,
 			}
 		},
 	},
+	":nkey-option-from-seed": {
+		doc: &slip.DocArg{
+			Name: ":nkey-option-from-seed",
+			Type: "string",
+			Text: `Will load an nkey pair from a seed file that will handle signing of nonce challenges
+from the server. It will take care to not hold keys in memory and to wipe memory.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			fn, err := nats.NkeyOptionFromSeed(slip.MustBeString(v, ":nkey-option-from-seed"))
+			if err == nil {
+				err = fn(options)
+			}
+			if err != nil {
+				slip.ErrorPanic(s, 0, ":nkey-option-from-seed: %s", err)
+			}
+		},
+	},
 	":no-callbacks-after-client-close": {
 		doc: &slip.DocArg{
 			Name: ":no-callbacks-after-client-close",

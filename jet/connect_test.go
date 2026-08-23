@@ -364,6 +364,19 @@ func TestClientConnectName(t *testing.T) {
 // 	}).Test(t)
 // }
 
+func TestClientConnectNkeyOptionFromSeed(t *testing.T) {
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password"
+                                          :nkey-option-from-seed "quux")`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password"
+                                          :nkey-option-from-seed "testdata/bad-seed")`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
 func TestClientConnectNoCallbacksAfterClientClose(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"
