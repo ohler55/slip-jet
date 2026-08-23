@@ -425,6 +425,17 @@ func TestClientConnectPedantic(t *testing.T) {
 	}).Test(t)
 }
 
+func TestClientConnectPermissionErrOnSubscribe(t *testing.T) {
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"
+                                                     :permission-err-on-subscribe t))
+                                    (val (get (send js :options) :permission-err-on-subscribe)))
+                              (send js :close)
+                              val)`, natsURL),
+		Expect: "t",
+	}).Test(t)
+}
+
 func TestClientConnectPingInterval(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password" :ping-interval 3))

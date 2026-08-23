@@ -404,6 +404,18 @@ Note this is supported on servers >= version 1.2. Proto 1 or greater.`,
 			options.Pedantic = (v != nil)
 		},
 	},
+	":permission-err-on-subscribe": {
+		doc: &slip.DocArg{
+			Name: ":permission-err-on-subscribe",
+			Type: "boolean",
+			Text: `If set to true, the client will return ErrPermissionViolation
+from SubscribeSync if the server returns a permissions error for a subscription.
+Defaults to false.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			options.PermissionErrOnSubscribe = (v != nil)
+		},
+	},
 	":ping-interval": {
 		doc: &slip.DocArg{
 			Name: ":ping-interval",

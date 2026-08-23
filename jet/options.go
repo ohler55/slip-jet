@@ -44,6 +44,7 @@ func (caller optionsCaller) Call(s *slip.Scope, args slip.List, depth int) slip.
 	options = caller.appendBool(options, ":no-randomize", cl.nc.Opts.NoRandomize)
 	options = caller.appendString(options, ":password", cl.nc.Opts.Password)
 	options = caller.appendBool(options, ":pedantic", cl.nc.Opts.Pedantic)
+	options = caller.appendBool(options, ":permission-err-on-subscribe", cl.nc.Opts.PermissionErrOnSubscribe)
 	options = append(options, slip.Symbol(":ping-interval"), slip.DoubleFloat(cl.nc.Opts.PingInterval))
 	options = caller.appendString(options, ":proxy-path", cl.nc.Opts.ProxyPath)
 	options = append(options, slip.Symbol(":reconnect-buf-size"), slip.Fixnum(cl.nc.Opts.ReconnectBufSize))
