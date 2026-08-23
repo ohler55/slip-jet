@@ -59,6 +59,7 @@ func (caller optionsCaller) Call(s *slip.Scope, args slip.List, depth int) slip.
 	options = caller.appendStringList(options, ":servers", cl.nc.Opts.Servers)
 	options = caller.appendFunc(options, ":signature-callback", cl.nc.Opts.SignatureCB, cl.options)
 	options = caller.appendBool(options, ":skip-host-lookup", cl.nc.Opts.SkipHostLookup)
+	options = caller.appendBool(options, ":skip-subject-validation", cl.nc.Opts.SkipSubjectValidation)
 	options = append(options, slip.Symbol(":sub-chan-len"), slip.Fixnum(cl.nc.Opts.SubChanLen))
 	options = append(options, slip.Symbol(":timeout"), slip.DoubleFloat(cl.nc.Opts.Timeout))
 	// TLSCertCB, a TLSCertHandler not supported yet

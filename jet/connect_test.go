@@ -688,6 +688,17 @@ func TestClientConnectSkipHostLookup(t *testing.T) {
 	}).Test(t)
 }
 
+func TestClientConnectSkipSubjectValidation(t *testing.T) {
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"
+                                                     :skip-subject-validation t))
+                                    (val (get (send js :options) :skip-subject-validation)))
+                              (send js :close)
+                              val)`, natsURL),
+		Expect: "t",
+	}).Test(t)
+}
+
 func TestClientConnectSubChanLen(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password" :sub-chan-len 111111))

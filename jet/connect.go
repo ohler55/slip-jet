@@ -678,6 +678,17 @@ presented from the server.`,
 			options.SkipHostLookup = (v != nil)
 		},
 	},
+	":skip-subject-validation": {
+		doc: &slip.DocArg{
+			Name: ":skip-subject-validation",
+			Type: "boolean",
+			Text: `Will disable publish subject validation. NOTE: This is not recommended in general,
+as the performance gain is minimal and may lead to breaking protocol.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			options.SkipSubjectValidation = (v != nil)
+		},
+	},
 	":sub-chan-len": {
 		doc: &slip.DocArg{
 			Name: ":sub-chan-len",
