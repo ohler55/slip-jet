@@ -692,7 +692,7 @@ as the performance gain is minimal and may lead to breaking protocol.`,
 	":sub-chan-len": {
 		doc: &slip.DocArg{
 			Name: ":sub-chan-len",
-			Type: "string",
+			Type: "fixnum",
 			Text: `The size of the buffered channel used between the socket
 Go routine and the message delivery for SyncSubscriptions.
 _NOTE: This does not affect AsyncSubscriptions which are
@@ -923,6 +923,26 @@ successfully processed by the server.`,
 			options.Verbose = (v != nil)
 		},
 	},
+	":write-buffer-size": {
+		doc: &slip.DocArg{
+			Name: ":write-buffer-size",
+			Type: "fixnum",
+			Text: `An advanced option that sets the flush threshold
+of the write buffer used to batch outgoing data before writing to
+the underlying connection. In most cases, the default value should
+not be changed. A smaller buffer reduces the amount of data that
+can be lost on blocked writes but may significantly reduce throughput.
+Defaults to 32768 bytes (32KB).`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			if num, ok := v.(slip.Fixnum); ok {
+				options.WriteBufferSize = int(num)
+			} else {
+				slip.TypePanic(s, 0, ":write-buffer-size", v, "fixnum")
+			}
+		},
+	},
+
 	// jetstream options
 	":trace": {
 		doc: &slip.DocArg{

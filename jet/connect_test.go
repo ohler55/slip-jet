@@ -940,6 +940,20 @@ func TestClientConnectVerbose(t *testing.T) {
 	}).Test(t)
 }
 
+func TestClientConnectWriteBufferSize(t *testing.T) {
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password" :write-buffer-size 11111))
+                                    (val (get (send js :options) :write-buffer-size)))
+                              (send js :close)
+                              val)`, natsURL),
+		Expect: "11111",
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password" :write-buffer-size t)`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
 // TBD :trace
 //  trace when pub sub is implemented
 
