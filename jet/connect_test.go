@@ -913,6 +913,21 @@ func TestClientConnectUserJWTError(t *testing.T) {
 	}).Test(t)
 }
 
+func TestClientConnectUserJWTAndSeedError(t *testing.T) {
+	// Panic on connect.
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-jwt-and-seed '("quux" "quack"))`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectUserJWTAndSeedBadType(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-jwt-and-seed "quux")`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
 func TestClientConnectVerbose(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q

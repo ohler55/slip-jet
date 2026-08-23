@@ -896,6 +896,22 @@ passing credentials directly from memory or environment variables without needin
 			}
 		},
 	},
+	":user-jwt-and-seed": {
+		doc: &slip.DocArg{
+			Name: ":user-jwt-and-seed",
+			Type: "list",
+			Text: `A convenience function that takes the JWT and seed values as strings in a list.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			if pair, _ := v.(slip.List); len(pair) == 2 {
+				_ = nats.UserJWTAndSeed(
+					slip.MustBeString(pair[0], ":user-jwt-and-seed jwt"),
+					slip.MustBeString(pair[1], ":user-jwt-and-seed seed"))(options)
+			} else {
+				slip.TypePanic(s, 0, ":user-jwt-and-seed", v, "list of two strings")
+			}
+		},
+	},
 	":verbose": {
 		doc: &slip.DocArg{
 			Name: ":verbose",
