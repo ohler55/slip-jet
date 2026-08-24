@@ -940,6 +940,37 @@ func TestClientConnectVerbose(t *testing.T) {
 	}).Test(t)
 }
 
+func TestClientConnectWebSocketConnectionHeaders(t *testing.T) {
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"
+                                                     :web-socket-connection-headers '(("Origin" "Test"))))
+                                    (val (get (send js :options) :web-socket-connection-headers)))
+                              (send js :close)
+                              val)`, natsURL),
+		Expect: `(("Origin" "Test"))`,
+	}).Test(t)
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password"
+                                             :web-socket-connection-headers t)`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password"
+                                             :web-socket-connection-headers '(t))`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password"
+                                             :web-socket-connection-headers '((t)))`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password"
+                                             :web-socket-connection-headers '(("quux")))`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
 func TestClientConnectWriteBufferSize(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password" :write-buffer-size 11111))

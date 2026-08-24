@@ -4,6 +4,7 @@ package jet
 
 import (
 	"fmt"
+	"net/http"
 	"sort"
 	"strings"
 	"time"
@@ -921,6 +922,33 @@ successfully processed by the server.`,
 		},
 		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
 			options.Verbose = (v != nil)
+		},
+	},
+	":web-socket-connection-headers": {
+		doc: &slip.DocArg{
+			Name: ":web-socket-connection-headers",
+			Type: "assoc",
+			Text: `Is an optional http request headers to be sent with the WebSocket request.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			if assoc, ok := v.(slip.List); ok {
+				hdr := http.Header{}
+				for _, a := range assoc {
+					alist, ok2 := a.(slip.List)
+					if !ok2 || len(alist) < 2 {
+						slip.TypePanic(s, 0, ":web-socket-connection-headers element", a, "list")
+					}
+					k := slip.MustBeString(alist[0], ":web-socket-connection-headers car")
+					var vs []string
+					for _, av := range alist[1:] {
+						vs = append(vs, slip.MustBeString(av, ":web-socket-connection-headers cdr"))
+					}
+					hdr[k] = vs
+				}
+				options.WebSocketConnectionHeaders = hdr
+			} else {
+				slip.TypePanic(s, 0, ":web-socket-connection-headers", v, "assoc")
+			}
 		},
 	},
 	":write-buffer-size": {

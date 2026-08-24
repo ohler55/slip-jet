@@ -3,6 +3,8 @@
 package jet
 
 import (
+	"net/http"
+
 	"github.com/ohler55/slip"
 	"github.com/ohler55/slip/pkg/flavors"
 )
@@ -72,6 +74,7 @@ func (caller optionsCaller) Call(s *slip.Scope, args slip.List, depth int) slip.
 	options = caller.appendString(options, ":user", cl.nc.Opts.User)
 	options = caller.appendFunc(options, ":user-jwt", cl.nc.Opts.UserJWT, cl.options)
 	options = caller.appendBool(options, ":verbose", cl.nc.Opts.Verbose)
+	options = caller.appendHeader(options, ":web-socket-connection-headers", cl.nc.Opts.WebSocketConnectionHeaders)
 	options = append(options, slip.Symbol(":write-buffer-size"), slip.Fixnum(cl.nc.Opts.WriteBufferSize))
 
 	options = caller.appendFromArgs(options, ":user-credentials", cl.options)
@@ -133,4 +136,17 @@ func (caller optionsCaller) appendFromArgs(options slip.List, name string, args 
 	pv, _ = slip.GetArgsKeyValue(args, key)
 
 	return append(options, key, pv)
+}
+
+func (caller optionsCaller) appendHeader(options slip.List, name string, hdr http.Header) slip.List {
+	headers := make(slip.List, 0, len(hdr))
+	for k, sa := range hdr {
+		el := make(slip.List, len(sa)+1)
+		el[0] = slip.String(k)
+		for i, v := range sa {
+			el[i+1] = slip.String(v)
+		}
+		headers = append(headers, el)
+	}
+	return append(options, slip.Symbol(name), headers)
 }
