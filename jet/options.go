@@ -75,6 +75,7 @@ func (caller optionsCaller) Call(s *slip.Scope, args slip.List, depth int) slip.
 	options = caller.appendFunc(options, ":user-jwt", cl.nc.Opts.UserJWT, cl.options)
 	options = caller.appendBool(options, ":verbose", cl.nc.Opts.Verbose)
 	options = caller.appendHeader(options, ":web-socket-connection-headers", cl.nc.Opts.WebSocketConnectionHeaders)
+	// TBD :web-socket-connection-headers-handler
 	options = append(options, slip.Symbol(":write-buffer-size"), slip.Fixnum(cl.nc.Opts.WriteBufferSize))
 
 	options = caller.appendFromArgs(options, ":user-credentials", cl.options)

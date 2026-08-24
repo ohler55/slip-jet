@@ -527,6 +527,8 @@ the connection is successfully reconnected.`,
 			}
 		},
 	},
+	// TBD reconnect-to-server
+
 	":reconnect-on-flusher-error": {
 		doc: &slip.DocArg{
 			Name: ":reconnect-on-flusher-error",
@@ -951,6 +953,7 @@ successfully processed by the server.`,
 			}
 		},
 	},
+	// TBD :web-socket-connection-headers-handler
 	":write-buffer-size": {
 		doc: &slip.DocArg{
 			Name: ":write-buffer-size",
