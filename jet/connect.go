@@ -4,6 +4,7 @@ package jet
 
 import (
 	"fmt"
+	"net/http"
 	"sort"
 	"strings"
 	"time"
@@ -49,6 +50,26 @@ var conOptMap = map[string]*conOpt{
 			}
 		},
 	},
+	":client-cert": {
+		doc: &slip.DocArg{
+			Name: ":client-cert",
+			Type: "list",
+			Text: `The :client-cert option is a helper to provide the client certificate from a file. If
+Secure is not already set this will set it as well. The value must be a list of two filepath strings.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			if pair, _ := v.(slip.List); len(pair) == 2 {
+				if err := nats.ClientCert(
+					slip.MustBeString(pair[0], ":client-cert cert-file"),
+					slip.MustBeString(pair[1], ":client-cert key-file"),
+				)(options); err != nil {
+					slip.ErrorPanic(s, 0, ":client-cert: %s", err)
+				}
+			} else {
+				slip.TypePanic(s, 0, ":client-cert", v, "list of two strings")
+			}
+		},
+	},
 	":closed-callback": {
 		doc: &slip.DocArg{
 			Name: ":closed-callback",
@@ -85,25 +106,6 @@ supports compression. If the server does too, then data will be compressed.`,
 			options.ConnectedCB = func(c *nats.Conn) {
 				self := s.Get("self").(*flavors.Instance)
 				caller.Call(s, slip.List{self}, 0)
-			}
-		},
-	},
-	":user-credentials": {
-		doc: &slip.DocArg{
-			Name: ":user-credentials",
-			Type: "string",
-			Text: `Path to a NATS credentials file (.creds). Sets up both the
-JWT callback and the NKey signing callback via nats.UserCredentials, so NSC
-JWT (decentralized) auth works without any other options. Equivalent to
-passing the file to nats.UserCredentials() when connecting via Go.`,
-		},
-		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
-			if ss, ok := v.(slip.String); ok {
-				if err := nats.UserCredentials(string(ss))(options); err != nil {
-					panic(fmt.Errorf(":user-credentials: %w", err))
-				}
-			} else {
-				slip.TypePanic(s, 0, ":user-credentials", v, "string")
 			}
 		},
 	},
@@ -222,6 +224,16 @@ subsequent reconnect attempts if server returns the same auth error twice (regar
 			options.IgnoreAuthErrorAbort = (v != nil)
 		},
 	},
+	":ignore-discovered-servers": {
+		doc: &slip.DocArg{
+			Name: ":ignore-discovered-servers",
+			Type: "boolean",
+			Text: `If set will disable adding advertised server URLs from INFO messages to the server pool.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			options.IgnoreDiscoveredServers = (v != nil)
+		},
+	},
 	// InProcessServer, a InProcessConnProvider not supporter yet
 	":inbox-prefix": {
 		doc: &slip.DocArg{
@@ -318,6 +330,23 @@ and if defined, UserJWT will take precedence.`,
 			}
 		},
 	},
+	":nkey-option-from-seed": {
+		doc: &slip.DocArg{
+			Name: ":nkey-option-from-seed",
+			Type: "string",
+			Text: `Will load an nkey pair from a seed file that will handle signing of nonce challenges
+from the server. It will take care to not hold keys in memory and to wipe memory.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			fn, err := nats.NkeyOptionFromSeed(slip.MustBeString(v, ":nkey-option-from-seed"))
+			if err == nil {
+				err = fn(options)
+			}
+			if err != nil {
+				slip.ErrorPanic(s, 0, ":nkey-option-from-seed: %s", err)
+			}
+		},
+	},
 	":no-callbacks-after-client-close": {
 		doc: &slip.DocArg{
 			Name: ":no-callbacks-after-client-close",
@@ -374,6 +403,18 @@ Note this is supported on servers >= version 1.2. Proto 1 or greater.`,
 		},
 		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
 			options.Pedantic = (v != nil)
+		},
+	},
+	":permission-err-on-subscribe": {
+		doc: &slip.DocArg{
+			Name: ":permission-err-on-subscribe",
+			Type: "boolean",
+			Text: `If set to true, the client will return ErrPermissionViolation
+from SubscribeSync if the server returns a permissions error for a subscription.
+Defaults to false.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			options.PermissionErrOnSubscribe = (v != nil)
 		},
 	},
 	":ping-interval": {
@@ -486,6 +527,46 @@ the connection is successfully reconnected.`,
 			}
 		},
 	},
+	// TBD reconnect-to-server
+
+	":reconnect-on-flusher-error": {
+		doc: &slip.DocArg{
+			Name: ":reconnect-on-flusher-error",
+			Type: "boolean",
+			Text: `When set to true, causes the client to trigger a reconnect if the background
+flusher fails to write to the underlying connection for any reason
+(timeout, broken pipe, connection reset, EOF etc.).
+
+
+This is an advanced option. Most applications do not need to enable
+it: the server-side stale connection detection (via PingInterval /
+MaxPingsOut) and the read loop's own error handling will eventually
+notice a dead connection and the client will reconnect. Enable this
+only if you need faster recovery from a stalled or broken TCP write
+— for example, in latency-sensitive setups where waiting for a ping
+timeout is unacceptable.
+
+
+Messages buffered at the time of the error are lost, as they are
+with any flusher write error. The purpose of this option is to
+limit the blast radius by preventing further messages from being
+buffered into a potentially corrupted connection, not to recover
+the in-flight data.
+
+
+When triggered, the standard DisconnectErrHandler and
+ReconnectHandler callbacks are invoked as with any other reconnect.
+The first reconnect attempt bypasses the configured ReconnectWait
+so that recovery is as fast as possible; if that attempt fails,
+subsequent attempts obey the normal backoff.
+
+
+Defaults to false.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			options.ReconnectOnFlusherError = (v != nil)
+		},
+	},
 	":retry-on-failed-connect": {
 		doc: &slip.DocArg{
 			Name: ":retry-on-failed-connect",
@@ -504,6 +585,40 @@ it fails to connect (after exhausting the MaxReconnect attempts).`,
 		},
 	},
 	// RootCAsCB, a RootCAsHandler not supported yet
+	":root-cas": {
+		doc: &slip.DocArg{
+			Name: ":root-cas",
+			Type: "string|list",
+			Text: `Is a helper option to provide the RootCAs pool from a list of filenames.
+If Secure is not already set this will set it as well.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			switch tv := v.(type) {
+			case slip.String:
+				if err := nats.RootCAs(string(tv))(options); err != nil {
+					slip.ErrorPanic(s, 0, ":root-cas: %s", err)
+				}
+			case slip.List:
+				files := make([]string, len(tv))
+				for i, ev := range tv {
+					if ss, ok := ev.(slip.String); ok {
+						files[i] = string(ss)
+					} else {
+						slip.TypePanic(s, 0, ":root-cas", v, "string", "list of strings")
+					}
+				}
+				if len(files) == 0 {
+					slip.TypePanic(s, 0, ":root-cas", v, "string", "list of strings")
+				}
+				if err := nats.RootCAs(files...)(options); err != nil {
+					slip.ErrorPanic(s, 0, ":root-cas: %s", err)
+				}
+			default:
+				slip.TypePanic(s, 0, ":root-cas", v, "string", "list of strings")
+			}
+		},
+	},
+
 	":secure": {
 		doc: &slip.DocArg{
 			Name: ":secure",
@@ -566,10 +681,21 @@ presented from the server.`,
 			options.SkipHostLookup = (v != nil)
 		},
 	},
+	":skip-subject-validation": {
+		doc: &slip.DocArg{
+			Name: ":skip-subject-validation",
+			Type: "boolean",
+			Text: `Will disable publish subject validation. NOTE: This is not recommended in general,
+as the performance gain is minimal and may lead to breaking protocol.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			options.SkipSubjectValidation = (v != nil)
+		},
+	},
 	":sub-chan-len": {
 		doc: &slip.DocArg{
 			Name: ":sub-chan-len",
-			Type: "string",
+			Type: "fixnum",
 			Text: `The size of the buffered channel used between the socket
 Go routine and the message delivery for SyncSubscriptions.
 _NOTE: This does not affect AsyncSubscriptions which are
@@ -598,7 +724,6 @@ Defaults to 65536.`,
 			}
 		},
 	},
-	// TLSCertCB, a TLSCertHandler not supported yet
 	// TLSConfig, a *tls.Config not supported yet
 	":tls-handshake-first": {
 		doc: &slip.DocArg{
@@ -680,6 +805,81 @@ a new Inbox and a new Subscription for each request.`,
 			}
 		},
 	},
+	":user-credentials": {
+		doc: &slip.DocArg{
+			Name: ":user-credentials",
+			Type: "string|list",
+			Text: `Path to a NATS credentials file (.creds). Sets up both the
+JWT callback and the NKey signing callback via nats.UserCredentials, so NSC
+JWT (decentralized) auth works without any other options. Equivalent to
+passing the file to nats.UserCredentials() when connecting via Go. If the
+value for the option is a list of strings all are passed to the
+nats.UserCredentials() according to the optional arguments to that function.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			switch tv := v.(type) {
+			case slip.String:
+				if err := nats.UserCredentials(string(tv))(options); err != nil {
+					slip.ErrorPanic(s, 0, ":user-credentials: %s", err)
+				}
+			case slip.List:
+				files := make([]string, len(tv))
+				for i, ev := range tv {
+					if ss, ok := ev.(slip.String); ok {
+						files[i] = string(ss)
+					} else {
+						slip.TypePanic(s, 0, ":user-credentials", v, "string", "list of strings")
+					}
+				}
+				if len(files) == 0 {
+					slip.TypePanic(s, 0, ":user-credentials", v, "string", "list of strings")
+				}
+				if err := nats.UserCredentials(files[0], files[1:]...)(options); err != nil {
+					slip.ErrorPanic(s, 0, ":user-credentials: %s", err)
+				}
+			default:
+				slip.TypePanic(s, 0, ":user-credentials", v, "string", "list of strings")
+			}
+		},
+	},
+	":user-credential-bytes": {
+		doc: &slip.DocArg{
+			Name: ":user-credential-bytes",
+			Type: "string|octets|list",
+			Text: `A convenience function that takes the JWT and seed values as byte slices. This allows
+passing credentials directly from memory or environment variables without needing to write them to disk.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			var err error
+			switch tv := v.(type) {
+			case slip.String:
+				err = nats.UserCredentialBytes([]byte(tv))(options)
+			case slip.Octets:
+				err = nats.UserCredentialBytes([]byte(tv))(options)
+			case slip.List:
+				data := make([][]byte, len(tv))
+				for i, ev := range tv {
+					switch tev := ev.(type) {
+					case slip.String:
+						data[i] = []byte(tev)
+					case slip.Octets:
+						data[i] = []byte(tev)
+					default:
+						slip.TypePanic(s, 0, ":user-credential-bytes", v, "string", "octets", "list of strings")
+					}
+				}
+				if len(data) == 0 {
+					slip.TypePanic(s, 0, ":user-credential-bytes", v, "string", "octets", "list of strings")
+				}
+				err = nats.UserCredentialBytes(data[0], data[1:]...)(options)
+			default:
+				slip.TypePanic(s, 0, ":user-credential-bytes", v, "string", "octets", "list of strings")
+			}
+			if err != nil {
+				slip.ErrorPanic(s, 0, ":user-credential-bytes: %s", err)
+			}
+		},
+	},
 	":user-jwt": {
 		doc: &slip.DocArg{
 			Name: ":user-jwt",
@@ -699,6 +899,22 @@ a new Inbox and a new Subscription for each request.`,
 			}
 		},
 	},
+	":user-jwt-and-seed": {
+		doc: &slip.DocArg{
+			Name: ":user-jwt-and-seed",
+			Type: "list",
+			Text: `A convenience function that takes the JWT and seed values as strings in a list.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			if pair, _ := v.(slip.List); len(pair) == 2 {
+				_ = nats.UserJWTAndSeed(
+					slip.MustBeString(pair[0], ":user-jwt-and-seed jwt"),
+					slip.MustBeString(pair[1], ":user-jwt-and-seed seed"))(options)
+			} else {
+				slip.TypePanic(s, 0, ":user-jwt-and-seed", v, "list of two strings")
+			}
+		},
+	},
 	":verbose": {
 		doc: &slip.DocArg{
 			Name: ":verbose",
@@ -710,6 +926,54 @@ successfully processed by the server.`,
 			options.Verbose = (v != nil)
 		},
 	},
+	":web-socket-connection-headers": {
+		doc: &slip.DocArg{
+			Name: ":web-socket-connection-headers",
+			Type: "assoc",
+			Text: `Is an optional http request headers to be sent with the WebSocket request.`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			if assoc, ok := v.(slip.List); ok {
+				hdr := http.Header{}
+				for _, a := range assoc {
+					alist, ok2 := a.(slip.List)
+					if !ok2 || len(alist) < 2 {
+						slip.TypePanic(s, 0, ":web-socket-connection-headers element", a, "list")
+					}
+					k := slip.MustBeString(alist[0], ":web-socket-connection-headers car")
+					var vs []string
+					for _, av := range alist[1:] {
+						vs = append(vs, slip.MustBeString(av, ":web-socket-connection-headers cdr"))
+					}
+					hdr[k] = vs
+				}
+				options.WebSocketConnectionHeaders = hdr
+			} else {
+				slip.TypePanic(s, 0, ":web-socket-connection-headers", v, "assoc")
+			}
+		},
+	},
+	// TBD :web-socket-connection-headers-handler
+	":write-buffer-size": {
+		doc: &slip.DocArg{
+			Name: ":write-buffer-size",
+			Type: "fixnum",
+			Text: `An advanced option that sets the flush threshold
+of the write buffer used to batch outgoing data before writing to
+the underlying connection. In most cases, the default value should
+not be changed. A smaller buffer reduces the amount of data that
+can be lost on blocked writes but may significantly reduce throughput.
+Defaults to 32768 bytes (32KB).`,
+		},
+		update: func(options *nats.Options, s *slip.Scope, v slip.Object) {
+			if num, ok := v.(slip.Fixnum); ok {
+				options.WriteBufferSize = int(num)
+			} else {
+				slip.TypePanic(s, 0, ":write-buffer-size", v, "fixnum")
+			}
+		},
+	},
+
 	// jetstream options
 	":trace": {
 		doc: &slip.DocArg{

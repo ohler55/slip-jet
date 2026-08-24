@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added `:user-credentials` option to `jet-connect` for NSC/decentralized JWT auth via a
   NATS credentials file (wraps `nats.UserCredentials`).
+- Add :client-cert connect option
+- Add :ignore-discovered-servers connect option
+- Add :nkey-option-from-seed connect option
+- Add :permission-err-on-subscribe connect option
+- Add :reconnect-on-flusher-error connect option
+- Add :root-cas connect option
+- Add :skip-subject-validation connect option
+- Add :user-credential-bytes connect option
+- Add :user-jwt-and-seed connect option
+- Update user-credentials to allow a list of files.
 
 ## [1.5.0] - 2026-06-26
 ### Changed

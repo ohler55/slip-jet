@@ -3,6 +3,8 @@
 package jet
 
 import (
+	"net/http"
+
 	"github.com/ohler55/slip"
 	"github.com/ohler55/slip/pkg/flavors"
 )
@@ -31,6 +33,7 @@ func (caller optionsCaller) Call(s *slip.Scope, args slip.List, depth int) slip.
 	options = append(options, slip.Symbol(":drain-timeout"), slip.DoubleFloat(cl.nc.Opts.DrainTimeout))
 	options = append(options, slip.Symbol(":flusher-timeout"), slip.DoubleFloat(cl.nc.Opts.FlusherTimeout))
 	options = caller.appendBool(options, ":ignore-auth-error-abort", cl.nc.Opts.IgnoreAuthErrorAbort)
+	options = caller.appendBool(options, ":ignore-discovered-servers", cl.nc.Opts.IgnoreDiscoveredServers)
 	// InProcessServer, a InProcessConnProvider not supported yet
 	options = caller.appendString(options, ":inbox-prefix", cl.nc.Opts.InboxPrefix)
 	options = caller.appendFunc(options, ":lame-duck-mode-handler", cl.nc.Opts.LameDuckModeHandler, cl.options)
@@ -43,6 +46,7 @@ func (caller optionsCaller) Call(s *slip.Scope, args slip.List, depth int) slip.
 	options = caller.appendBool(options, ":no-randomize", cl.nc.Opts.NoRandomize)
 	options = caller.appendString(options, ":password", cl.nc.Opts.Password)
 	options = caller.appendBool(options, ":pedantic", cl.nc.Opts.Pedantic)
+	options = caller.appendBool(options, ":permission-err-on-subscribe", cl.nc.Opts.PermissionErrOnSubscribe)
 	options = append(options, slip.Symbol(":ping-interval"), slip.DoubleFloat(cl.nc.Opts.PingInterval))
 	options = caller.appendString(options, ":proxy-path", cl.nc.Opts.ProxyPath)
 	options = append(options, slip.Symbol(":reconnect-buf-size"), slip.Fixnum(cl.nc.Opts.ReconnectBufSize))
@@ -50,12 +54,14 @@ func (caller optionsCaller) Call(s *slip.Scope, args slip.List, depth int) slip.
 	options = append(options, slip.Symbol(":reconnect-jitter-tls"), slip.DoubleFloat(cl.nc.Opts.ReconnectJitterTLS))
 	options = append(options, slip.Symbol(":reconnect-wait"), slip.DoubleFloat(cl.nc.Opts.ReconnectWait))
 	options = caller.appendFunc(options, ":reconnected-callback", cl.nc.Opts.ReconnectedCB, cl.options)
+	options = caller.appendBool(options, ":reconnect-on-flusher-error", cl.nc.Opts.ReconnectOnFlusherError)
 	options = caller.appendBool(options, ":retry-on-failed-connect", cl.nc.Opts.RetryOnFailedConnect)
 	// RootCAsCB, a RootCAsHandler not supported yet
 	options = caller.appendBool(options, ":secure", cl.nc.Opts.Secure)
 	options = caller.appendStringList(options, ":servers", cl.nc.Opts.Servers)
 	options = caller.appendFunc(options, ":signature-callback", cl.nc.Opts.SignatureCB, cl.options)
 	options = caller.appendBool(options, ":skip-host-lookup", cl.nc.Opts.SkipHostLookup)
+	options = caller.appendBool(options, ":skip-subject-validation", cl.nc.Opts.SkipSubjectValidation)
 	options = append(options, slip.Symbol(":sub-chan-len"), slip.Fixnum(cl.nc.Opts.SubChanLen))
 	options = append(options, slip.Symbol(":timeout"), slip.DoubleFloat(cl.nc.Opts.Timeout))
 	// TLSCertCB, a TLSCertHandler not supported yet
@@ -68,6 +74,9 @@ func (caller optionsCaller) Call(s *slip.Scope, args slip.List, depth int) slip.
 	options = caller.appendString(options, ":user", cl.nc.Opts.User)
 	options = caller.appendFunc(options, ":user-jwt", cl.nc.Opts.UserJWT, cl.options)
 	options = caller.appendBool(options, ":verbose", cl.nc.Opts.Verbose)
+	options = caller.appendHeader(options, ":web-socket-connection-headers", cl.nc.Opts.WebSocketConnectionHeaders)
+	// TBD :web-socket-connection-headers-handler
+	options = append(options, slip.Symbol(":write-buffer-size"), slip.Fixnum(cl.nc.Opts.WriteBufferSize))
 
 	options = caller.appendFromArgs(options, ":user-credentials", cl.options)
 	options = caller.appendFromArgs(options, ":prefix", cl.options)
@@ -128,4 +137,17 @@ func (caller optionsCaller) appendFromArgs(options slip.List, name string, args 
 	pv, _ = slip.GetArgsKeyValue(args, key)
 
 	return append(options, key, pv)
+}
+
+func (caller optionsCaller) appendHeader(options slip.List, name string, hdr http.Header) slip.List {
+	headers := make(slip.List, 0, len(hdr))
+	for k, sa := range hdr {
+		el := make(slip.List, len(sa)+1)
+		el[0] = slip.String(k)
+		for i, v := range sa {
+			el[i+1] = slip.String(v)
+		}
+		headers = append(headers, el)
+	}
+	return append(options, slip.Symbol(name), headers)
 }

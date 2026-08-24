@@ -24,14 +24,6 @@ func TestClientConnectPassword(t *testing.T) {
 	}).Test(t)
 }
 
-func TestClientConnectCredsBadType(t *testing.T) {
-	// A non-string :user-credentials is a type error, raised while parsing options
-	(&sliptest.Function{
-		Source:    fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password" :user-credentials t)`, natsURL),
-		PanicType: slip.TypeErrorSymbol,
-	}).Test(t)
-}
-
 func TestClientConnectAllowReconnect(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q
@@ -66,6 +58,20 @@ func TestClientConnectAsyncErrorCallback(t *testing.T) {
 	tt.NotNil(t, nc.Opts.AsyncErrorCB)
 	nc.Opts.AsyncErrorCB(nc, &nats.Subscription{Subject: "quux"}, fmt.Errorf("dummy"))
 	tt.Equal(t, slip.Symbol("error"), scope.Get("out"))
+}
+
+func TestClientConnectClientCertError(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :client-cert '("quux" "quack"))`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectClientCertBadType(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :client-cert "quux")`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
 }
 
 func TestClientConnectClosedHandler(t *testing.T) {
@@ -251,6 +257,16 @@ func TestClientConnectIgnoreAuthErrorAbort(t *testing.T) {
 	}).Test(t)
 }
 
+func TestClientConnectIgnoreDiscoveredServers(t *testing.T) {
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password" :ignore-discovered-servers 7))
+                                    (val (get (send js :options) :ignore-discovered-servers)))
+                              (send js :close)
+                              val)`, natsURL),
+		Expect: "t",
+	}).Test(t)
+}
+
 func TestClientConnectInboxPrefix(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password" :inbox-prefix "pre"))
@@ -348,6 +364,19 @@ func TestClientConnectName(t *testing.T) {
 // 	}).Test(t)
 // }
 
+func TestClientConnectNkeyOptionFromSeed(t *testing.T) {
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password"
+                                          :nkey-option-from-seed "quux")`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password"
+                                          :nkey-option-from-seed "testdata/bad-seed")`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
 func TestClientConnectNoCallbacksAfterClientClose(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"
@@ -390,6 +419,17 @@ func TestClientConnectPedantic(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password" :pedantic 7))
                                     (val (get (send js :options) :pedantic)))
+                              (send js :close)
+                              val)`, natsURL),
+		Expect: "t",
+	}).Test(t)
+}
+
+func TestClientConnectPermissionErrOnSubscribe(t *testing.T) {
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"
+                                                     :permission-err-on-subscribe t))
+                                    (val (get (send js :options) :permission-err-on-subscribe)))
                               (send js :close)
                               val)`, natsURL),
 		Expect: "t",
@@ -467,6 +507,17 @@ func TestClientConnectReconnectJitterTLS(t *testing.T) {
 	}).Test(t)
 }
 
+func TestClientConnectReconnectOnFlushError(t *testing.T) {
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"
+                                                     :reconnect-on-flusher-error t))
+                                    (val (get (send js :options) :reconnect-on-flusher-error)))
+                              (send js :close)
+                              val)`, natsURL),
+		Expect: "t",
+	}).Test(t)
+}
+
 func TestClientConnectReconnectWait(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password" :reconnect-wait 2))
@@ -513,6 +564,38 @@ func TestClientConnectRetryOnFailedConnect(t *testing.T) {
                               (send js :close)
                               val)`, natsURL),
 		Expect: "t",
+	}).Test(t)
+}
+
+func TestClientConnectRootCAsBadType(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password" :root-cas t)`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectRootCAsError(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :root-cas "quux")`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :root-cas '("quux" "quack"))`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectRootCAsListNotString(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :root-cas '("quux" t))`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectRootCAsListEmpty(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :root-cas '())`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
 	}).Test(t)
 }
 
@@ -599,6 +682,17 @@ func TestClientConnectSkipHostLookup(t *testing.T) {
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"
                                                      :skip-host-lookup 7))
                                     (val (get (send js :options) :skip-host-lookup)))
+                              (send js :close)
+                              val)`, natsURL),
+		Expect: "t",
+	}).Test(t)
+}
+
+func TestClientConnectSkipSubjectValidation(t *testing.T) {
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"
+                                                     :skip-subject-validation t))
+                                    (val (get (send js :options) :skip-subject-validation)))
                               (send js :close)
                               val)`, natsURL),
 		Expect: "t",
@@ -732,6 +826,80 @@ func TestClientConnectBadUser(t *testing.T) {
 // 	tt.Equal(t, "jit", jwt)
 // }
 
+func TestClientConnectUserCredentialsBadType(t *testing.T) {
+	// A non-string :user-credentials is a type error, raised while parsing options
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password" :user-credentials t)`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectUserCredentialsError(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credentials "quux")`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credentials '("quux" "quack"))`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectUserCredentialsListNotString(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credentials '("quux" t))`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectUserCredentialsListEmpty(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credentials '())`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+///////////////////
+func TestClientConnectUserCredentialBytesBadType(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password" :user-credential-bytes t)`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectUserCredentialBytesError(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credential-bytes "quux")`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credential-bytes '("quux" "quack"))`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credential-bytes (coerce "quux" 'octets))`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credential-bytes (list (coerce "quux" 'octets)))`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectUserCredentialBytesListNotString(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credential-bytes '("quux" t))`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectUserCredentialBytesListEmpty(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-credential-bytes '())`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
 func TestClientConnectUserJWTError(t *testing.T) {
 	scope := slip.NewScope()
 	scope.Let(slip.Symbol("js"), nil)
@@ -745,6 +913,21 @@ func TestClientConnectUserJWTError(t *testing.T) {
 	}).Test(t)
 }
 
+func TestClientConnectUserJWTAndSeedError(t *testing.T) {
+	// Panic on connect.
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-jwt-and-seed '("quux" "quack"))`, natsURL),
+		PanicType: slip.ErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectUserJWTAndSeedBadType(t *testing.T) {
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user-jwt-and-seed "quux")`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
 func TestClientConnectVerbose(t *testing.T) {
 	(&sliptest.Function{
 		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q
@@ -754,6 +937,51 @@ func TestClientConnectVerbose(t *testing.T) {
                               (send js :close)
                               value)`, natsURL),
 		Expect: "t",
+	}).Test(t)
+}
+
+func TestClientConnectWebSocketConnectionHeaders(t *testing.T) {
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password"
+                                                     :web-socket-connection-headers '(("Origin" "Test"))))
+                                    (val (get (send js :options) :web-socket-connection-headers)))
+                              (send js :close)
+                              val)`, natsURL),
+		Expect: `(("Origin" "Test"))`,
+	}).Test(t)
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password"
+                                             :web-socket-connection-headers t)`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password"
+                                             :web-socket-connection-headers '(t))`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password"
+                                             :web-socket-connection-headers '((t)))`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password"
+                                             :web-socket-connection-headers '(("quux")))`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
+	}).Test(t)
+}
+
+func TestClientConnectWriteBufferSize(t *testing.T) {
+	(&sliptest.Function{
+		Source: fmt.Sprintf(`(let* ((js (jet-connect :url %q :user "u1" :password "password" :write-buffer-size 11111))
+                                    (val (get (send js :options) :write-buffer-size)))
+                              (send js :close)
+                              val)`, natsURL),
+		Expect: "11111",
+	}).Test(t)
+	(&sliptest.Function{
+		Source:    fmt.Sprintf(`(jet-connect :url %q :user "u1" :password "password" :write-buffer-size t)`, natsURL),
+		PanicType: slip.TypeErrorSymbol,
 	}).Test(t)
 }
 
