@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.5.1] 2026-08-29
 ### Added
 - Added `:user-credentials` option to `jet-connect` for NSC/decentralized JWT auth via a
   NATS credentials file (wraps `nats.UserCredentials`).
@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add :user-credential-bytes connect option
 - Add :user-jwt-and-seed connect option
 - Update user-credentials to allow a list of files.
+
+### Changed
+- Updated Slip version to v1.5.1
 
 ## [1.5.0] - 2026-06-26
 ### Changed

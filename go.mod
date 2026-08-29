@@ -1,14 +1,14 @@
 module github.com/ohler55/slip-jet
 
-go 1.26
+go 1.27
 
 require (
 	github.com/nats-io/jwt/v2 v2.8.2
 	github.com/nats-io/nats-server/v2 v2.14.4
 	github.com/nats-io/nats.go v1.52.0
 	github.com/nats-io/nkeys v0.4.16
-	github.com/ohler55/ojg v1.28.4
-	github.com/ohler55/slip v1.5.0
+	github.com/ohler55/ojg v1.28.5
+	github.com/ohler55/slip v1.5.1
 )
 
 require (
